@@ -5,28 +5,34 @@ using UnityEngine;
 
 namespace Dpm
 {
-    public class Game : MonoBehaviour
-    {
-        private EventSystem _eventSystem;
-        private UpdateSystem _updateSystem;
+	public class Game : MonoBehaviour
+	{
+		public static Game Instance => _instance;
 
-        private void Awake()
-        {
-            _eventSystem = EventSystem.Instance;
-            _updateSystem = UpdateSystem.Instance;
-        }
+		private static Game _instance;
 
-        private void OnDestroy()
-        {
-            (_eventSystem as IDisposable).Dispose();
-            (_updateSystem as IDisposable).Dispose();
-        }
+		private EventSystem _eventSystem;
+		private UpdateSystem _updateSystem;
 
-        private void Update()
-        {
-            // FIXME : 순서는 바뀔 수 있음
-            (_eventSystem as ISystem).Update();
-            (_updateSystem as ISystem).Update();
-        }
-    }
+		private void Awake()
+		{
+			_instance = this;
+
+			_eventSystem = EventSystem.Instance;
+			_updateSystem = UpdateSystem.Instance;
+		}
+
+		private void OnDestroy()
+		{
+			(_eventSystem as IDisposable).Dispose();
+			(_updateSystem as IDisposable).Dispose();
+		}
+
+		private void Update()
+		{
+			// FIXME : 순서는 바뀔 수 있음
+			(_eventSystem as ISystem).Update();
+			(_updateSystem as ISystem).Update();
+		}
+	}
 }

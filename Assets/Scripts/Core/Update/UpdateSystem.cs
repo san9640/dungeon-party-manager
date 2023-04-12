@@ -87,10 +87,10 @@ namespace Core.Update
 		}
 
 		/// <summary>
-		///
+		/// 업데이트 콜백 등록
 		/// </summary>
 		/// <param name="updatable">업데이트 등록할 객체</param>
-		/// <param name="priority"></param>
+		/// <param name="priority">업데이트 실행 우선순위. 낮을 수록 먼저 실행되므로, 일반적인 경우 EntityId를 넣는 것이 바람직</param>
 		public void Register(IUpdatable updatable, int priority)
 		{
 			_registerRequests.Add(new RegisterRequest
@@ -104,6 +104,11 @@ namespace Core.Update
 			});
 		}
 
+		/// <summary>
+		/// 업데이트 콜백 해제
+		/// </summary>
+		/// <param name="updatable">업데이트 해제할 객체</param>
+		/// <param name="priority">등록할 때 기입한 업데이트 실행 우선순위. 등록할 때랑 달라지면 해제가 안됨!!</param>
 		public void Unregister(IUpdatable updatable, int priority)
 		{
 			_registerRequests.Add(new RegisterRequest

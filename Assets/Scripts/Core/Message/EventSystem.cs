@@ -1,20 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
+using System.Linq;
+
+#if UNITY_EDITOR
 using UnityEngine;
+#endif
 
 namespace Core.Message
 {
 	/// <summary>
-	/// 메세지 시스템
+	/// 이벤트를 주고받거나, 브로드캐스팅되는 이벤트를 구독/구독해제하는 시스템
 	/// </summary>
-	public class EventSystem : ISystem
+	public class EventSystem : IDisposable
 	{
 		public static EventSystem Instance { get; } = new();
 
 		/// <summary>
 		/// 구독자(함수)의 형태 규정
 		/// </summary>
+		/// <returns>Consume 여부</returns>
 		public delegate bool Subscriber(Event e);
 
 		/// <summary>
@@ -35,48 +39,41 @@ namespace Core.Message
 			public bool IsPublished => ReferenceEquals(Listener, null);
 		}
 
-		/// <summary>
-		/// 구독인지 구독 해제인지 확인하기 위한 타입
-		/// </summary>
-		private enum SubscribeRequestType
-		{
-			Subscribe,
-			Unsubscribe
-		}
-
 		private const int SubscriberWalkerInvalidValue = -1;
+
 		private int _subscriberWalker = SubscriberWalkerInvalidValue;
 
-		private bool IsSubscribeWalking => _subscriberWalker == SubscriberWalkerInvalidValue;
+		private bool IsSubscribeWalking => _subscriberWalker != SubscriberWalkerInvalidValue;
 
 		private Type _subscriberWalkingEventType;
 
-		private readonly Dictionary<Type, List<Subscriber>> _subscribers = new();
+		private readonly Dictionary<Type, List<Subscriber>> _subscribers = new(1024);
 
-		private readonly List<EventRequest> _eventRequests = new();
+		private readonly List<EventRequest> _eventRequests = new(1024);
 
 		void IDisposable.Dispose()
 		{
 			_eventRequests.Clear();
 			_subscribers.Clear();
+
+			_subscriberWalkingEventType = null;
+			_subscriberWalker = SubscriberWalkerInvalidValue;
 		}
 
-		void ISystem.Update()
+		public void ProcessEventRequests()
 		{
 			// _eventRequests 처리
-			for (int i = 0; i < _eventRequests.Count; i++)
+			for (var i = 0; i < _eventRequests.Count; i++)
 			{
-				var request = _eventRequests[i];
-
-				if (request.IsPublished)
+				if (_eventRequests[i].IsPublished)
 				{
-					_subscriberWalkingEventType = request.Event.GetType();
+					_subscriberWalkingEventType = _eventRequests[i].Event.GetType();
 
 					if (_subscribers.TryGetValue(_subscriberWalkingEventType, out var subscribers))
 					{
-						for (_subscriberWalker = 0; _subscriberWalker < subscribers.Count; _subscriberWalker++)
+						for (_subscriberWalker = 0; _subscriberWalker < subscribers.Count && IsSubscribeWalking; _subscriberWalker++)
 						{
-							var consumed = subscribers[_subscriberWalker].Invoke(request.Event);
+							var consumed = subscribers[_subscriberWalker].Invoke(_eventRequests[i].Event);
 
 							if (consumed)
 							{
@@ -91,10 +88,10 @@ namespace Core.Message
 				}
 				else
 				{
-					request.Listener.OnEvent(request.Event);
+					_eventRequests[i].Listener.OnEvent(_eventRequests[i].Event);
 				}
 
-				request.Event.Dispose();
+				_eventRequests[i].Event.Dispose();
 			}
 
 			_eventRequests.Clear();
@@ -143,7 +140,7 @@ namespace Core.Message
 				return;
 			}
 
-			for (int i = 0; i < subscribers.Count; i++)
+			for (var i = 0; i < subscribers.Count; i++)
 			{
 				if (subscribers[i] != target)
 					continue;
@@ -160,7 +157,6 @@ namespace Core.Message
 			}
 
 			// 해당 Event에 대해 구독자가 더 이상 남아있지 않은 경우 리스트도 지워줌
-			// FIXME : Any() 등의 함수를 사용하는 것과 어떤 것이 다른가?
 			if (subscribers.Count == 0)
 			{
 				// 브로드캐스팅 문맥 상에서 동작하는 상황이라도, 레퍼런스는 해당 문맥이 들고있고 바로 파괴되는 것도 아니기 때문에 _subscribers에서는 지워도 됨
@@ -183,10 +179,12 @@ namespace Core.Message
 			{
 				consumed = listener.OnEvent(e);
 			}
+#if UNITY_EDITOR
 			else
 			{
 				Debug.LogError($"Send an { e } to null target");
 			}
+#endif
 
 			if (disposeAfter)
 			{
@@ -210,7 +208,7 @@ namespace Core.Message
 
 			if (_subscribers.TryGetValue(_subscriberWalkingEventType, out var subscribers))
 			{
-				for (_subscriberWalker = 0; _subscriberWalker < subscribers.Count; _subscriberWalker++)
+				for (_subscriberWalker = 0; _subscriberWalker < subscribers.Count && IsSubscribeWalking; _subscriberWalker++)
 				{
 					// 흡수된 경우에는 Return해버림
 					consumed = subscribers[_subscriberWalker].Invoke(e);
@@ -249,12 +247,14 @@ namespace Core.Message
 					Listener = listener
 				});
 			}
+#if UNITY_EDITOR
 			else
 			{
 				Debug.LogError($"Send an { e } to null target");
 
 				e.Dispose();
 			}
+#endif
 		}
 
 		/// <summary>

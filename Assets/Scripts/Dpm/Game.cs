@@ -1,6 +1,6 @@
 ﻿using System;
-using Core;
 using Core.Message;
+using Core.Resource;
 using Core.Update;
 using UnityEngine;
 
@@ -12,15 +12,15 @@ namespace Dpm
 
 		private static Game _instance;
 
-		private EventSystem _eventSystem;
-		private UpdateSystem _updateSystem;
+		private readonly EventSystem _eventSystem = EventSystem.Instance;
+
+		public UpdateSystem UpdateSystem { get; private set; } = new();
+
+		public ResourceManager ResourceManager { get; private set; } = new ResourceManager();
 
 		private void Awake()
 		{
 			_instance = this;
-
-			_eventSystem = EventSystem.Instance;
-			_updateSystem = new();
 
 			// 씬 이동이나 씬 전체 해제 등의 행위로 날아가지 않도록 세팅
 			DontDestroyOnLoad(this);
@@ -29,7 +29,7 @@ namespace Dpm
 		private void OnDestroy()
 		{
 			(_eventSystem as IDisposable).Dispose();
-			(_updateSystem as IDisposable).Dispose();
+			(UpdateSystem as IDisposable).Dispose();
 		}
 
 		private void Update()
@@ -37,7 +37,7 @@ namespace Dpm
 			var dt = Time.deltaTime;
 
 			// FIXME : 순서 지정 필요
-			(_updateSystem as IUpdatable).UpdateFrame(dt);
+			(UpdateSystem as IUpdatable).UpdateFrame(dt);
 			_eventSystem.ProcessEventRequests();
 		}
 	}

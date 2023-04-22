@@ -24,19 +24,25 @@ namespace Core.Message
 		/// <summary>
 		/// (Immediate가 아닌 메소드로) 발행된 이벤트들
 		/// </summary>
-		private struct EventRequest
+		private readonly struct EventRequest
 		{
-			public Event Event;
+			public readonly Event Event;
 
 			/// <summary>
 			/// null이면 브로드캐스팅된 이벤트임
 			/// </summary>
-			public IEventListener Listener;
+			public readonly IEventListener Listener;
 
 			/// <summary>
 			/// 이 이벤트가 브로드캐스팅된 것이면 true
 			/// </summary>
 			public bool IsPublished => ReferenceEquals(Listener, null);
+
+			public EventRequest(Event e, IEventListener listener)
+			{
+				Event = e;
+				Listener = listener;
+			}
 		}
 
 		private const int SubscriberWalkerInvalidValue = -1;
@@ -241,11 +247,7 @@ namespace Core.Message
 		{
 			if (listener != null)
 			{
-				_eventRequests.Add(new EventRequest
-				{
-					Event = e,
-					Listener = listener
-				});
+				_eventRequests.Add(new EventRequest(e, listener));
 			}
 #if UNITY_EDITOR
 			else
@@ -263,11 +265,7 @@ namespace Core.Message
 		/// <param name="e">브로드캐스팅할 이벤트</param>
 		public void Publish(Event e)
 		{
-			_eventRequests.Add(new EventRequest
-			{
-				Event = e,
-				Listener = null
-			});
+			_eventRequests.Add(new EventRequest(e, null));
 		}
 	}
 }

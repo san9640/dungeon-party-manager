@@ -6,7 +6,7 @@ namespace Core.Pool
 {
 	public class ObjectPool
 	{
-		private static Dictionary<Type, ObjectPool> pools = new();
+		private static readonly Dictionary<Type, ObjectPool> Pools = new();
 
 		/// <summary>
 		/// 원하는 타입의 오브젝트풀을 가져옴
@@ -17,12 +17,12 @@ namespace Core.Pool
 		{
 			var type = typeof(T);
 
-			if (!pools.ContainsKey(type))
+			if (!Pools.ContainsKey(type))
 			{
-				pools.Add(type, new ObjectPool<T>());
+				Pools.Add(type, new ObjectPool<T>());
 			}
 
-			return pools[type];
+			return Pools[type];
 		}
 
 		/// <summary>
@@ -31,21 +31,21 @@ namespace Core.Pool
 		/// </summary>
 		public static void Clear()
 		{
-			foreach (var keyValue in pools)
+			foreach (var keyValue in Pools)
 			{
 				(keyValue.Value as IDisposable)?.Dispose();
 			}
 
-			pools.Clear();
+			Pools.Clear();
 		}
 	}
 
 	public class ObjectPool<T> : ObjectPool, IDisposable where T : class, new()
 	{
-		private Stack<T> pool = new();
+		private readonly Stack<T> _pool = new();
 
 #if UNITY_EDITOR
-		private int PoolCount => pool.Count;
+		private int PoolCount => _pool.Count;
 
 		public int UsingCount { get; private set; } = 0;
 #endif
@@ -58,12 +58,12 @@ namespace Core.Pool
 #if UNITY_EDITOR
 			UsingCount++;
 #endif
-			if (pool.Count == 0)
+			if (_pool.Count == 0)
 			{
 				return new();
 			}
 
-			return pool.Pop();
+			return _pool.Pop();
 		}
 
 		/// <summary>
@@ -72,13 +72,13 @@ namespace Core.Pool
 		public void Return(T obj)
 		{
 #if UNITY_EDITOR
-			if (pool.Contains(obj))
+			if (_pool.Contains(obj))
 			{
 				Debug.LogError($"Object already returned to { typeof(T) } object pool.");
 				return;
 			}
 #endif
-			pool.Push(obj);
+			_pool.Push(obj);
 		}
 
 		/// <summary>
@@ -95,7 +95,7 @@ namespace Core.Pool
 
 			UsingCount = 0;
 #endif
-			pool.Clear();
+			_pool.Clear();
 		}
 	}
 }

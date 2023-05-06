@@ -1,53 +1,82 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Core.Interface;
 using UnityEngine;
 
 namespace Core.Resource
 {
-	public class ResourceManager
+	public class ResourceManager : IResourceManager
 	{
-		private readonly string _prefabLootPath = "Prefabs";
+		private ICoroutineManager _coroutineManager;
 
-		private readonly Dictionary<string, GameObject> _prefabs = new();
+		private readonly Dictionary<Type, Dictionary<string, object>> _resources = new();
 
-		public static ResourceManager Instance => _instance;
-
-		private static ResourceManager _instance;
-
-		public ResourceManager(string prefabLootPath = null)
+		public ResourceManager(ICoroutineManager coroutineManager)
 		{
-			_instance = this;
-
-			if (prefabLootPath != null)
-			{
-				_prefabLootPath = prefabLootPath;
-			}
+			_coroutineManager = coroutineManager;
 		}
 
-		public IEnumerator LoadAsync(string path, Action<GameObject> doneCallback)
+		/// <summary>
+		/// 비동기 로드
+		/// </summary>
+		/// <param name="path"></param>
+		/// <param name="doneCallback"></param>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
+		public IEnumerator LoadAsync<T>(string path, Action<T> doneCallback) where T : class
 		{
-			if (!_prefabs.ContainsKey(path))
+			var type = typeof(T);
+
+			if (!_resources.ContainsKey(type))
 			{
-				var loadReq = Resources.LoadAsync($"{_prefabLootPath}/{path}");
+				_resources.Add(type, new());
+			}
+
+			if (!_resources[type].ContainsKey(path))
+			{
+				var loadReq = Resources.LoadAsync(path);
 
 				yield return loadReq;
 
-				if (loadReq.asset is GameObject assetGo)
+				if (loadReq.asset is T)
 				{
-					_prefabs.Add(path, assetGo);
+					_resources[type].Add(path, loadReq.asset);
 				}
 #if UNITY_EDITOR
 				else
 				{
-					Debug.LogError($"{ path } load failed.");
+					Debug.LogError($"Resource { path } [ type { type } ] load failed.");
 
 					yield break;
 				}
 #endif
 			}
 
-			doneCallback.Invoke(_prefabs[path]);
+			doneCallback.Invoke(_resources[type][path] as T);
+		}
+
+		/// <summary>
+		/// 비동기 로드 실행
+		/// </summary>
+		/// <param name="path">에셋 경로 및 이름</param>
+		/// <param name="doneCallback"></param>
+		/// <typeparam name="T"></typeparam>
+		public void Load<T>(string path, Action<T> doneCallback) where T : class
+		{
+			_coroutineManager.StartCoroutine(LoadAsync(path, doneCallback));
+		}
+
+		public void ClearAll()
+		{
+			_resources.Clear();
+		}
+
+		public void Dispose()
+		{
+			ClearAll();
+
+			_coroutineManager = null;
 		}
 	}
 }

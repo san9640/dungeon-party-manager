@@ -5,8 +5,6 @@ namespace Dpm
 {
 	public class SceneManager
 	{
-		public static SceneManager Instance { get; } = new();
-
 		private IScene _currentScene;
 
 		public IEnumerator EnterScene(IScene nextScene)

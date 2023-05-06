@@ -13,8 +13,6 @@ namespace Core.Message
 	/// </summary>
 	public class EventSystem : IDisposable
 	{
-		public static EventSystem Instance { get; } = new();
-
 		/// <summary>
 		/// 구독자(함수)의 형태 규정
 		/// </summary>

@@ -1,9 +1,10 @@
 ﻿using System.Collections;
+using Core.Interface;
 using UnityEngine;
 
-namespace Dpm
+namespace Core.Base.Scene
 {
-	public class SceneManager
+	public class SceneManager : ISceneManager
 	{
 		private IScene _currentScene;
 

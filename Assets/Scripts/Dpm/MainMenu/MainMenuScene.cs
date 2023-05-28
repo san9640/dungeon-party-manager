@@ -1,45 +1,31 @@
 ﻿using System.Collections;
+using Core.Interface;
+using Dpm.CoreAdapter;
 using Dpm.MainMenu.Event;
-using SceneManagement = UnityEngine.SceneManagement.SceneManager;
+using UnityScene = UnityEngine.SceneManagement.SceneManager;
 
 namespace Dpm.MainMenu
 {
 	public class MainMenuScene : IScene
 	{
-		// private GameObject _menuGo;
-
 		private const string SceneName = "MainMenu";
 
 		public IEnumerator LoadAsync()
 		{
-			// GameObject prefab = null;
-			//
-			// yield return Game.Instance.ResourceManager.
-			// 	LoadAsync<GameObject>("Prefabs/MainMenu", go => prefab = go);
-			//
-			// _menuGo = Object.Instantiate(prefab, null);
-			// _menuGo.SetActive(false);
-
-			yield return SceneManagement.LoadSceneAsync(SceneName);
+			yield return UnityScene.LoadSceneAsync(SceneName);
 		}
 
 		public void Enter()
 		{
-			// _menuGo.SetActive(true);
-
-			Game.Instance.EventSystem.Subscribe<ExitButtonEvent>(OnExitButton);
+			CoreService.Event.Subscribe<ExitButtonEvent>(OnExitButton);
 		}
 
 		public void Exit()
 		{
-			Game.Instance.EventSystem.Unsubscribe<ExitButtonEvent>(OnExitButton);
-
-			// Object.Destroy(_menuGo);
-			//
-			// _menuGo = null;
+			CoreService.Event.Unsubscribe<ExitButtonEvent>(OnExitButton);
 		}
 
-		private bool OnExitButton(Core.Message.Event e)
+		private bool OnExitButton(EventBase e)
 		{
 			Game.Instance.ExitGame();
 

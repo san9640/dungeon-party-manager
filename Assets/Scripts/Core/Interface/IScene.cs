@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace Dpm
+namespace Core.Interface
 {
 	public interface IScene
 	{

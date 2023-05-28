@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Core.Interface;
 using UnityEngine;
 
-namespace Core.Async
+namespace Core.Base.Async
 {
 	public delegate void OnTaskDone(bool canceled);
 

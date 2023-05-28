@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Core.Interface;
 using UnityEngine;
 
-namespace Core.Resource
+namespace Core.Base.Resource
 {
 	public class ResourceManager : IResourceManager
 	{

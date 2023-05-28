@@ -1,4 +1,5 @@
-﻿using Dpm.MainMenu.Event;
+﻿using Dpm.CoreAdapter;
+using Dpm.MainMenu.Event;
 using UnityEngine;
 
 namespace Dpm.MainMenu.UI
@@ -7,7 +8,7 @@ namespace Dpm.MainMenu.UI
 	{
 		public void OnExitButton()
 		{
-			Game.Instance.EventSystem.Publish(ExitButtonEvent.Instance);
+			CoreService.Event.Publish(ExitButtonEvent.Instance);
 		}
 	}
 }

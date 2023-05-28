@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Core.Interface;
 
-namespace Core.Update
+namespace Core.Base.Update
 {
 	/// <summary>
 	/// Update할 것들을 수집하여 일괄 실행시키는 시스템
@@ -9,7 +10,7 @@ namespace Core.Update
 	/// 싱글톤이 아닌 이유는 Game.cs에서 여러 단계의 업데이트 기능을 제공할 필요성이 있는 경우 여러 UpdateSystem을 이용하려 한 것
 	/// </summary>
 	/// TODO : 업데이트 등록 및 해제, 업데이트 일괄 실행 구현
-	public class UpdateSystem : IDisposable, IUpdatable
+	public class UpdateSystem : IUpdateSystem
 	{
 		/// <summary>
 		/// Updatable 정보

@@ -25,11 +25,9 @@ namespace Dpm.MainMenu
 			CoreService.Event.Unsubscribe<ExitButtonEvent>(OnExitButton);
 		}
 
-		private bool OnExitButton(EventBase e)
+		private void OnExitButton(IEvent e)
 		{
 			Game.Instance.ExitGame();
-
-			return false;
 		}
 	}
 }

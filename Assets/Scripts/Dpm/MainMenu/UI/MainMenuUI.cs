@@ -1,4 +1,5 @@
-﻿using Dpm.CoreAdapter;
+﻿using Core.Interface;
+using Dpm.CoreAdapter;
 using Dpm.MainMenu.Event;
 using UnityEngine;
 

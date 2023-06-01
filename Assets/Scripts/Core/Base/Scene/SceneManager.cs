@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using Core.Interface;
+#if UNITY_EDITOR
 using UnityEngine;
+#endif
 
 namespace Core.Base.Scene
 {
@@ -12,7 +14,9 @@ namespace Core.Base.Scene
 		{
 			if (_currentScene != null)
 			{
+#if UNITY_EDITOR
 				Debug.LogError($"Previous scene [{ _currentScene }] is still exist");
+#endif
 				yield break;
 			}
 

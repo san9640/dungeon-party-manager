@@ -13,7 +13,7 @@ namespace Dpm.CoreAdapter
 	/// 코어 서비스 홀더
 	/// 편의성을 위해 싱글톤 패턴을 사용했음
 	/// </summary>
-	public class CoreService : IDisposable, IUpdatable
+	public class CoreService : IDisposable, IUpdatable, ILateUpdatable
 	{
 		private static CoreService _instance;
 
@@ -29,9 +29,9 @@ namespace Dpm.CoreAdapter
 
 		private IEventSystem _event;
 
-		public static IUpdateSystem Update => _instance._update;
+		public static IFrameUpdateSystem FrameFrameUpdate => _instance._frameFrameUpdate;
 
-		private IUpdateSystem _update;
+		private IFrameUpdateSystem _frameFrameUpdate;
 
 		public static ISceneManager Scene => _instance._scene;
 
@@ -42,7 +42,7 @@ namespace Dpm.CoreAdapter
 			_coroutine = new CoroutineManager(parent);
 			_resource = new ResourceManager(_coroutine);
 			_event = new EventSystem();
-			_update = new UpdateSystem();
+			_frameFrameUpdate = new FrameUpdateSystem();
 			_scene = new SceneManager();
 
 			_instance = this;
@@ -51,21 +51,31 @@ namespace Dpm.CoreAdapter
 		public void UpdateFrame(float dt)
 		{
 			_event.ProcessEventRequests();
-			_update.UpdateFrame(dt);
+			_frameFrameUpdate.UpdateFrame(dt);
+		}
+
+		public void LateUpdateFrame(float dt)
+		{
+			_frameFrameUpdate.LateUpdateFrame(dt);
 		}
 
 		public void Dispose()
 		{
 			_scene.ExitCurrentScene();
+			_scene = null;
 
 			_event.Dispose();
+			_event = null;
 
-			_update.Dispose();
+			_frameFrameUpdate.Dispose();
+			_frameFrameUpdate = null;
 
 			_resource.ClearAll();
 			_resource.Dispose();
+			_resource = null;
 
 			_coroutine.Dispose();
+			_coroutine = null;
 		}
 	}
 }

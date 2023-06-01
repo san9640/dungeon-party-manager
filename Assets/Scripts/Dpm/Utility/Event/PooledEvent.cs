@@ -1,7 +1,7 @@
 ﻿using Core.Interface;
-using Core.Utility.Pool;
+using Dpm.Utility.Pool;
 
-namespace Core.Utility.Event
+namespace Dpm.Utility.Event
 {
 	/// <summary>
 	/// 풀링 가능한 추상 이벤트 클래스

@@ -1,4 +1,4 @@
-﻿using Core.Utility.Event;
+﻿using Dpm.Utility.Event;
 
 namespace Dpm.MainMenu.Event
 {

@@ -1,4 +1,6 @@
-﻿using Dpm.CoreAdapter;
+﻿using System;
+using Core.Utility.Pool;
+using Dpm.CoreAdapter;
 using Dpm.MainMenu;
 using UnityEngine;
 
@@ -29,6 +31,9 @@ namespace Dpm
 		{
 			_service.Dispose();
 			_service = null;
+
+			InstancePool.Clear();
+
 			_instance = null;
 		}
 
@@ -37,6 +42,13 @@ namespace Dpm
 			var dt = Time.deltaTime;
 
 			_service.UpdateFrame(dt);
+		}
+
+		private void LateUpdate()
+		{
+			var dt = Time.deltaTime;
+
+			_service.LateUpdateFrame(dt);
 		}
 
 		public void ExitGame()

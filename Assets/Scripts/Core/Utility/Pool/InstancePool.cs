@@ -4,22 +4,22 @@ using UnityEngine;
 
 namespace Core.Utility.Pool
 {
-	public class ObjectPool
+	public class InstancePool
 	{
-		private static readonly Dictionary<Type, ObjectPool> Pools = new();
+		private static readonly Dictionary<Type, InstancePool> Pools = new();
 
 		/// <summary>
 		/// 원하는 타입의 오브젝트풀을 가져옴
 		/// </summary>
 		/// <typeparam name="T">풀링될 오브젝트의 타입</typeparam>
 		/// <returns>오브젝트 풀</returns>
-		public static ObjectPool Get<T>() where T : class, new()
+		public static InstancePool Get<T>() where T : class, new()
 		{
 			var type = typeof(T);
 
 			if (!Pools.ContainsKey(type))
 			{
-				Pools.Add(type, new ObjectPool<T>());
+				Pools.Add(type, new InstancePool<T>());
 			}
 
 			return Pools[type];
@@ -40,7 +40,7 @@ namespace Core.Utility.Pool
 		}
 	}
 
-	public class ObjectPool<T> : ObjectPool, IDisposable where T : class, new()
+	public class InstancePool<T> : InstancePool, IDisposable where T : class, new()
 	{
 		private readonly Stack<T> _pool = new();
 

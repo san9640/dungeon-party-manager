@@ -21,9 +21,9 @@ namespace Dpm.CoreAdapter
 
 		private ICoroutineManager _coroutine;
 
-		public static IResourceManager Resource => _instance._resource;
+		public static IAssetManager Asset => _instance._asset;
 
-		private IResourceManager _resource;
+		private IAssetManager _asset;
 
 		public static IEventSystem Event => _instance._event;
 
@@ -40,7 +40,11 @@ namespace Dpm.CoreAdapter
 		public CoreService(MonoBehaviour parent)
 		{
 			_coroutine = new CoroutineManager(parent);
-			_resource = new ResourceManager(_coroutine);
+
+			_asset = new AssetManager();
+			// TODO : Json 파싱해서 스펙 가져오기
+			_asset.Load(new IAssetSpecs[] {});
+
 			_event = new EventSystem();
 			_frameFrameUpdate = new FrameUpdateSystem();
 			_scene = new SceneManager();
@@ -70,9 +74,8 @@ namespace Dpm.CoreAdapter
 			_frameFrameUpdate.Dispose();
 			_frameFrameUpdate = null;
 
-			_resource.ClearAll();
-			_resource.Dispose();
-			_resource = null;
+			_asset.Dispose();
+			_asset = null;
 
 			_coroutine.Dispose();
 			_coroutine = null;

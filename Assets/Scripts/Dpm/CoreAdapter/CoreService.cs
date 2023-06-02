@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Core.Base.Async;
 using Core.Base.Message;
 using Core.Base.Resource;
@@ -29,9 +30,9 @@ namespace Dpm.CoreAdapter
 
 		private IEventSystem _event;
 
-		public static IFrameUpdateSystem FrameFrameUpdate => _instance._frameFrameUpdate;
+		public static IFrameUpdateSystem FrameUpdate => _instance._frameUpdate;
 
-		private IFrameUpdateSystem _frameFrameUpdate;
+		private IFrameUpdateSystem _frameUpdate;
 
 		public static ISceneManager Scene => _instance._scene;
 
@@ -43,27 +44,38 @@ namespace Dpm.CoreAdapter
 
 			_asset = new AssetManager();
 			// TODO : Json 파싱해서 스펙 가져오기
-			_asset.Load(new IAssetSpecs[] {});
+			_asset.Load(new IAssetSpecs[]
+			{
+				new AssetSpecs<GameObject>(new Dictionary<string, string>()
+				{
+					["test"] = "Prefabs/TestPrefab"
+				})
+			});
 
 			_event = new EventSystem();
-			_frameFrameUpdate = new FrameUpdateSystem();
+			_frameUpdate = new FrameUpdateSystem();
 			_scene = new SceneManager();
 
 			_instance = this;
 		}
-
-		public void UpdateFrame(float dt)
+		void IUpdatable.UpdateFrame(float dt)
 		{
+			_frameUpdate.UpdateFrame(dt);
 			_event.ProcessEventRequests();
-			_frameFrameUpdate.UpdateFrame(dt);
 		}
 
-		public void LateUpdateFrame(float dt)
+		void ILateUpdatable.LateUpdateFrame(float dt)
 		{
-			_frameFrameUpdate.LateUpdateFrame(dt);
+			_frameUpdate.LateUpdateFrame(dt);
 		}
 
-		public void Dispose()
+		public void OnSceneExited()
+		{
+			_event.Dispose();
+			_frameUpdate.Dispose();
+		}
+
+		void IDisposable.Dispose()
 		{
 			_scene.ExitCurrentScene();
 			_scene = null;
@@ -71,8 +83,8 @@ namespace Dpm.CoreAdapter
 			_event.Dispose();
 			_event = null;
 
-			_frameFrameUpdate.Dispose();
-			_frameFrameUpdate = null;
+			_frameUpdate.Dispose();
+			_frameUpdate = null;
 
 			_asset.Dispose();
 			_asset = null;

@@ -66,7 +66,9 @@ namespace Core.Base.Message
 			// _eventRequests 처리
 			for (var i = 0; i < _eventRequests.Count; i++)
 			{
-				if (_eventRequests[i].IsPublished)
+				var request = _eventRequests[i];
+
+				if (request.IsPublished)
 				{
 					_subscriberWalkingEventType = _eventRequests[i].Event.GetType();
 
@@ -74,7 +76,7 @@ namespace Core.Base.Message
 					{
 						for (_subscriberWalker = 0; _subscriberWalker < subscribers.Count; _subscriberWalker++)
 						{
-							subscribers[_subscriberWalker].Invoke(_eventRequests[i].Event);
+							subscribers[_subscriberWalker].Invoke(request.Event);
 
 							// 메세지 처리 중 EventSystem이 해제되면 바로 중단
 							if (!IsSubscribeWalking)
@@ -90,10 +92,10 @@ namespace Core.Base.Message
 				}
 				else
 				{
-					_eventRequests[i].Listener.OnEvent(_eventRequests[i].Event);
+					request.Listener.OnEvent(request.Event);
 				}
 
-				_eventRequests[i].Event.Dispose();
+				request.Event.Dispose();
 			}
 
 			_eventRequests.Clear();

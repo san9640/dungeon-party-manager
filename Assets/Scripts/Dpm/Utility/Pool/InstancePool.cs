@@ -29,7 +29,7 @@ namespace Dpm.Utility.Pool
 		/// 전체 오브젝트 풀 삭제
 		/// 일반적인 상황에서는 사용할 일이 없고, 게임을 나갈 때만 사용할 듯...?
 		/// </summary>
-		public static void Clear()
+		public static void Dispose()
 		{
 			foreach (var keyValue in Pools)
 			{

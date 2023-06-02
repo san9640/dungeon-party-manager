@@ -1,11 +1,14 @@
-﻿using Dpm.CoreAdapter;
+﻿using System;
+using Core.Interface;
+using Dpm.CoreAdapter;
 using Dpm.MainMenu;
+using Dpm.Stage;
 using Dpm.Utility.Pool;
 using UnityEngine;
 
 namespace Dpm
 {
-	public class Game : MonoBehaviour
+	public class Game : MonoBehaviour, IDisposable
 	{
 		public static Game Instance => _instance;
 
@@ -26,37 +29,66 @@ namespace Dpm
 				CoreService.Scene.EnterScene(new MainMenuScene()));
 		}
 
-		private void OnDestroy()
+		public void Dispose()
 		{
-			_service.Dispose();
+			(_service as IDisposable).Dispose();
 			_service = null;
 
-			InstancePool.Clear();
+			GameObjectPool.Dispose();
+			InstancePool.Dispose();
 
 			_instance = null;
+
+			if (gameObject != null)
+			{
+				Destroy(gameObject);
+			}
 		}
 
 		private void Update()
 		{
 			var dt = Time.deltaTime;
 
-			_service.UpdateFrame(dt);
+			(_service as IUpdatable).UpdateFrame(dt);
 		}
 
 		private void LateUpdate()
 		{
 			var dt = Time.deltaTime;
 
-			_service.LateUpdateFrame(dt);
+			(_service as ILateUpdatable).LateUpdateFrame(dt);
 		}
 
 		public void ExitGame()
 		{
+			Dispose();
+
 #if UNITY_EDITOR
 			UnityEditor.EditorApplication.isPlaying = false;
 #else
 			Application.Quit();
 #endif
+		}
+
+		public void MoveToStage()
+		{
+			ChangeScene(new StageScene());
+		}
+
+		public void MoveToMainMenu()
+		{
+			ChangeScene(new MainMenuScene());
+		}
+
+		private void ChangeScene(IScene next)
+		{
+			CoreService.Scene.ExitCurrentScene();
+
+			_service.OnSceneExited();
+			GameObjectPool.Dispose();
+			InstancePool.Dispose();
+
+			CoreService.Coroutine.StartCoroutine(CoreService.Scene.EnterScene(next));
 		}
 	}
 }

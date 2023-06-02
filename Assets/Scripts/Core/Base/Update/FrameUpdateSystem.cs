@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Core.Interface;
 
@@ -19,162 +20,122 @@ namespace Core.Base.Update
 			public T FrameUpdatable;
 		}
 
-		/// <summary>
-		/// 등록/해제 판별용
-		/// </summary>
-		private enum RegisterType
-		{
-			Add,
-			Remove
-		}
-
-		/// <summary>
-		/// 등록/해제 요청 정보
-		/// </summary>
-		private struct RegisterRequest<T> where T : IFrameUpdatable
-		{
-			public RegisterType Type;
-			public FrameUpdatableInfo<T> FrameUpdatableInfo;
-		}
-
-		private class FrameUpdatableContainer<T> : IDisposable where T : IFrameUpdatable
+		private class FrameUpdatableHolder<T> : IEnumerable, IDisposable where T : class, IFrameUpdatable
 		{
 			/// <summary>
 			/// 미리 Capacity를 크게 잡아둠
 			/// </summary>
-			public readonly List<FrameUpdatableInfo<T>> FrameUpdatables = new(256);
+			private readonly List<FrameUpdatableInfo<T>> _container = new(256);
 
-			/// <summary>
-			/// 전체 요청
-			/// </summary>
-			public readonly List<RegisterRequest<T>> RegisterRequests = new(64);
-
-			public void ProcessRequests()
-			{
-				for (var i = 0; i < RegisterRequests.Count; i++)
-				{
-					if (RegisterRequests[i].Type == RegisterType.Add)
-					{
-						var insertPos = 0;
-
-						// FIXME : 이분 탐색으로 변경
-						for (; insertPos < FrameUpdatables.Count; insertPos++)
-						{
-							// Priority 값이 같은 경우에는 미리 들어가 있는 것들보다 더 늦게 불러줌
-							// Updatables가 비어있는 경우도 있기 때문에, for문 안에서 Insert한다면 제대로 처리되지 않을 것임
-							if (RegisterRequests[i].FrameUpdatableInfo.Priority > FrameUpdatables[insertPos].Priority)
-								break;
-						}
-
-						// 비어있거나 insertPos == _updatables.Count인 경우에도 insert는 유효함
-						FrameUpdatables.Insert(insertPos, RegisterRequests[i].FrameUpdatableInfo);
-					}
-					else
-					{
-						// FIXME : 이분 탐색으로 변경
-						FrameUpdatables.Remove(RegisterRequests[i].FrameUpdatableInfo);
-					}
-				}
-
-				RegisterRequests.Clear();
-			}
+			private int _walkingIndex = -1;
 
 			public void Add(T frameUpdatable, int priority)
 			{
+				var insertPos = 0;
 
+				// FIXME : 이분 탐색으로 변경
+				for (; insertPos < _container.Count; insertPos++)
+				{
+					// Priority 값이 같은 경우에는 미리 들어가 있는 것들보다 더 늦게 불러줌
+					// Updatables가 비어있는 경우도 있기 때문에, for문 안에서 Insert한다면 제대로 처리되지 않을 것임
+					if (priority > _container[insertPos].Priority)
+						break;
+				}
+
+				// 비어있거나 insertPos == _updatables.Count인 경우에도 insert는 유효함
+				_container.Insert(insertPos, new FrameUpdatableInfo<T>
+				{
+					Priority = priority,
+					FrameUpdatable = frameUpdatable
+				});
+
+				if (insertPos <= _walkingIndex)
+				{
+					_walkingIndex++;
+				}
 			}
 
 			public void Remove(T frameUpdatable, int priority)
 			{
+				// FIXME : 이분 탐색으로 변경
+				for (int i = 0; i < _container.Count; i++)
+				{
+					if (_container[i].Priority == priority &&
+					    _container[i].FrameUpdatable == frameUpdatable)
+					{
+						_container.RemoveAt(i);
 
+						if (i <= _walkingIndex)
+						{
+							_walkingIndex--;
+						}
+					}
+				}
 			}
 
 			public void Dispose()
 			{
-				FrameUpdatables.Clear();
-				RegisterRequests.Clear();
+				_container.Clear();
+			}
+
+			/// <summary>
+			/// 외부에서 각 Updatable 객체에 접근하기 위해 IEnumerable 구현
+			/// </summary>
+			/// <returns></returns>
+			public IEnumerator GetEnumerator()
+			{
+				for (_walkingIndex = 0; _walkingIndex < _container.Count; _walkingIndex++)
+				{
+					yield return _container[_walkingIndex].FrameUpdatable;
+				}
+
+				_walkingIndex = -1;
 			}
 		}
 
-		private readonly FrameUpdatableContainer<IUpdatable> _updatableContainer = new();
-		private readonly FrameUpdatableContainer<ILateUpdatable> _lateUpdatableContainer = new();
+		private readonly FrameUpdatableHolder<IUpdatable> _updatableHolder = new();
+		private readonly FrameUpdatableHolder<ILateUpdatable> _lateUpdatableHolder = new();
 
 		public void Dispose()
 		{
-			_updatableContainer.Dispose();
-			_lateUpdatableContainer.Dispose();
+			_updatableHolder.Dispose();
+			_lateUpdatableHolder.Dispose();
 		}
 
-		void IUpdatable.UpdateFrame(float dt)
+		public void UpdateFrame(float dt)
 		{
-			_updatableContainer.ProcessRequests();
-
-			for (var i = 0; i < _updatableContainer.FrameUpdatables.Count; i++)
+			foreach (IUpdatable updatable in _updatableHolder)
 			{
-				_updatableContainer.FrameUpdatables[i].FrameUpdatable.UpdateFrame(dt);
+				updatable.UpdateFrame(dt);
 			}
 		}
 
 		public void LateUpdateFrame(float dt)
 		{
-			_lateUpdatableContainer.ProcessRequests();
-
-			for (var i = 0; i < _lateUpdatableContainer.FrameUpdatables.Count; i++)
+			foreach (ILateUpdatable lateUpdatable in _lateUpdatableHolder)
 			{
-				_lateUpdatableContainer.FrameUpdatables[i].FrameUpdatable.LateUpdateFrame(dt);
+				lateUpdatable.LateUpdateFrame(dt);
 			}
 		}
 
 		public void RegisterUpdate(IUpdatable updatable, int priority)
 		{
-			_updatableContainer.RegisterRequests.Add(new RegisterRequest<IUpdatable>
-			{
-				Type = RegisterType.Add,
-				FrameUpdatableInfo = new FrameUpdatableInfo<IUpdatable>
-				{
-					FrameUpdatable = updatable,
-					Priority = priority
-				}
-			});
+			_updatableHolder.Add(updatable, priority);
 		}
 
 		public void UnregisterUpdate(IUpdatable updatable, int priority)
 		{
-			_updatableContainer.RegisterRequests.Add(new RegisterRequest<IUpdatable>
-			{
-				Type = RegisterType.Remove,
-				FrameUpdatableInfo = new FrameUpdatableInfo<IUpdatable>
-				{
-					FrameUpdatable = updatable,
-					Priority = priority
-				}
-			});
+			_updatableHolder.Remove(updatable, priority);
 		}
 
 		public void RegisterLateUpdate(ILateUpdatable lateUpdatable, int priority)
 		{
-			_lateUpdatableContainer.RegisterRequests.Add(new RegisterRequest<ILateUpdatable>
-			{
-				Type = RegisterType.Add,
-				FrameUpdatableInfo = new FrameUpdatableInfo<ILateUpdatable>
-				{
-					FrameUpdatable = lateUpdatable,
-					Priority = priority
-				}
-			});
+			_lateUpdatableHolder.Add(lateUpdatable, priority);
 		}
 
 		public void UnregisterLateUpdate(ILateUpdatable lateUpdatable, int priority)
 		{
-			_lateUpdatableContainer.RegisterRequests.Add(new RegisterRequest<ILateUpdatable>
-			{
-				Type = RegisterType.Remove,
-				FrameUpdatableInfo = new FrameUpdatableInfo<ILateUpdatable>
-				{
-					FrameUpdatable = lateUpdatable,
-					Priority = priority
-				}
-			});
+			_lateUpdatableHolder.Remove(lateUpdatable, priority);
 		}
 	}
 }

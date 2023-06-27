@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Core.Interface;
+using UnityEditor;
 using UnityEngine;
 
 namespace Core.Base.Resource
@@ -9,30 +10,38 @@ namespace Core.Base.Resource
 	{
 		private readonly Dictionary<Type, Dictionary<string, UnityEngine.Object>> _resources = new();
 
-		public void Load(IAssetSpecs[] assetSpec)
+		public AssetManager(params string[] assetSpecsHolderPaths)
 		{
-			foreach (var assetSpecs in assetSpec)
+			foreach (var path in assetSpecsHolderPaths)
 			{
-				var resourcesHolder = new Dictionary<string, UnityEngine.Object>();
+				var assetSpecsHolder = AssetDatabase.LoadAssetAtPath<AssetSpecsHolder>(path);
 
-				foreach (var keyToPath in assetSpecs.KeyToPath)
-				{
-					resourcesHolder.Add(keyToPath.Key, Resources.Load(keyToPath.Value));
-				}
-
-				_resources.Add(assetSpecs.AssetType, resourcesHolder);
-
-				assetSpecs.Dispose();
+				// 타입 맞춰서 미리 로드해둠
+				Load(assetSpecsHolder);
 			}
 		}
 
-		public bool TryGet<T>(string key, out T result) where T : UnityEngine.Object
+		private void Load(AssetSpecsHolder assetSpecsHolder)
+		{
+			var resourcesHolder = new Dictionary<string, UnityEngine.Object>();
+
+			foreach (var assetSpec in assetSpecsHolder.specs)
+			{
+				var resource = Resources.Load(assetSpec.path);
+
+				resourcesHolder.Add(assetSpec.name, resource);
+			}
+
+			_resources.Add(assetSpecsHolder.AssetType, resourcesHolder);
+		}
+
+		public bool TryGet<T>(string specName, out T result) where T : UnityEngine.Object
 		{
 			var type = typeof(T);
 			result = null;
 
 			if (_resources.TryGetValue(type, out var resHolder) &&
-			    resHolder.TryGetValue(key, out var asset))
+			    resHolder.TryGetValue(specName, out var asset))
 			{
 				result = asset as T;
 

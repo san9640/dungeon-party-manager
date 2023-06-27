@@ -42,16 +42,7 @@ namespace Dpm.CoreAdapter
 		{
 			_coroutine = new CoroutineManager(parent);
 
-			_asset = new AssetManager();
-			// TODO : Json 파싱해서 스펙 가져오기
-			_asset.Load(new IAssetSpecs[]
-			{
-				new AssetSpecs<GameObject>(new Dictionary<string, string>()
-				{
-					["test"] = "Prefabs/TestPrefab"
-				})
-			});
-
+			_asset = new AssetManager("Assets/Resources/ScriptableObject/PrefabSpecs.asset");
 			_event = new EventSystem();
 			_frameUpdate = new FrameUpdateSystem();
 			_scene = new SceneManager();

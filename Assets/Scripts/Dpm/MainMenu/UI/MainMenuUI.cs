@@ -21,6 +21,7 @@ namespace Dpm.MainMenu.UI
 
 		public void OnOptionButton()
 		{
+			CoreService.Event.Publish(OptionButtonEvent.Instance);
 		}
 	}
 }

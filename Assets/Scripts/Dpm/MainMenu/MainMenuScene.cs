@@ -2,7 +2,6 @@
 using Core.Interface;
 using Dpm.CoreAdapter;
 using Dpm.MainMenu.Event;
-using Dpm.Stage;
 using UnityScene = UnityEngine.SceneManagement.SceneManager;
 
 namespace Dpm.MainMenu
@@ -20,12 +19,14 @@ namespace Dpm.MainMenu
 		{
 			CoreService.Event.Subscribe<ExitButtonEvent>(OnExitButton);
 			CoreService.Event.Subscribe<StartButtonEvent>(OnStartButton);
+			CoreService.Event.Subscribe<OptionButtonEvent>(OnOptionButton);
 		}
 
 		public void Exit()
 		{
 			CoreService.Event.Unsubscribe<ExitButtonEvent>(OnExitButton);
 			CoreService.Event.Unsubscribe<StartButtonEvent>(OnStartButton);
+			CoreService.Event.Unsubscribe<OptionButtonEvent>(OnOptionButton);
 		}
 
 		private void OnStartButton(IEvent e)
@@ -33,10 +34,13 @@ namespace Dpm.MainMenu
 			Game.Instance.MoveToStage();
 		}
 
+		private void OnOptionButton(IEvent e)
+		{
+		}
+
 		private void OnExitButton(IEvent e)
 		{
 			Game.Instance.ExitGame();
-			// Game.Instance.ChangeScene(new MainMenuScene());
 		}
 	}
 }

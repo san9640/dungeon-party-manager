@@ -2,6 +2,8 @@
 using Core.Interface;
 using Dpm.CoreAdapter;
 using Dpm.MainMenu.Event;
+using Dpm.Utility.Pool;
+using UnityEngine;
 using UnityScene = UnityEngine.SceneManagement.SceneManager;
 
 namespace Dpm.MainMenu
@@ -36,6 +38,7 @@ namespace Dpm.MainMenu
 
 		private void OnOptionButton(IEvent e)
 		{
+			GameObjectPool.Get("test").TrySpawn(Vector3.zero, out _);
 		}
 
 		private void OnExitButton(IEvent e)

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Core.Base.Async;
 using Core.Base.Message;
 using Core.Base.Resource;
@@ -22,14 +21,23 @@ namespace Dpm.CoreAdapter
 
 		private ICoroutineManager _coroutine;
 
+		/// <summary>
+		/// AssetManager 인스턴스
+		/// </summary>
 		public static IAssetManager Asset => _instance._asset;
 
 		private IAssetManager _asset;
 
+		/// <summary>
+		/// EventSystem 인스턴스
+		/// </summary>
 		public static IEventSystem Event => _instance._event;
 
 		private IEventSystem _event;
 
+		/// <summary>
+		/// FrameUpdateSystem 인스턴스
+		/// </summary>
 		public static IFrameUpdateSystem FrameUpdate => _instance._frameUpdate;
 
 		private IFrameUpdateSystem _frameUpdate;
@@ -42,7 +50,10 @@ namespace Dpm.CoreAdapter
 		{
 			_coroutine = new CoroutineManager(parent);
 
-			_asset = new AssetManager("Assets/Resources/ScriptableObject/PrefabSpecs.asset");
+			_asset = new AssetManager(
+				"Assets/Resources/ScriptableObject/PrefabSpecs.asset",
+				"Assets/Resources/ScriptableObject/ScriptableObjectSpecs.asset"
+				);
 			_event = new EventSystem();
 			_frameUpdate = new FrameUpdateSystem();
 			_scene = new SceneManager();

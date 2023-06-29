@@ -1,38 +1,82 @@
 ﻿using System;
 using System.Collections.Generic;
+using Core.Interface;
 using Dpm.CoreAdapter;
 using UnityEngine;
-using UnityEngine.Serialization;
-using Object = UnityEngine.Object;
 
 namespace Dpm.Utility.Pool
 {
 	/// <summary>
 	/// 풀링된 GameObject 컴포넌트
-	/// TODO : 이펙트 등은 시간이 지나면 알아서 해제되는 것이 편하므로, ObjectPoolSpec.json을 파싱해서 LifeTime을 가져와야 함
 	/// </summary>
-	public class PooledGameObject : MonoBehaviour, IDisposable
+	public class PooledGameObject : MonoBehaviour, IDisposable, IUpdatable
 	{
 		private GameObjectPool _parent;
 
-		public bool isUsing = false;
+		private bool _isUsing = false;
 
-		public void AttachToPool(GameObjectPool parent)
+		/// <summary>
+		/// 이 오브젝트의 수명. 0이면 무제한
+		/// </summary>
+		private float _lifeTime = 0;
+
+		/// <summary>
+		/// 이 오브젝트의 지나간 수명. _lifeTime을 넘어가면 자동으로 해제됨
+		/// </summary>
+		private float _timePassed = 0;
+
+		public void Initialize(GameObjectPool parent, float lifeTime)
 		{
 			_parent = parent;
+			_lifeTime = lifeTime;
+		}
+
+		public void Activate()
+		{
+			if (_lifeTime > 0)
+			{
+				CoreService.FrameUpdate.RegisterUpdate(this, UpdatePriority.GameObjectPool);
+			}
+
+			_isUsing = true;
 		}
 
 		/// <summary>
 		/// 풀에 반환. 사용이 끝나면 호출 필요
 		/// </summary>
-		public void Return()
+		public void Deactivate()
 		{
+			if (!_isUsing)
+			{
+				return;
+			}
+
+			_isUsing = false;
+
+			if (_lifeTime > 0)
+			{
+				CoreService.FrameUpdate.UnregisterUpdate(this, UpdatePriority.GameObjectPool);
+			}
+
+			_timePassed = 0;
+
 			_parent.Return(this);
 		}
 
 		void IDisposable.Dispose()
 		{
 			_parent = null;
+		}
+
+		public void UpdateFrame(float dt)
+		{
+			_timePassed += dt;
+
+			// 스펙에 명시된 시간이 지나면 해제
+			if (_timePassed >= _lifeTime)
+			{
+				Deactivate();
+			}
 		}
 	}
 
@@ -48,15 +92,20 @@ namespace Dpm.Utility.Pool
 		private List<PooledGameObject> _usingObjects = new();
 
 		/// <summary>
+		/// 풀링 오브젝트 스펙
+		/// </summary>
+		private GameObjectPoolSpec _spec;
+
+		/// <summary>
 		/// 새 PooledGameObject 생성
 		/// </summary>
 		private PooledGameObject CreateNew()
 		{
-			var newGo = Object.Instantiate(_prefab, transform);
+			var newGo = Instantiate(_prefab, transform);
 
 			var result = newGo.AddComponent<PooledGameObject>();
 
-			result.AttachToPool(this);
+			result.Initialize(this, _spec.lifeTime);
 
 			return result;
 		}
@@ -64,18 +113,27 @@ namespace Dpm.Utility.Pool
 		/// <summary>
 		/// Position 세팅된 오브젝트를 꺼냄
 		/// </summary>
-		public PooledGameObject Instantiate(Vector3 position)
+		public bool TrySpawn(Vector3 position, out PooledGameObject result)
 		{
-			return Instantiate(position, Quaternion.identity);
+			return TrySpawn(position, Quaternion.identity, out result);
 		}
 
 		/// <summary>
 		/// Position 및 Rotation 세팅된 오브젝트를 꺼냄
 		/// </summary>
-		public PooledGameObject Instantiate(Vector3 position, Quaternion rotation)
+		public bool TrySpawn(Vector3 position, Quaternion rotation, out PooledGameObject result)
 		{
+			if (_spec.maxCount > 0 && _usingObjects.Count >= _spec.maxCount)
+			{
+#if UNITY_EDITOR
+				Debug.LogError($"[{ _spec.name } GameObjectPool] already using full of MaxCount.");
+#endif
+				result = null;
+				return false;
+			}
+
 			// 풀에 오브젝트가 없으면 새로 생성
-			if (!_pool.TryPop(out var result))
+			if (!_pool.TryPop(out result))
 			{
 				result = CreateNew();
 			}
@@ -87,23 +145,13 @@ namespace Dpm.Utility.Pool
 
 			_usingObjects.Add(result);
 
-			result.isUsing = true;
+			result.Activate();
 
-			return result;
+			return true;
 		}
 
-		/// <summary>
-		/// 풀에 오브젝트를 직접 리턴
-		/// </summary>
 		public void Return(PooledGameObject target)
 		{
-			if (!target.isUsing)
-			{
-				return;
-			}
-
-			target.isUsing = true;
-
 			for (int i = 0; i < _usingObjects.Count; i++)
 			{
 				if (ReferenceEquals(target, _usingObjects[i]))
@@ -120,6 +168,8 @@ namespace Dpm.Utility.Pool
 					break;
 				}
 			}
+
+			// usingObjects에 존재하지 않는다면 풀에 반환되지 않을 것임
 		}
 
 		void IDisposable.Dispose()
@@ -127,7 +177,7 @@ namespace Dpm.Utility.Pool
 			// 오브젝트 풀로 전부 반환함
 			while (_usingObjects.Count > 0)
 			{
-				_usingObjects[0].Return();
+				_usingObjects[0].Deactivate();
 			}
 
 			_usingObjects = null;
@@ -146,32 +196,50 @@ namespace Dpm.Utility.Pool
 		/// <summary>
 		/// 오브젝트 풀을 가져옴
 		/// </summary>
-		/// <param name="specKey">
+		/// <param name="specName">
 		/// 프리팹 스펙
 		/// TODO : 오브젝트 풀 스펙으로 변경 필요!!
 		/// </param>
 		/// <returns></returns>
-		public static GameObjectPool Get(string specKey)
+		public static GameObjectPool Get(string specName)
 		{
-			if (Pools.TryGetValue(specKey, out var pool))
+			if (Pools.TryGetValue(specName, out var pool))
 			{
 				return pool;
 			}
 
-			if (!CoreService.Asset.TryGet<GameObject>(specKey, out var prefab))
+			if (!CoreService.Asset.TryGet<ScriptableObject>("GameObjectPoolSpec", out var specAsset))
 			{
 #if UNITY_EDITOR
-				Debug.LogError($"AssetManager has no Prefab [SpecKey : { specKey }");
+				Debug.LogError("Has no GameObjectPoolSpec.asset.");
 #endif
 				return null;
 			}
 
-			var go = new GameObject($"{ specKey }Pool");
+			if (!(specAsset is GameObjectPoolSpecHolder specHolder) ||
+			    !specHolder.NameToSpec.TryGetValue(specName, out var spec))
+			{
+#if UNITY_EDITOR
+				Debug.LogError($"AssetManager has no GameObjectPoolSpec [SpecName : { specName }");
+#endif
+				return null;
+			}
+
+			if (!CoreService.Asset.TryGet<GameObject>(spec.prefabSpecName, out var prefab))
+			{
+#if UNITY_EDITOR
+				Debug.LogError($"AssetManager has no Prefab [SpecName : { spec.prefabSpecName }");
+#endif
+				return null;
+			}
+
+			var go = new GameObject($"{ specName }Pool");
 			var newPool = go.AddComponent<GameObjectPool>();
 
 			newPool._prefab = prefab;
+			newPool._spec = spec;
 
-			Pools.Add(specKey, newPool);
+			Pools.Add(specName, newPool);
 
 			return newPool;
 		}

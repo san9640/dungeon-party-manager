@@ -1,5 +1,4 @@
 ﻿using System;
-using Core.Base.Resource;
 
 namespace Core.Interface
 {
@@ -11,6 +10,7 @@ namespace Core.Interface
 		/// <param name="specName">에셋 키 (Json)</param>
 		/// <param name="result">로드된 에셋</param>
 		/// <typeparam name="T">에셋 타입</typeparam>
+		/// <returns>로드 성공 여부</returns>
 		bool TryGet<T>(string specName, out T result) where T : UnityEngine.Object;
 	}
 }

@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using Core.Interface;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Core.Base.Resource
 {
 	public class AssetManager : IAssetManager
 	{
-		private readonly Dictionary<Type, Dictionary<string, UnityEngine.Object>> _resources = new();
+		private readonly Dictionary<Type, Dictionary<string, Object>> _resources = new();
 
 		public AssetManager(params string[] assetSpecsHolderPaths)
 		{
@@ -23,7 +24,7 @@ namespace Core.Base.Resource
 
 		private void Load(AssetSpecsHolder assetSpecsHolder)
 		{
-			var resourcesHolder = new Dictionary<string, UnityEngine.Object>();
+			var resourcesHolder = new Dictionary<string, Object>();
 
 			foreach (var assetSpec in assetSpecsHolder.specs)
 			{
@@ -35,10 +36,9 @@ namespace Core.Base.Resource
 			_resources.Add(assetSpecsHolder.AssetType, resourcesHolder);
 		}
 
-		public bool TryGet<T>(string specName, out T result) where T : UnityEngine.Object
+		public bool TryGet<T>(string specName, out T result) where T : Object
 		{
 			var type = typeof(T);
-			result = null;
 
 			if (_resources.TryGetValue(type, out var resHolder) &&
 			    resHolder.TryGetValue(specName, out var asset))
@@ -47,6 +47,8 @@ namespace Core.Base.Resource
 
 				return true;
 			}
+
+			result = null;
 
 			return false;
 		}

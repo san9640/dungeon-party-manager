@@ -46,14 +46,11 @@ namespace Dpm.CoreAdapter
 
 		private ISceneManager _scene;
 
-		public CoreService(MonoBehaviour parent)
+		public CoreService(MonoBehaviour parent, string[] assetSpecsHolderPaths)
 		{
 			_coroutine = new CoroutineManager(parent);
 
-			_asset = new AssetManager(
-				"Assets/Resources/ScriptableObject/PrefabSpecs.asset",
-				"Assets/Resources/ScriptableObject/ScriptableObjectSpecs.asset"
-				);
+			_asset = new AssetManager(assetSpecsHolderPaths);
 			_event = new EventSystem();
 			_frameUpdate = new FrameUpdateSystem();
 			_scene = new SceneManager();

@@ -11,7 +11,7 @@ namespace Core.Base.Resource
 	{
 		private readonly Dictionary<Type, Dictionary<string, Object>> _resources = new();
 
-		public AssetManager(params string[] assetSpecsHolderPaths)
+		public AssetManager(string[] assetSpecsHolderPaths)
 		{
 			foreach (var path in assetSpecsHolderPaths)
 			{

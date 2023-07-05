@@ -152,6 +152,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d0f1479133f4c9492db4365397f175d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  assetSpecsHolderPaths:
+  - 'Assets/Resources/ScriptableObject/PrefabSpecs.asset '
+  - Assets/Resources/ScriptableObject/ScriptableObjectSpecs.asset
 --- !u!4 &402417274
 Transform:
   m_ObjectHideFlags: 0

@@ -16,11 +16,14 @@ namespace Dpm
 
 		private CoreService _service;
 
+		[SerializeField]
+		private string[] assetSpecsHolderPaths;
+
 		private void Awake()
 		{
 			_instance = this;
 
-			_service = new CoreService(this);
+			_service = new CoreService(this, assetSpecsHolderPaths);
 
 			// 씬 이동이나 씬 전체 해제 등의 행위로 날아가지 않도록 세팅
 			DontDestroyOnLoad(this);

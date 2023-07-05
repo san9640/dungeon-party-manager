@@ -153,7 +153,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   assetSpecsHolderPaths:
-  - 'Assets/Resources/ScriptableObject/PrefabSpecs.asset '
+  - Assets/Resources/ScriptableObject/PrefabSpecs.asset
   - Assets/Resources/ScriptableObject/ScriptableObjectSpecs.asset
 --- !u!4 &402417274
 Transform:

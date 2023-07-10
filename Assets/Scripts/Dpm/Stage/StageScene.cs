@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using Core.Interface;
+using Dpm.Common;
 using Dpm.CoreAdapter;
-using Dpm.MainMenu;
 using Dpm.Stage.Event;
 using UnityScene = UnityEngine.SceneManagement.SceneManager;
 
@@ -19,10 +19,14 @@ namespace Dpm.Stage
 		public void Enter()
 		{
 			CoreService.Event.Subscribe<ExitStageEvent>(OnExitStage);
+
+			ScreenTransition.Instance.FadeIn();
 		}
 
 		public void Exit()
 		{
+			ScreenTransition.Instance.FadeOut();
+
 			CoreService.Event.Unsubscribe<ExitStageEvent>(OnExitStage);
 		}
 

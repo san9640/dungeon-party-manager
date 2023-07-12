@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using Core.Interface;
+using Dpm.Common;
 using Dpm.CoreAdapter;
 using Dpm.MainMenu;
 using Dpm.Stage;
@@ -19,6 +21,8 @@ namespace Dpm
 		[SerializeField]
 		private string[] assetSpecsHolderPaths;
 
+		private bool _isSceneChanging = false;
+
 		private void Awake()
 		{
 			_instance = this;
@@ -28,8 +32,20 @@ namespace Dpm
 			// 씬 이동이나 씬 전체 해제 등의 행위로 날아가지 않도록 세팅
 			DontDestroyOnLoad(this);
 
-			CoreService.Coroutine.StartCoroutine(
-				CoreService.Scene.EnterScene(new MainMenuScene()));
+			CoreService.Coroutine.StartCoroutine(ActivateGame());
+		}
+
+		private IEnumerator ActivateGame()
+		{
+			_isSceneChanging = true;
+
+			yield return null;
+
+			yield return CoreService.Scene.EnterScene(new MainMenuScene());
+
+			yield return ScreenTransition.Instance.FadeInAsync(1f);
+
+			_isSceneChanging = false;
 		}
 
 		public void Dispose()
@@ -85,13 +101,31 @@ namespace Dpm
 
 		private void ChangeScene(IScene next)
 		{
+			if (_isSceneChanging)
+			{
+				return;
+			}
+
+			_isSceneChanging = true;
+
+			CoreService.Coroutine.StartCoroutine(ChangeSceneAsync(next));
+		}
+
+		private IEnumerator ChangeSceneAsync(IScene next)
+		{
+			yield return ScreenTransition.Instance.FadeOutAsync(1f);
+
 			CoreService.Scene.ExitCurrentScene();
 
 			_service.OnSceneExited();
 			GameObjectPool.Dispose();
 			InstancePool.Dispose();
 
-			CoreService.Coroutine.StartCoroutine(CoreService.Scene.EnterScene(next));
+			yield return CoreService.Scene.EnterScene(next);
+
+			yield return ScreenTransition.Instance.FadeInAsync(1f);
+
+			_isSceneChanging = false;
 		}
 	}
 }

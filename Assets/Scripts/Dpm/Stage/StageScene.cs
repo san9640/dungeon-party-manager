@@ -19,14 +19,10 @@ namespace Dpm.Stage
 		public void Enter()
 		{
 			CoreService.Event.Subscribe<ExitStageEvent>(OnExitStage);
-
-			ScreenTransition.Instance.FadeIn();
 		}
 
 		public void Exit()
 		{
-			ScreenTransition.Instance.FadeOut();
-
 			CoreService.Event.Unsubscribe<ExitStageEvent>(OnExitStage);
 		}
 

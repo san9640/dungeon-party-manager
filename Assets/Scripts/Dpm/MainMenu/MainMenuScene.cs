@@ -23,14 +23,10 @@ namespace Dpm.MainMenu
 			CoreService.Event.Subscribe<ExitButtonEvent>(OnExitButton);
 			CoreService.Event.Subscribe<StartButtonEvent>(OnStartButton);
 			CoreService.Event.Subscribe<OptionButtonEvent>(OnOptionButton);
-
-			ScreenTransition.Instance.FadeIn();
 		}
 
 		public void Exit()
 		{
-			ScreenTransition.Instance.FadeOut();
-
 			CoreService.Event.Unsubscribe<ExitButtonEvent>(OnExitButton);
 			CoreService.Event.Unsubscribe<StartButtonEvent>(OnStartButton);
 			CoreService.Event.Unsubscribe<OptionButtonEvent>(OnOptionButton);

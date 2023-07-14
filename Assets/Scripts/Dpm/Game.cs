@@ -18,6 +18,16 @@ namespace Dpm
 
 		private CoreService _service;
 
+		private enum StartSceneType
+		{
+			Default,
+			MainMenu,
+			Stage,
+		}
+
+		[SerializeField]
+		private StartSceneType startSceneType = StartSceneType.Default;
+
 		[SerializeField]
 		private string[] assetSpecsHolderPaths;
 
@@ -41,7 +51,14 @@ namespace Dpm
 
 			yield return null;
 
-			yield return CoreService.Scene.EnterScene(new MainMenuScene());
+			IScene scene = startSceneType switch
+			{
+				StartSceneType.MainMenu => new MainMenuScene(),
+				StartSceneType.Stage => new StageScene(),
+				_ => new MainMenuScene()
+			};
+
+			yield return CoreService.Scene.EnterScene(scene);
 
 			yield return ScreenTransition.Instance.FadeInAsync(1f);
 

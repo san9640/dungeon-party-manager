@@ -18,3 +18,7 @@ MonoBehaviour:
     path: Prefabs/Character
   - name: TestPrefab
     path: Prefabs/TestPrefab
+  - name: field
+    path: Prefabs/Field/Field
+  - name: field_door
+    path: Prefabs/Field/door_unit

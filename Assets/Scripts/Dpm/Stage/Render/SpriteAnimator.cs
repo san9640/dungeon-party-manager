@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Dpm.Stage.Render
 {
-	public class CharacterAnimator : MonoBehaviour
+	public class SpriteAnimator : MonoBehaviour
 	{
 		[Serializable]
 		public class SpriteAnimationInfo

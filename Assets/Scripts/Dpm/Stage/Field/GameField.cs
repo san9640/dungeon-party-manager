@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Dpm.CoreAdapter;
+using Dpm.Stage.Event;
 using Dpm.Utility.Pool;
 using UnityEngine;
 
@@ -18,12 +20,23 @@ namespace Dpm.Stage.Field
 		[SerializeField]
 		private GameObject topWallLayer;
 
+		private enum State
+		{
+			None,
+			WaitDoorOpen,
+			Cleared,
+		}
+
+		private State _state = State.None;
+
+		public const int MaxDoorCount = 5;
+
 		private class DoorHolder : IDisposable
 		{
 			private const float MinXOffset = -1.5f;
 			private const float MaxXOffset = 2.5f;
 
-			public Vector3 Position;
+			public readonly Vector3 Position;
 			private List<GameObject> _overlappedWalls = new();
 
 			private PooledGameObject _doorObj;
@@ -68,11 +81,11 @@ namespace Dpm.Stage.Field
 					return;
 				}
 
-				_door.IsOpened = false;
+				_door.Dispose();
+				_door = null;
 
 				_doorObj.Deactivate();
 				_doorObj = null;
-				_door = null;
 
 				foreach (var wall in _overlappedWalls)
 				{
@@ -142,12 +155,23 @@ namespace Dpm.Stage.Field
 
 				doorHolder.AttachDoor();
 
+				// FIXME : 이런 식으로 할당하는 것이 괜찮은 걸까?
+				doorHolder.Door.Id = index;
+
 				_usingDoorHolders.Add(doorHolder);
 			}
+
+			_state = State.WaitDoorOpen;
+
+			CoreService.Event.Subscribe<DoorClickEvent>(OnDoorClickEvent);
 		}
 
 		public void Dispose()
 		{
+			CoreService.Event.Unsubscribe<DoorClickEvent>(OnDoorClickEvent);
+
+			_state = State.None;
+
 			foreach (var doorHolder in _usingDoorHolders)
 			{
 				doorHolder.DetachDoor();
@@ -156,11 +180,23 @@ namespace Dpm.Stage.Field
 			_usingDoorHolders.Clear();
 		}
 
-		public void Update()
+		private void OnDoorClickEvent(Core.Interface.Event e)
 		{
-			for (int i = 0; i < _usingDoorHolders.Count; i++)
+			if (e is not DoorClickEvent doorClickEvent)
 			{
-				_usingDoorHolders[i].Door.IsOpened = Input.GetKey($"{i + 1}");
+				return;
+			}
+
+			if (_state == State.WaitDoorOpen)
+			{
+				if (doorClickEvent.DoorIndex >= 0 && doorClickEvent.DoorIndex < _doorHolders.Length)
+				{
+					_state = State.Cleared;
+
+					_doorHolders[doorClickEvent.DoorIndex].Door.IsOpened = true;
+
+					CoreService.Event.Publish(FieldClearedEvent.Instance);
+				}
 			}
 		}
 	}

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Core.Interface;
+using Event = Core.Interface.Event;
 #if UNITY_EDITOR
 using UnityEngine;
 #endif
@@ -17,7 +18,7 @@ namespace Core.Base.Message
 		/// </summary>
 		private readonly struct EventRequest
 		{
-			public readonly IEvent Event;
+			public readonly Event Event;
 
 			/// <summary>
 			/// null이면 브로드캐스팅된 이벤트임
@@ -29,7 +30,7 @@ namespace Core.Base.Message
 			/// </summary>
 			public bool IsPublished => ReferenceEquals(Listener, null);
 
-			public EventRequest(IEvent e, IEventListener listener)
+			public EventRequest(Event e, IEventListener listener)
 			{
 				Event = e;
 				Listener = listener;
@@ -51,6 +52,11 @@ namespace Core.Base.Message
 
 		void IDisposable.Dispose()
 		{
+			foreach (var request in _eventRequests)
+			{
+				request.Event.Dispose();
+			}
+
 			_eventRequests.Clear();
 			_subscribers.Clear();
 
@@ -106,7 +112,7 @@ namespace Core.Base.Message
 		/// </summary>
 		/// <param name="target">구독할 대상(메서드). null을 넣지 말 것!!</param>
 		/// <typeparam name="T">구독할 Event 타입</typeparam>
-		public void Subscribe<T>(IEventSystem.Subscriber target) where T : IEvent
+		public void Subscribe<T>(IEventSystem.Subscriber target) where T : Event
 		{
 			var eventType = typeof(T);
 
@@ -135,7 +141,7 @@ namespace Core.Base.Message
 		/// </summary>
 		/// <param name="target">구독 해제할 대상(메서드)</param>
 		/// <typeparam name="T">구독 해제할 Event 타입</typeparam>
-		public void Unsubscribe<T>(IEventSystem.Subscriber target) where T : IEvent
+		public void Unsubscribe<T>(IEventSystem.Subscriber target) where T : Event
 		{
 			var eventType = typeof(T);
 
@@ -175,7 +181,7 @@ namespace Core.Base.Message
 		/// <param name="e">전달할 이벤트</param>
 		/// <param name="disposeAfter">처리가 끝나고 Dispose를 해 줄 것인지. 최대한 기본값을 쓰는 것이 좋음</param>
 		/// <returns>흡수되었는지 여부</returns>
-		public void SendImmediate(IEventListener listener, IEvent e, bool disposeAfter = true)
+		public void SendImmediate(IEventListener listener, Event e, bool disposeAfter = true)
 		{
 			if (listener != null)
 			{
@@ -200,7 +206,7 @@ namespace Core.Base.Message
 		/// <param name="e">브로드캐스팅할 이벤트</param>
 		/// <param name="disposeAfter">처리가 끝나고 Dispose를 해 줄 것인지. 최대한 기본값을 쓰는 것이 좋음</param>
 		/// <returns>흡수되었는지 여부</returns>
-		public void PublishImmediate(IEvent e, bool disposeAfter = true)
+		public void PublishImmediate(Event e, bool disposeAfter = true)
 		{
 			_subscriberWalkingEventType = e.GetType();
 
@@ -233,7 +239,7 @@ namespace Core.Base.Message
 		/// </summary>
 		/// <param name="listener">전달받을 객체</param>
 		/// <param name="e">전달할 이벤트</param>
-		public void Send(IEventListener listener, IEvent e)
+		public void Send(IEventListener listener, Event e)
 		{
 			if (listener != null)
 			{
@@ -253,7 +259,7 @@ namespace Core.Base.Message
 		/// EventSystem 업데이트 시점에 맞춰 이벤트 브로드캐스팅
 		/// </summary>
 		/// <param name="e">브로드캐스팅할 이벤트</param>
-		public void Publish(IEvent e)
+		public void Publish(Event e)
 		{
 			_eventRequests.Add(new EventRequest(e, null));
 		}

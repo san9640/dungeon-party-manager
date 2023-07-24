@@ -6,12 +6,13 @@ namespace Dpm.Utility.Event
 	/// 싱글톤 이벤트
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public abstract class SingletonEvent<T> : IEvent where T : SingletonEvent<T>, new()
+	public abstract class SingletonEvent<T> : Core.Interface.Event where T : SingletonEvent<T>, new()
 	{
 		public static T Instance { get; private set; } = new T();
 
-		public void Dispose()
+		public new void Dispose()
 		{
+			base.Dispose();
 		}
 	}
 }

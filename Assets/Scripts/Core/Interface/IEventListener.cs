@@ -5,6 +5,6 @@
 	/// </summary>
 	public interface IEventListener
 	{
-		void OnEvent(IEvent e);
+		void OnEvent(Event e);
 	}
 }

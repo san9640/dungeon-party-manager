@@ -49,7 +49,7 @@ namespace Dpm.Stage
 			_field = null;
 		}
 
-		private void OnExitStage(IEvent e)
+		private void OnExitStage(Core.Interface.Event e)
 		{
 			Game.Instance.MoveToMainMenu();
 		}

@@ -32,17 +32,17 @@ namespace Dpm.MainMenu
 			CoreService.Event.Unsubscribe<OptionButtonEvent>(OnOptionButton);
 		}
 
-		private void OnStartButton(IEvent e)
+		private void OnStartButton(Core.Interface.Event e)
 		{
 			Game.Instance.MoveToStage();
 		}
 
-		private void OnOptionButton(IEvent e)
+		private void OnOptionButton(Core.Interface.Event e)
 		{
 			GameObjectPool.Get("test").TrySpawn(Vector3.zero, out _);
 		}
 
-		private void OnExitButton(IEvent e)
+		private void OnExitButton(Core.Interface.Event e)
 		{
 			Game.Instance.ExitGame();
 		}

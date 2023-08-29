@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Dpm.CoreAdapter;
 using Dpm.Stage.Event;
+using Dpm.Stage.Unit;
 using Dpm.Utility.Pool;
 using UnityEngine;
 
@@ -103,6 +104,16 @@ namespace Dpm.Stage.Field
 		private DoorHolder[] _doorHolders;
 
 		private readonly List<DoorHolder> _usingDoorHolders = new(5);
+
+		[SerializeField]
+		private SpawnArea allySpawnArea;
+
+		public SpawnArea AllySpawnArea => allySpawnArea;
+
+		[SerializeField]
+		private SpawnArea enemySpawnArea;
+
+		public SpawnArea EnemySpawnArea => enemySpawnArea;
 
 		private void Awake()
 		{

@@ -12,7 +12,7 @@ namespace Dpm.Utility.Event
 	{
 		protected static readonly InstancePool<T> Pool = new();
 
-		public new void Dispose()
+		public override void Dispose()
 		{
 			Pool.Return(this as T);
 

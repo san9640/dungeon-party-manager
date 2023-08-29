@@ -8,7 +8,7 @@ namespace Core.Interface
 	/// </summary>
 	public abstract class Event
 	{
-		public void Dispose()
+		public virtual void Dispose()
 		{
 		}
 	}

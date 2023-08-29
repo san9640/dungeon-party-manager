@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using Dpm.Common.Event;
 using Dpm.CoreAdapter;
 using UnityEngine;
 
@@ -35,6 +36,9 @@ namespace Dpm.Common
 		private void Awake()
 		{
 			Instance = this;
+
+			Alpha = 1;
+			Enable = true;
 		}
 
 		private void OnDestroy()
@@ -42,18 +46,20 @@ namespace Dpm.Common
 			Instance = null;
 		}
 
-		public void FadeOut(float duration)
+		public void FadeOut(float duration, object requester)
 		{
-			CoreService.Coroutine.StartCoroutine(FadeOutAsync(duration));
+			CoreService.Coroutine.StartCoroutine(FadeOutAsync(duration, requester));
 		}
 
-		public void FadeIn(float duration)
+		public void FadeIn(float duration, object requester)
 		{
-			CoreService.Coroutine.StartCoroutine(FadeInAsync(duration));
+			CoreService.Coroutine.StartCoroutine(FadeInAsync(duration, requester));
 		}
 
-		public IEnumerator FadeOutAsync(float duration)
+		public IEnumerator FadeOutAsync(float duration, object requester)
 		{
+			CoreService.Event.Publish(ScreenFadeOutStartEvent.Create(requester));
+
 			Enable = true;
 
 			var reqId = unchecked(++_reqId);
@@ -61,7 +67,7 @@ namespace Dpm.Common
 			yield return FadeAlphaAsync(1, duration, reqId);
 		}
 
-		public IEnumerator FadeInAsync(float duration)
+		public IEnumerator FadeInAsync(float duration, object requester)
 		{
 			Enable = true;
 
@@ -72,6 +78,8 @@ namespace Dpm.Common
 			if (reqId == _reqId)
 			{
 				Enable = false;
+
+				CoreService.Event.Publish(ScreenFadeInEndEvent.Create(requester));
 			}
 		}
 

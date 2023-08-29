@@ -60,7 +60,7 @@ namespace Dpm
 
 			yield return CoreService.Scene.EnterScene(scene);
 
-			yield return ScreenTransition.Instance.FadeInAsync(1f);
+			yield return ScreenTransition.Instance.FadeInAsync(1f, this);
 
 			_isSceneChanging = false;
 		}
@@ -130,7 +130,7 @@ namespace Dpm
 
 		private IEnumerator ChangeSceneAsync(IScene next)
 		{
-			yield return ScreenTransition.Instance.FadeOutAsync(1f);
+			yield return ScreenTransition.Instance.FadeOutAsync(1f, this);
 
 			CoreService.Scene.ExitCurrentScene();
 
@@ -140,7 +140,7 @@ namespace Dpm
 
 			yield return CoreService.Scene.EnterScene(next);
 
-			yield return ScreenTransition.Instance.FadeInAsync(1f);
+			yield return ScreenTransition.Instance.FadeInAsync(1f, this);
 
 			_isSceneChanging = false;
 		}

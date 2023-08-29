@@ -32,7 +32,7 @@ namespace Dpm.Stage.Render
 
 		private Direction _lookDirection = Direction.Right;
 
-		private Direction LookDirection
+		public Direction LookDirection
 		{
 			get => _lookDirection;
 			set

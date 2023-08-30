@@ -1,11 +1,8 @@
 ﻿using System;
 using Core.Interface;
 using Dpm.CoreAdapter;
-using Dpm.Stage.Field;
 using Dpm.Stage.Physics;
 using Dpm.Stage.Render;
-using Dpm.Stage.Unit.AI;
-using Dpm.Utility;
 using UnityEngine;
 
 namespace Dpm.Stage.Unit
@@ -22,9 +19,7 @@ namespace Dpm.Stage.Unit
 			set => transform.position = new Vector3(value.x, value.y, 0);
 		}
 
-		// public Bound2D Bounds => new(new Vector2(Position.x, Position.y), spec.BoundSize);
-
-		// public CharacterSpec spec;
+		public Bounds2D Bounds { get; private set; }
 
 		public SpriteAnimator Animator { get; private set; }
 

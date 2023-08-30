@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using Dpm.CoreAdapter;
 using Dpm.Stage.Event;
-using Dpm.Stage.Unit;
 using Dpm.Utility.Pool;
 using UnityEngine;
 
-namespace Dpm.Stage.Field
+namespace Dpm.Stage.Room
 {
-	public class GameField : MonoBehaviour, IDisposable
+	public class GameRoom : MonoBehaviour, IDisposable
 	{
 		[SerializeField]
 		private GameObject doorLayer;

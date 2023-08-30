@@ -3,7 +3,7 @@ using Dpm.CoreAdapter;
 using Dpm.Stage.Event;
 using UnityEngine;
 
-namespace Dpm.Stage.Field
+namespace Dpm.Stage.Room
 {
 	public class Door : MonoBehaviour, IDisposable
 	{

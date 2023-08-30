@@ -5,8 +5,10 @@ using Dpm.Common;
 using Dpm.Common.Event;
 using Dpm.CoreAdapter;
 using Dpm.Stage.Event;
-using Dpm.Stage.Field;
+using Dpm.Stage.Physics;
+using Dpm.Stage.Room;
 using Dpm.Stage.Unit;
+using Dpm.Utility;
 using UnityEngine;
 using UnityScene = UnityEngine.SceneManagement.SceneManager;
 
@@ -25,7 +27,7 @@ namespace Dpm.Stage
 	{
 		private const string SceneName = "Stage";
 
-		private GameField _field;
+		private GameRoom _field;
 
 		public StageState State { get; private set; } = StageState.None;
 
@@ -33,9 +35,15 @@ namespace Dpm.Stage
 
 		public Party EnemyParty { get; private set; }
 
+		public StagePartitionManager PartitionManager { get; private set; }
+
+		private List<IUnit> _units = new();
+
 		public IEnumerator LoadAsync()
 		{
 			yield return UnityScene.LoadSceneAsync(SceneName);
+
+			PartitionManager = new StagePartitionManager();
 
 			if (!CoreService.Asset.TryGet<GameObject>("field", out var prefab))
 			{
@@ -44,7 +52,7 @@ namespace Dpm.Stage
 
 			var fieldGo = Object.Instantiate(prefab);
 
-			_field = fieldGo.GetComponent<GameField>();
+			_field = fieldGo.GetComponent<Room.GameRoom>();
 
 			GenerateField();
 
@@ -62,20 +70,13 @@ namespace Dpm.Stage
 			}
 
 			AllyParty = new Party(UnitRegion.Ally, allies);
-
-			EnemyParty = new Party(UnitRegion.Enemy, new List<Character>());
 		}
 
 		public void Enter()
 		{
-			foreach (var ally in AllyParty.Members)
+			foreach (var unit in _units)
 			{
-				ally.EnterField();
-			}
-
-			foreach (var enemy in EnemyParty.Members)
-			{
-				enemy.EnterField();
+				unit.EnterField();
 			}
 
 			CoreService.Event.Subscribe<ExitStageEvent>(OnExitStage);
@@ -91,22 +92,32 @@ namespace Dpm.Stage
 			CoreService.Event.Unsubscribe<ScreenFadeOutStartEvent>(OnScreenFadeOutStart);
 			CoreService.Event.Unsubscribe<ScreenFadeInEndEvent>(OnScreenFadeInEnd);
 
-			foreach (var ally in AllyParty.Members)
+			foreach (var unit in _units)
 			{
-				ally.ExitField();
+				unit.ExitField();
 			}
 
-			foreach (var enemy in EnemyParty.Members)
+			AllyParty?.Dispose();
+			AllyParty = null;
+
+			EnemyParty?.Dispose();
+			EnemyParty = null;
+
+			if (!_field.IsDestroyedOrNull())
 			{
-				enemy.ExitField();
+				// TODO : 그리드 옮겨갈 때마다 리셋해주는 것으로 변경
+				_field.Dispose();
+
+				Object.Destroy(_field.gameObject);
 			}
-
-			// TODO : 그리드 옮겨갈 때마다 리셋해주는 것으로 변경
-			_field.Dispose();
-
-			Object.Destroy(_field.gameObject);
 
 			_field = null;
+
+			PartitionManager?.Dispose();
+			PartitionManager = null;
+
+			_units.Clear();
+			_units = null;
 		}
 
 		private void OnExitStage(Core.Interface.Event e)
@@ -156,28 +167,19 @@ namespace Dpm.Stage
 
 			yield return ScreenTransition.Instance.FadeOutAsync(1, this);
 
-			foreach (var ally in AllyParty.Members)
+			foreach (var unit in _units)
 			{
-				ally.ExitField();
-			}
-
-			foreach (var enemy in EnemyParty.Members)
-			{
-				enemy.ExitField();
+				unit.ExitField();
 			}
 
 			_field.Dispose();
 
 			GenerateField();
 
-			foreach (var ally in AllyParty.Members)
+			// FIXME : Field에 들어와있는지 확인
+			foreach (var unit in _units)
 			{
-				ally.EnterField();
-			}
-
-			foreach (var enemy in EnemyParty.Members)
-			{
-				enemy.EnterField();
+				unit.EnterField();
 			}
 
 			yield return ScreenTransition.Instance.FadeInAsync(1, this);
@@ -188,10 +190,16 @@ namespace Dpm.Stage
 		private void GenerateField()
 		{
 			// FIXME
-			var doorCount = Random.Range(1, GameField.MaxDoorCount + 1);
+			var doorCount = Random.Range(1, Room.GameRoom.MaxDoorCount + 1);
 			_field.Initialize(doorCount);
 		}
 
+		/// <summary>
+		/// 캐릭터 생성
+		/// FIXME : Generator가 많아지면 분리 필요
+		/// </summary>
+		/// <param name="specName"></param>
+		/// <returns></returns>
 		private Character GenerateCharacter(string specName)
 		{
 			if (!CoreService.Asset.TryGet<GameObject>(specName, out var prefab))
@@ -201,6 +209,8 @@ namespace Dpm.Stage
 
 			var go = Object.Instantiate(prefab);
 			var character = go.GetComponent<Character>();
+
+			_units.Add(character);
 
 			return character;
 		}

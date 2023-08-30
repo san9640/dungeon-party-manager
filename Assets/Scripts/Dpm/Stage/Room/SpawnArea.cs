@@ -1,9 +1,8 @@
-﻿using System;
-using Dpm.Utility;
+﻿using Dpm.Utility;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Dpm.Stage.Field
+namespace Dpm.Stage.Room
 {
 	public class SpawnArea : MonoBehaviour
 	{
@@ -59,7 +58,7 @@ namespace Dpm.Stage.Field
 			var center = (min + max) / 2;
 			var size = max - min;
 
-			Gizmos.DrawCube(center, size);
+			Gizmos.DrawWireCube(center, size);
 		}
 #endif
 	}

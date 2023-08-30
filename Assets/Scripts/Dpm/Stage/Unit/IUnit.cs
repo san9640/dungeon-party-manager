@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿using Dpm.Stage.Physics;
 
 namespace Dpm.Stage.Unit
 {
@@ -9,7 +9,7 @@ namespace Dpm.Stage.Unit
 		Neutral
 	}
 
-	public interface IUnit
+	public interface IUnit : ICustomCollider
 	{
 		void EnterField();
 

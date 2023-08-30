@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Dpm.Stage.Unit
 {
-	public class Party
+	public class Party : IDisposable
 	{
 		public UnitRegion Region { get; private set; }
 
@@ -12,6 +13,12 @@ namespace Dpm.Stage.Unit
 		{
 			Region = region;
 			Members = members;
+		}
+
+		public void Dispose()
+		{
+			Members?.Clear();
+			Members = null;
 		}
 	}
 }

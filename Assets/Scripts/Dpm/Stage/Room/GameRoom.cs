@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using Dpm.CoreAdapter;
 using Dpm.Stage.Event;
+using Dpm.Stage.Unit;
 using Dpm.Utility.Pool;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Dpm.Stage.Room
 {
@@ -19,6 +21,11 @@ namespace Dpm.Stage.Room
 
 		[SerializeField]
 		private GameObject topWallLayer;
+
+		[SerializeField]
+		private ObjectUnit[] units;
+
+		public ObjectUnit[] Units => units;
 
 		private enum State
 		{

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Dpm.Utility
+namespace Dpm.Utility.Constants
 {
 	[Flags]
 	public enum Direction

@@ -1,4 +1,5 @@
 ﻿using Dpm.Utility;
+using Dpm.Utility.Constants;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -37,6 +38,9 @@ namespace Dpm.Stage.Room
 
 		public Direction Direction => direction;
 
+		/// <summary>
+		/// TODO : 테스트용 코드이므로 지워야 함
+		/// </summary>
 		public Vector2 RandomPos
 		{
 			get
@@ -51,7 +55,7 @@ namespace Dpm.Stage.Room
 #if UNITY_EDITOR
 		private void OnDrawGizmos()
 		{
-			Gizmos.color = Color.green;
+			Gizmos.color = Color.blue;
 
 			var min = transform.position + new Vector3(minOffset.x, minOffset.y, 0);
 			var max = transform.position + new Vector3(maxOffset.x, maxOffset.y, 0);

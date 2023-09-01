@@ -23,6 +23,9 @@ namespace Dpm.Stage
 		AfterBattle,
 	}
 
+	/// <summary>
+	/// FIXME: 로드하면 이벤트 등을 받아 units에 추가되는 방식으로 변경 필요
+	/// </summary>
 	public class StageScene : IScene
 	{
 		private const string SceneName = "Stage";
@@ -35,7 +38,7 @@ namespace Dpm.Stage
 
 		public Party EnemyParty { get; private set; }
 
-		public StagePartitionManager PartitionManager { get; private set; }
+		public StagePhysicsManager PhysicsManager { get; private set; }
 
 		private List<IUnit> _units = new();
 
@@ -43,7 +46,7 @@ namespace Dpm.Stage
 		{
 			yield return UnityScene.LoadSceneAsync(SceneName);
 
-			PartitionManager = new StagePartitionManager();
+			PhysicsManager = new StagePhysicsManager();
 
 			if (!CoreService.Asset.TryGet<GameObject>("field", out var prefab))
 			{
@@ -52,9 +55,15 @@ namespace Dpm.Stage
 
 			var fieldGo = Object.Instantiate(prefab);
 
-			_field = fieldGo.GetComponent<Room.GameRoom>();
+			_field = fieldGo.GetComponent<GameRoom>();
 
 			GenerateField();
+
+			// FIXME : unit이 생성되면 알아서 Add되도록 변경해야 함
+			foreach (var unit in _field.Units)
+			{
+				_units.Add(unit);
+			}
 
 			var allies = new List<Character>();
 
@@ -103,7 +112,7 @@ namespace Dpm.Stage
 			EnemyParty?.Dispose();
 			EnemyParty = null;
 
-			if (!_field.IsDestroyedOrNull())
+			if (_field != null)
 			{
 				// TODO : 그리드 옮겨갈 때마다 리셋해주는 것으로 변경
 				_field.Dispose();
@@ -113,8 +122,8 @@ namespace Dpm.Stage
 
 			_field = null;
 
-			PartitionManager?.Dispose();
-			PartitionManager = null;
+			PhysicsManager?.Dispose();
+			PhysicsManager = null;
 
 			_units.Clear();
 			_units = null;
@@ -127,7 +136,7 @@ namespace Dpm.Stage
 
 		private void OnFieldCleared(Core.Interface.Event e)
 		{
-			CoreService.Coroutine.StartCoroutine(MoveFieldAsync());
+			CoreService.Coroutine.StartCoroutine(MoveRoomAsync());
 		}
 
 		private void OnScreenFadeOutStart(Core.Interface.Event e)
@@ -161,7 +170,10 @@ namespace Dpm.Stage
 			}
 		}
 
-		private IEnumerator MoveFieldAsync()
+		/// <summary>
+		/// 클리어 이후 방을 이동하는 코루틴
+		/// </summary>
+		private IEnumerator MoveRoomAsync()
 		{
 			State = StageState.Loading;
 
@@ -187,10 +199,14 @@ namespace Dpm.Stage
 			State = StageState.WaitBattle;
 		}
 
+		/// <summary>
+		/// Field 생성
+		/// </summary>
 		private void GenerateField()
 		{
 			// FIXME
-			var doorCount = Random.Range(1, Room.GameRoom.MaxDoorCount + 1);
+			var doorCount = Random.Range(1, GameRoom.MaxDoorCount + 1);
+
 			_field.Initialize(doorCount);
 		}
 
@@ -198,8 +214,6 @@ namespace Dpm.Stage
 		/// 캐릭터 생성
 		/// FIXME : Generator가 많아지면 분리 필요
 		/// </summary>
-		/// <param name="specName"></param>
-		/// <returns></returns>
 		private Character GenerateCharacter(string specName)
 		{
 			if (!CoreService.Asset.TryGet<GameObject>(specName, out var prefab))

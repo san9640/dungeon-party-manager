@@ -1,4 +1,4 @@
-﻿namespace Dpm.Utility
+﻿namespace Dpm.Utility.Constants
 {
 	public static class UpdatePriority
 	{

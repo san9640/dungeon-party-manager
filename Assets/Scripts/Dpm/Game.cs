@@ -33,6 +33,32 @@ namespace Dpm
 
 		private bool _isSceneChanging = false;
 
+		public StageScene Stage
+		{
+			get
+			{
+				if (CoreService.Scene.CurrentScene is StageScene stage)
+				{
+					return stage;
+				}
+
+				return null;
+			}
+		}
+
+		public MainMenuScene MainMenu
+		{
+			get
+			{
+				if (CoreService.Scene.CurrentScene is MainMenuScene mainMenu)
+				{
+					return mainMenu;
+				}
+
+				return null;
+			}
+		}
+
 		private void Awake()
 		{
 			_instance = this;

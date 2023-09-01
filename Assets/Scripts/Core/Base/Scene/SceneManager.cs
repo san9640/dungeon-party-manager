@@ -8,19 +8,19 @@ namespace Core.Base.Scene
 {
 	public class SceneManager : ISceneManager
 	{
-		private IScene _currentScene;
+		public IScene CurrentScene { get; private set; }
 
 		public IEnumerator EnterScene(IScene nextScene)
 		{
-			if (_currentScene != null)
+			if (CurrentScene != null)
 			{
 #if UNITY_EDITOR
-				Debug.LogError($"Previous scene [{ _currentScene }] is still exist");
+				Debug.LogError($"Previous scene [{ CurrentScene }] is still exist");
 #endif
 				yield break;
 			}
 
-			_currentScene = nextScene;
+			CurrentScene = nextScene;
 			yield return nextScene.LoadAsync();
 
 			nextScene.Enter();
@@ -28,8 +28,8 @@ namespace Core.Base.Scene
 
 		public void ExitCurrentScene()
 		{
-			_currentScene?.Exit();
-			_currentScene = null;
+			CurrentScene?.Exit();
+			CurrentScene = null;
 		}
 	}
 }

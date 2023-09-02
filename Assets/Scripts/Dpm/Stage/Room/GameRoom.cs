@@ -23,9 +23,9 @@ namespace Dpm.Stage.Room
 		private GameObject topWallLayer;
 
 		[SerializeField]
-		private ObjectUnit[] units;
+		private Unit.Unit[] units;
 
-		public ObjectUnit[] Units => units;
+		public Unit.Unit[] Units => units;
 
 		private enum State
 		{

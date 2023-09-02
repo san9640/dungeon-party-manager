@@ -95,6 +95,13 @@ namespace Dpm.Stage.Physics
 			var anotherAxisMax = bounds.Max[anotherAxisIndex];
 			float newCenterAxis;
 
+			if (diff == 0)
+			{
+				endPos = bounds.center;
+
+				return false;
+			}
+
 			if (diff > 0)
 			{
 				var boundsMax = bounds.Max[axisIndex];
@@ -147,7 +154,7 @@ namespace Dpm.Stage.Physics
 
 						// 충돌이 없었다가 발생했을 때
 						if (boundsMin > otherBoundsMax &&
-						    targetBoundsMin + GameConstants.Epsilon <= otherBoundsMax)
+						    targetBoundsMin - GameConstants.Epsilon <= otherBoundsMax)
 						{
 							var newResultBoundMin = otherBoundsMax + GameConstants.Epsilon;
 

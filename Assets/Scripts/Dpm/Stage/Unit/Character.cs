@@ -7,12 +7,19 @@ using UnityEngine;
 
 namespace Dpm.Stage.Unit
 {
-	public class Character : ObjectUnit, IUpdatable, IEventListener, IDisposable
+	public class Character : Unit, IUpdatable, IEventListener, IDisposable
 	{
 		public SpriteAnimator Animator { get; private set; }
 
 		private void Awake()
 		{
+			OnInit();
+		}
+
+		public override void OnInit()
+		{
+			base.OnInit();
+
 			Animator = GetComponent<SpriteAnimator>();
 		}
 

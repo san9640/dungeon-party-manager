@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Dpm.Stage.Unit
 {
 	[RequireComponent(typeof(UnitSpec))]
-	public class ObjectUnit : MonoBehaviour, IUnit
+	public class Unit : MonoBehaviour, IUnit
 	{
 		public string Name { get; protected set; }
 
@@ -32,6 +32,11 @@ namespace Dpm.Stage.Unit
 		public Bounds2D Bounds { get; protected set; }
 
 		private void Awake()
+		{
+			OnInit();
+		}
+
+		public virtual void OnInit()
 		{
 			var spec = GetComponent<UnitSpec>();
 

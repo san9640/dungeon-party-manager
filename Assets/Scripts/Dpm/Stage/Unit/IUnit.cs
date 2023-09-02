@@ -25,6 +25,8 @@ namespace Dpm.Stage.Unit
 
 		Vector2 Position { get; set; }
 
+		void OnInit();
+
 		void EnterField();
 
 		void ExitField();

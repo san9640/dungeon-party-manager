@@ -21,3 +21,7 @@ MonoBehaviour:
     prefabSpecName: field_door
     maxCount: 5
     lifeTime: -1
+  - name: character_wizard
+    prefabSpecName: character_wizard
+    maxCount: 4
+    lifeTime: -1

@@ -34,19 +34,16 @@ namespace Dpm.Stage
 
 		public StageState State { get; private set; } = StageState.None;
 
-		public Party AllyParty { get; private set; }
-
-		public Party EnemyParty { get; private set; }
-
 		public StagePhysicsManager PhysicsManager { get; private set; }
 
-		private List<IUnit> _units = new();
+		public UnitManager UnitManager { get; private set; }
 
 		public IEnumerator LoadAsync()
 		{
 			yield return UnityScene.LoadSceneAsync(SceneName);
 
 			PhysicsManager = new StagePhysicsManager();
+			UnitManager = new UnitManager();
 
 			if (!CoreService.Asset.TryGet<GameObject>("field", out var prefab))
 			{
@@ -62,31 +59,15 @@ namespace Dpm.Stage
 			// FIXME : unit이 생성되면 알아서 Add되도록 변경해야 함
 			foreach (var unit in _field.Units)
 			{
-				_units.Add(unit);
+				UnitManager.RegisterUnit(unit);
 			}
 
-			var allies = new List<Character>();
-
-			// FIXME
-			for (int i = 0; i < 4; i++)
-			{
-				var ally = GenerateCharacter("character_wizard");
-
-				ally.Position = _field.AllySpawnArea.RandomPos;
-				ally.Animator.LookDirection = _field.AllySpawnArea.Direction;
-
-				allies.Add(ally);
-			}
-
-			AllyParty = new Party(UnitRegion.Ally, allies);
+			UnitManager.SpawnAllies(_field.AllySpawnArea);
 		}
 
 		public void Enter()
 		{
-			foreach (var unit in _units)
-			{
-				unit.EnterField();
-			}
+			UnitManager.EnterFieldAll();
 
 			CoreService.Event.Subscribe<ExitStageEvent>(OnExitStage);
 			CoreService.Event.Subscribe<FieldClearedEvent>(OnFieldCleared);
@@ -101,16 +82,10 @@ namespace Dpm.Stage
 			CoreService.Event.Unsubscribe<ScreenFadeOutStartEvent>(OnScreenFadeOutStart);
 			CoreService.Event.Unsubscribe<ScreenFadeInEndEvent>(OnScreenFadeInEnd);
 
-			foreach (var unit in _units)
-			{
-				unit.ExitField();
-			}
+			UnitManager.ExitFieldAll();
 
-			AllyParty?.Dispose();
-			AllyParty = null;
-
-			EnemyParty?.Dispose();
-			EnemyParty = null;
+			UnitManager.Dispose();
+			UnitManager = null;
 
 			if (_field != null)
 			{
@@ -124,9 +99,6 @@ namespace Dpm.Stage
 
 			PhysicsManager?.Dispose();
 			PhysicsManager = null;
-
-			_units.Clear();
-			_units = null;
 		}
 
 		private void OnExitStage(Core.Interface.Event e)
@@ -179,20 +151,13 @@ namespace Dpm.Stage
 
 			yield return ScreenTransition.Instance.FadeOutAsync(1, this);
 
-			foreach (var unit in _units)
-			{
-				unit.ExitField();
-			}
+			UnitManager.ExitFieldAll();
 
 			_field.Dispose();
 
 			GenerateField();
 
-			// FIXME : Field에 들어와있는지 확인
-			foreach (var unit in _units)
-			{
-				unit.EnterField();
-			}
+			UnitManager.EnterFieldAll();
 
 			yield return ScreenTransition.Instance.FadeInAsync(1, this);
 
@@ -208,25 +173,6 @@ namespace Dpm.Stage
 			var doorCount = Random.Range(1, GameRoom.MaxDoorCount + 1);
 
 			_field.Initialize(doorCount);
-		}
-
-		/// <summary>
-		/// 캐릭터 생성
-		/// FIXME : Generator가 많아지면 분리 필요
-		/// </summary>
-		private Character GenerateCharacter(string specName)
-		{
-			if (!CoreService.Asset.TryGet<GameObject>(specName, out var prefab))
-			{
-				return null;
-			}
-
-			var go = Object.Instantiate(prefab);
-			var character = go.GetComponent<Character>();
-
-			_units.Add(character);
-
-			return character;
 		}
 	}
 }

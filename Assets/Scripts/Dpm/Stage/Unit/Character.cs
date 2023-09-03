@@ -3,6 +3,7 @@ using Core.Interface;
 using Dpm.CoreAdapter;
 using Dpm.Stage.Physics;
 using Dpm.Stage.Render;
+using Dpm.Utility.Constants;
 using UnityEngine;
 
 namespace Dpm.Stage.Unit
@@ -10,6 +11,12 @@ namespace Dpm.Stage.Unit
 	public class Character : Unit, IUpdatable, IEventListener, IDisposable
 	{
 		public SpriteAnimator Animator { get; private set; }
+
+		public Direction Direction
+		{
+			get => Animator.LookDirection;
+			set => Animator.LookDirection = value;
+		}
 
 		private void Awake()
 		{

@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using Dpm.CoreAdapter;
+using Dpm.Stage.Event;
 using Dpm.Stage.Room;
+using Dpm.Stage.Unit.State;
 using Dpm.Utility.Constants;
 using Dpm.Utility.Extensions;
 using Dpm.Utility.Pool;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Dpm.Stage.Unit
@@ -14,12 +18,20 @@ namespace Dpm.Stage.Unit
 		private Party _allyParty;
 		private Party _enemyParty;
 
-		public UnitManager()
-		{
-		}
-
 		public void Dispose()
 		{
+			_allyParty?.Dispose();
+			_allyParty = null;
+
+			_enemyParty?.Dispose();
+			_enemyParty = null;
+
+			// 모든 유닛 해제
+			foreach (var unit in _units)
+			{
+				UnregisterUnit(unit);
+			}
+
 			_units?.Clear();
 			_units = null;
 		}
@@ -69,7 +81,7 @@ namespace Dpm.Stage.Unit
 		{
 			var pool = GameObjectPool.Get(poolSpecName);
 
-			if (pool == null || !pool.TrySpawn(Vector3.zero, out var go))
+			if (pool.IsUnityNull() || !pool.TrySpawn(Vector3.zero, out var go))
 			{
 				character = null;
 				return false;
@@ -96,28 +108,16 @@ namespace Dpm.Stage.Unit
 		public void RegisterUnit(IUnit unit)
 		{
 			_units.Add(unit);
+
+			CoreService.Event.SendImmediate(unit, UnitRegisteredEvent.Instance);
 		}
 
 		public void UnregisterUnit(IUnit unit)
 		{
+			// State 비워줌
+			CoreService.Event.SendImmediate(unit, UnitUnregisteredEvent.Instance);
+
 			_units.Remove(unit);
-		}
-
-		// FIXME : Field 진입을 직접 호출하지 않고, 이벤트로 관리하도록 변경해야 함
-		public void EnterFieldAll()
-		{
-			foreach (var unit in _units)
-			{
-				unit.EnterField();
-			}
-		}
-
-		public void ExitFieldAll()
-		{
-			foreach (var unit in _units)
-			{
-				unit.ExitField();
-			}
 		}
 	}
 }

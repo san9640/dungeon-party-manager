@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using Core.Interface;
 using Dpm.Common;
 using Dpm.Common.Event;
@@ -8,7 +7,6 @@ using Dpm.Stage.Event;
 using Dpm.Stage.Physics;
 using Dpm.Stage.Room;
 using Dpm.Stage.Unit;
-using Dpm.Utility;
 using UnityEngine;
 using UnityScene = UnityEngine.SceneManagement.SceneManager;
 
@@ -56,7 +54,7 @@ namespace Dpm.Stage
 
 			GenerateField();
 
-			// FIXME : unit이 생성되면 알아서 Add되도록 변경해야 함
+			// FIXME : Register 방식을 변경하고 싶음
 			foreach (var unit in _field.Units)
 			{
 				UnitManager.RegisterUnit(unit);
@@ -67,7 +65,7 @@ namespace Dpm.Stage
 
 		public void Enter()
 		{
-			UnitManager.EnterFieldAll();
+			CoreService.Event.PublishImmediate(StageEnterEvent.Instance);
 
 			CoreService.Event.Subscribe<ExitStageEvent>(OnExitStage);
 			CoreService.Event.Subscribe<FieldClearedEvent>(OnFieldCleared);
@@ -82,7 +80,7 @@ namespace Dpm.Stage
 			CoreService.Event.Unsubscribe<ScreenFadeOutStartEvent>(OnScreenFadeOutStart);
 			CoreService.Event.Unsubscribe<ScreenFadeInEndEvent>(OnScreenFadeInEnd);
 
-			UnitManager.ExitFieldAll();
+			CoreService.Event.PublishImmediate(StageExitEvent.Instance);
 
 			UnitManager.Dispose();
 			UnitManager = null;
@@ -151,13 +149,13 @@ namespace Dpm.Stage
 
 			yield return ScreenTransition.Instance.FadeOutAsync(1, this);
 
-			UnitManager.ExitFieldAll();
+			CoreService.Event.PublishImmediate(RoomChangeStartEvent.Instance);
 
 			_field.Dispose();
 
 			GenerateField();
 
-			UnitManager.EnterFieldAll();
+			CoreService.Event.PublishImmediate(RoomChangeEndEvent.Instance);
 
 			yield return ScreenTransition.Instance.FadeInAsync(1, this);
 

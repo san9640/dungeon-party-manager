@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Dpm.Common;
 using Dpm.CoreAdapter;
 using Dpm.Stage.Event;
-using Dpm.Stage.Unit;
 using Dpm.Utility.Pool;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Dpm.Stage.Room
 {
@@ -204,7 +203,8 @@ namespace Dpm.Stage.Room
 				return;
 			}
 
-			if (_state == State.WaitDoorOpen)
+			// 스크린 페이드 중에는 동작하지 않도록 함
+			if (_state == State.WaitDoorOpen && !ScreenTransition.Instance.Enabled)
 			{
 				if (doorClickEvent.DoorIndex >= 0 && doorClickEvent.DoorIndex < _doorHolders.Length)
 				{

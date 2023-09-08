@@ -2,6 +2,8 @@
 using Dpm.CoreAdapter;
 using Dpm.Stage.Event;
 using Dpm.Stage.Physics;
+using Dpm.Stage.Unit.State;
+using Dpm.Utility.State;
 using UnityEngine;
 
 namespace Dpm.Stage.Unit
@@ -31,6 +33,10 @@ namespace Dpm.Stage.Unit
 
 		public Bounds2D Bounds { get; protected set; }
 
+		public IState CurrentState => _stateMachine.CurrentState;
+
+		protected StateMachine _stateMachine = new();
+
 		private void Awake()
 		{
 			OnInit();
@@ -45,14 +51,20 @@ namespace Dpm.Stage.Unit
 			Region = UnitRegion.Neutral;
 		}
 
-		public virtual void EnterField()
+		public virtual void OnEvent(Core.Interface.Event e)
 		{
-			CoreService.Event.PublishImmediate(AddedToPartitionEvent.Create(this));
-		}
-
-		public virtual void ExitField()
-		{
-			CoreService.Event.PublishImmediate(RemovedFromPartitionEvent.Create(this));
+			if (e is StateChangeEvent sce)
+			{
+				_stateMachine.ChangeState(sce.State);
+			}
+			else if (e is UnitRegisteredEvent)
+			{
+				_stateMachine.ChangeState(UnitIdleState.Create(this));
+			}
+			else if (e is UnitUnregisteredEvent)
+			{
+				_stateMachine.ChangeState(null);
+			}
 		}
 	}
 }

@@ -4,7 +4,7 @@ using Dpm.Utility.Event;
 
 namespace Dpm.Stage.Event
 {
-	public class RemovedFromPartitionEvent : PooledEvent<RemovedFromPartitionEvent>
+	public class AddToPartitionEvent : PooledEvent<AddToPartitionEvent>
 	{
 		public ICustomCollider Collider { get; private set; }
 
@@ -15,7 +15,7 @@ namespace Dpm.Stage.Event
 			base.Dispose();
 		}
 
-		public static RemovedFromPartitionEvent Create(IUnit target)
+		public static AddToPartitionEvent Create(IUnit target)
 		{
 			var e = Pool.GetOrCreate();
 			e.Collider = target;

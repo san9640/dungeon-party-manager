@@ -1,5 +1,7 @@
 ﻿using System;
+using Core.Interface;
 using Dpm.Stage.Physics;
+using Dpm.Utility.State;
 using UnityEngine;
 
 namespace Dpm.Stage.Unit
@@ -15,7 +17,7 @@ namespace Dpm.Stage.Unit
 		All = Ally | Enemy | Neutral,
 	}
 
-	public interface IUnit : ICustomCollider
+	public interface IUnit : ICustomCollider, IEventListener
 	{
 		int Id { get; }
 
@@ -25,10 +27,6 @@ namespace Dpm.Stage.Unit
 
 		Vector2 Position { get; set; }
 
-		void OnInit();
-
-		void EnterField();
-
-		void ExitField();
+		IState CurrentState { get; }
 	}
 }

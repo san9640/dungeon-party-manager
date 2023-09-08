@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Dpm.CoreAdapter;
 using Dpm.Stage.Event;
 using Dpm.Stage.Unit;
-using Dpm.Utility;
 using Dpm.Utility.Constants;
 using Dpm.Utility.Extensions;
 using UnityEngine;
@@ -21,19 +20,19 @@ namespace Dpm.Stage.Physics
 
 		public StagePhysicsManager()
 		{
-			CoreService.Event.Subscribe<AddedToPartitionEvent>(OnAddedToPartition);
-			CoreService.Event.Subscribe<RemovedFromPartitionEvent>(OnRemovedFromPartition);
+			CoreService.Event.Subscribe<AddToPartitionEvent>(OnAddToPartition);
+			CoreService.Event.Subscribe<RemoveFromPartitionEvent>(OnRemoveFromPartition);
 		}
 
 		public void Dispose()
 		{
-			CoreService.Event.Unsubscribe<AddedToPartitionEvent>(OnAddedToPartition);
-			CoreService.Event.Unsubscribe<RemovedFromPartitionEvent>(OnRemovedFromPartition);
+			CoreService.Event.Unsubscribe<AddToPartitionEvent>(OnAddToPartition);
+			CoreService.Event.Unsubscribe<RemoveFromPartitionEvent>(OnRemoveFromPartition);
 		}
 
-		private void OnAddedToPartition(Core.Interface.Event e)
+		private void OnAddToPartition(Core.Interface.Event e)
 		{
-			if (e is not AddedToPartitionEvent ape)
+			if (e is not AddToPartitionEvent ape)
 			{
 				return;
 			}
@@ -42,9 +41,9 @@ namespace Dpm.Stage.Physics
 			_colliders.Add(ape.Collider);
 		}
 
-		private void OnRemovedFromPartition(Core.Interface.Event e)
+		private void OnRemoveFromPartition(Core.Interface.Event e)
 		{
-			if (e is not RemovedFromPartitionEvent rpe)
+			if (e is not RemoveFromPartitionEvent rpe)
 			{
 				return;
 			}
@@ -147,6 +146,13 @@ namespace Dpm.Stage.Physics
 
 				foreach (var other in _colliders)
 				{
+					// 충돌할 타입과 다르면 패스
+					if (other is IUnit otherUnit &&
+					    (otherUnit.Region & canCollideUnitRegions) == UnitRegion.None)
+					{
+						continue;
+					}
+
 					if (anotherAxisMax > other.Bounds.Min[anotherAxisIndex] &&
 					    anotherAxisMin < other.Bounds.Max[anotherAxisIndex])
 					{

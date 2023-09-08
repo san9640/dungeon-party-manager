@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using Dpm.Utility.Pool;
 using UnityEditor;
 
-namespace Dpm.Utility.Pool
+namespace Dpm.Editor
 {
 	[CustomEditor(typeof(GameObjectPoolSpec))]
-	public class GameObjectPoolSpecHolderEditor : Editor
+	public class GameObjectPoolSpecHolderEditor : UnityEditor.Editor
 	{
 		private GameObjectPoolSpecHolder _holder;
 		private readonly HashSet<string> _specNames = new();

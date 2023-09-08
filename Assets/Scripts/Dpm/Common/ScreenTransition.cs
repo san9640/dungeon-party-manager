@@ -16,9 +16,10 @@ namespace Dpm.Common
 
 		public static ScreenTransition Instance { get; private set; }
 
-		private bool Enable
+		public bool Enabled
 		{
-			set
+			get => renderer.enabled;
+			private set
 			{
 				renderer.enabled = value;
 				camera.enabled = value;
@@ -38,7 +39,7 @@ namespace Dpm.Common
 			Instance = this;
 
 			Alpha = 1;
-			Enable = true;
+			Enabled = true;
 		}
 
 		private void OnDestroy()
@@ -60,7 +61,7 @@ namespace Dpm.Common
 		{
 			CoreService.Event.Publish(ScreenFadeOutStartEvent.Create(requester));
 
-			Enable = true;
+			Enabled = true;
 
 			var reqId = unchecked(++_reqId);
 
@@ -69,7 +70,7 @@ namespace Dpm.Common
 
 		public IEnumerator FadeInAsync(float duration, object requester)
 		{
-			Enable = true;
+			Enabled = true;
 
 			var reqId = unchecked(++_reqId);
 
@@ -77,7 +78,7 @@ namespace Dpm.Common
 
 			if (reqId == _reqId)
 			{
-				Enable = false;
+				Enabled = false;
 
 				CoreService.Event.Publish(ScreenFadeInEndEvent.Create(requester));
 			}

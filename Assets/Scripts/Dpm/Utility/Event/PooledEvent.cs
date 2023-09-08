@@ -15,8 +15,6 @@ namespace Dpm.Utility.Event
 		public override void Dispose()
 		{
 			Pool.Return(this as T);
-
-			base.Dispose();
 		}
 	}
 }

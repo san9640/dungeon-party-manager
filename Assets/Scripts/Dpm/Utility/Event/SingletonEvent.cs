@@ -12,7 +12,6 @@ namespace Dpm.Utility.Event
 
 		public new void Dispose()
 		{
-			base.Dispose();
 		}
 	}
 }

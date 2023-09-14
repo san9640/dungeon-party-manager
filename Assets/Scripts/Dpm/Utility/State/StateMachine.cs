@@ -13,7 +13,7 @@ namespace Dpm.Utility.State
 
 			CurrentState = nextState;
 
-			CurrentState.Enter();
+			CurrentState?.Enter();
 		}
 	}
 }

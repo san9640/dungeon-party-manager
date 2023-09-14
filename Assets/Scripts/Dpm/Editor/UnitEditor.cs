@@ -1,5 +1,6 @@
 ﻿using Dpm.Stage.Unit;
 using UnityEditor;
+using UnityEngine;
 
 namespace Dpm.Editor
 {
@@ -22,7 +23,10 @@ namespace Dpm.Editor
 		{
 			base.OnInspectorGUI();
 
-			EditorGUILayout.LabelField("CurrentState", _unit.CurrentState.ToString());
+			if (Application.isPlaying)
+			{
+				EditorGUILayout.LabelField("CurrentState", _unit.CurrentState.ToString());
+			}
 		}
 	}
 }

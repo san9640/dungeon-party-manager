@@ -19,4 +19,6 @@ MonoBehaviour:
   - name: field_door
     path: Prefabs/Field/door_unit
   - name: character_wizard
-    path: Prefabs/Character/wizard
+    path: Prefabs/Character/wizard/wizard
+  - name: character_orc_warrior
+    path: Prefabs/Character/orc_warrior/orc_warrior

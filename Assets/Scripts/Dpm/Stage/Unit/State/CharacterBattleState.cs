@@ -42,13 +42,32 @@ namespace Dpm.Stage.Unit.State
 
 		public void UpdateFrame(float dt)
 		{
-			var dist = dt * 3;
-			var xMove = Input.GetAxis("Horizontal");
-			var yMove = Input.GetAxis("Vertical");
+			// FIXME : 테스트 코드
+			if (_character.Region == UnitRegion.Ally)
+			{
+				var dist = dt * 3;
+				var xMove = Input.GetAxis("Horizontal");
+				var yMove = Input.GetAxis("Vertical");
 
-			var moveDir = new Vector2(xMove, yMove).normalized;
+				var moveDir = new Vector2(xMove, yMove).normalized;
 
-			StagePhysicsManager.Instance.MoveUnit(_character, moveDir, dist);
+				StagePhysicsManager.Instance.MoveUnit(_character, moveDir, dist);
+			}
+			else if (_character.Region == UnitRegion.Enemy)
+			{
+				for (var key = KeyCode.Alpha1; key <= KeyCode.Alpha4; key++)
+				{
+					if (Input.GetKeyDown(key) &&
+					    ReferenceEquals(_character, UnitManager.Instance.EnemyParty.Members[key - KeyCode.Alpha1]))
+					{
+						var deadState = CharacterDeadState.Create(_character);
+
+						CoreService.Event.Send(_character, StateChangeEvent.Create(deadState));
+
+						break;
+					}
+				}
+			}
 		}
 
 		private void OnBattleEnd(Core.Interface.Event e)

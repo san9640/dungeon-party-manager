@@ -1,4 +1,6 @@
-﻿using Dpm.Utility.State;
+﻿using Dpm.CoreAdapter;
+using Dpm.Stage.Event;
+using Dpm.Utility.State;
 
 namespace Dpm.Stage.Unit.State
 {
@@ -10,6 +12,8 @@ namespace Dpm.Stage.Unit.State
 		{
 			// TODO?
 			// _character.Animator.SetAnimation("dead");
+
+			CoreService.Event.Publish(CharacterEliminatedEvent.Create(_character));
 		}
 
 		public override void Exit()

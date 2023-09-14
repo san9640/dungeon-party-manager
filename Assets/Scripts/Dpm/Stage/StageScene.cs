@@ -6,6 +6,8 @@ using Dpm.CoreAdapter;
 using Dpm.Stage.Event;
 using Dpm.Stage.Physics;
 using Dpm.Stage.Room;
+using Dpm.Stage.UI;
+using Dpm.Stage.UI.Event;
 using Dpm.Stage.Unit;
 using UnityEngine;
 using UnityScene = UnityEngine.SceneManagement.SceneManager;
@@ -26,9 +28,11 @@ namespace Dpm.Stage
 	/// </summary>
 	public class StageScene : IScene
 	{
+		public static StageScene Instance => Game.Instance.Stage;
+
 		private const string SceneName = "Stage";
 
-		private GameRoom _field;
+		private GameRoom _room;
 
 		public StageState State { get; private set; } = StageState.None;
 
@@ -36,8 +40,12 @@ namespace Dpm.Stage
 
 		public UnitManager UnitManager { get; private set; }
 
+		private StageUIManager _stageUIManager;
+
 		public IEnumerator LoadAsync()
 		{
+			State = StageState.Loading;
+
 			yield return UnityScene.LoadSceneAsync(SceneName);
 
 			PhysicsManager = new StagePhysicsManager();
@@ -48,19 +56,23 @@ namespace Dpm.Stage
 				yield break;
 			}
 
-			var fieldGo = Object.Instantiate(prefab);
+			var roomGo = Object.Instantiate(prefab);
 
-			_field = fieldGo.GetComponent<GameRoom>();
+			_room = roomGo.GetComponent<GameRoom>();
 
-			GenerateField();
+			GenerateRoom();
 
 			// FIXME : Register 방식을 변경하고 싶음
-			foreach (var unit in _field.Units)
+			foreach (var unit in _room.Units)
 			{
 				UnitManager.RegisterUnit(unit);
 			}
 
-			UnitManager.SpawnAllies(_field.AllySpawnArea);
+			UnitManager.SpawnAllies(_room.AllySpawnArea);
+			UnitManager.SpawnEnemies(_room.EnemySpawnArea);
+
+			_stageUIManager = StageUIManager.Instance;
+			_stageUIManager.Init();
 		}
 
 		public void Enter()
@@ -68,32 +80,39 @@ namespace Dpm.Stage
 			CoreService.Event.PublishImmediate(StageEnterEvent.Instance);
 
 			CoreService.Event.Subscribe<ExitStageEvent>(OnExitStage);
-			CoreService.Event.Subscribe<FieldClearedEvent>(OnFieldCleared);
+			CoreService.Event.Subscribe<RoomClearedEvent>(OnRoomCleared);
 			CoreService.Event.Subscribe<ScreenFadeOutStartEvent>(OnScreenFadeOutStart);
 			CoreService.Event.Subscribe<ScreenFadeInEndEvent>(OnScreenFadeInEnd);
+			CoreService.Event.Subscribe<PartyEliminatedEvent>(OnPartyEliminated);
+			CoreService.Event.Subscribe<BattleStartButtonPressedEvent>(OnBattleStartButtonPressed);
 		}
 
 		public void Exit()
 		{
 			CoreService.Event.Unsubscribe<ExitStageEvent>(OnExitStage);
-			CoreService.Event.Unsubscribe<FieldClearedEvent>(OnFieldCleared);
+			CoreService.Event.Unsubscribe<RoomClearedEvent>(OnRoomCleared);
 			CoreService.Event.Unsubscribe<ScreenFadeOutStartEvent>(OnScreenFadeOutStart);
 			CoreService.Event.Unsubscribe<ScreenFadeInEndEvent>(OnScreenFadeInEnd);
+			CoreService.Event.Unsubscribe<PartyEliminatedEvent>(OnPartyEliminated);
+			CoreService.Event.Unsubscribe<BattleStartButtonPressedEvent>(OnBattleStartButtonPressed);
 
 			CoreService.Event.PublishImmediate(StageExitEvent.Instance);
+
+			_stageUIManager.Dispose();
+			_stageUIManager = null;
 
 			UnitManager.Dispose();
 			UnitManager = null;
 
-			if (_field != null)
+			if (_room != null)
 			{
 				// TODO : 그리드 옮겨갈 때마다 리셋해주는 것으로 변경
-				_field.Dispose();
+				_room.Dispose();
 
-				Object.Destroy(_field.gameObject);
+				Object.Destroy(_room.gameObject);
 			}
 
-			_field = null;
+			_room = null;
 
 			PhysicsManager?.Dispose();
 			PhysicsManager = null;
@@ -104,7 +123,7 @@ namespace Dpm.Stage
 			Game.Instance.MoveToMainMenu();
 		}
 
-		private void OnFieldCleared(Core.Interface.Event e)
+		private void OnRoomCleared(Core.Interface.Event e)
 		{
 			CoreService.Coroutine.StartCoroutine(MoveRoomAsync());
 		}
@@ -140,6 +159,42 @@ namespace Dpm.Stage
 			}
 		}
 
+		private void OnBattleStartButtonPressed(Core.Interface.Event e)
+		{
+			if (e is not BattleStartButtonPressedEvent bsbe)
+			{
+				return;
+			}
+
+			CoreService.Event.Publish(BattleStartEvent.Instance);
+
+			bsbe.DeactivateButton();
+		}
+
+		private void OnPartyEliminated(Core.Interface.Event e)
+		{
+			if (e is not PartyEliminatedEvent pee)
+			{
+				return;
+			}
+
+			if (pee.Party.Region == UnitRegion.Ally)
+			{
+				State = StageState.AfterBattle;
+
+				CoreService.Event.Publish(BattleEndEvent.Create(UnitRegion.Enemy));
+
+				// TODO : 임시 처리임. 게임 결과창 띄워주기
+				Game.Instance.MoveToMainMenu();
+			}
+			else if (pee.Party.Region == UnitRegion.Enemy)
+			{
+				State = StageState.AfterBattle;
+
+				CoreService.Event.Publish(BattleEndEvent.Create(UnitRegion.Ally));
+			}
+		}
+
 		/// <summary>
 		/// 클리어 이후 방을 이동하는 코루틴
 		/// </summary>
@@ -151,9 +206,13 @@ namespace Dpm.Stage
 
 			CoreService.Event.PublishImmediate(RoomChangeStartEvent.Instance);
 
-			_field.Dispose();
+			UnitManager.DespawnEnemies();
 
-			GenerateField();
+			_room.Dispose();
+
+			GenerateRoom();
+
+			UnitManager.SpawnEnemies(_room.EnemySpawnArea);
 
 			CoreService.Event.PublishImmediate(RoomChangeEndEvent.Instance);
 
@@ -163,14 +222,14 @@ namespace Dpm.Stage
 		}
 
 		/// <summary>
-		/// Field 생성
+		/// Room 생성
 		/// </summary>
-		private void GenerateField()
+		private void GenerateRoom()
 		{
 			// FIXME
 			var doorCount = Random.Range(1, GameRoom.MaxDoorCount + 1);
 
-			_field.Initialize(doorCount);
+			_room.Initialize(doorCount);
 		}
 	}
 }

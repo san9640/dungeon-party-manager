@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Dpm.Common;
 using Dpm.CoreAdapter;
 using Dpm.Stage.Event;
+using Dpm.Stage.Unit;
 using Dpm.Utility.Pool;
 using UnityEngine;
 
@@ -177,14 +178,16 @@ namespace Dpm.Stage.Room
 				_usingDoorHolders.Add(doorHolder);
 			}
 
-			_state = State.WaitDoorOpen;
+			_state = State.None;
 
-			CoreService.Event.Subscribe<DoorClickEvent>(OnDoorClickEvent);
+			CoreService.Event.Subscribe<DoorClickEvent>(OnDoorClick);
+			CoreService.Event.Subscribe<BattleEndEvent>(OnBattleEnd);
 		}
 
 		public void Dispose()
 		{
-			CoreService.Event.Unsubscribe<DoorClickEvent>(OnDoorClickEvent);
+			CoreService.Event.Unsubscribe<DoorClickEvent>(OnDoorClick);
+			CoreService.Event.Unsubscribe<BattleEndEvent>(OnBattleEnd);
 
 			_state = State.None;
 
@@ -196,7 +199,7 @@ namespace Dpm.Stage.Room
 			_usingDoorHolders.Clear();
 		}
 
-		private void OnDoorClickEvent(Core.Interface.Event e)
+		private void OnDoorClick(Core.Interface.Event e)
 		{
 			if (e is not DoorClickEvent doorClickEvent)
 			{
@@ -212,8 +215,21 @@ namespace Dpm.Stage.Room
 
 					_doorHolders[doorClickEvent.DoorIndex].Door.IsOpened = true;
 
-					CoreService.Event.Publish(FieldClearedEvent.Instance);
+					CoreService.Event.Publish(RoomClearedEvent.Instance);
 				}
+			}
+		}
+
+		private void OnBattleEnd(Core.Interface.Event e)
+		{
+			if (e is not BattleEndEvent bee)
+			{
+				return;
+			}
+
+			if (bee.WonPartyRegion == UnitRegion.Ally)
+			{
+				_state = State.WaitDoorOpen;
 			}
 		}
 	}

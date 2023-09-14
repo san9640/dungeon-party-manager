@@ -1,8 +1,5 @@
 ﻿using System;
-using Core.Interface;
-using Dpm.CoreAdapter;
 using Dpm.Stage.Event;
-using Dpm.Stage.Physics;
 using Dpm.Stage.Render;
 using Dpm.Stage.Unit.State;
 using Dpm.Utility.Constants;
@@ -10,9 +7,12 @@ using UnityEngine;
 
 namespace Dpm.Stage.Unit
 {
-	public class Character : Unit, IEventListener, IDisposable
+	public class Character : Unit, IDisposable
 	{
-		public SpriteAnimator Animator { get; private set; }
+		[SerializeField]
+		private SpriteAnimator animator;
+
+		public SpriteAnimator Animator => animator;
 
 		public Direction Direction
 		{
@@ -23,13 +23,6 @@ namespace Dpm.Stage.Unit
 		private void Awake()
 		{
 			OnInit();
-		}
-
-		public override void OnInit()
-		{
-			base.OnInit();
-
-			Animator = GetComponent<SpriteAnimator>();
 		}
 
 		public void Dispose()

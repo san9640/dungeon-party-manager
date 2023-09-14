@@ -15,7 +15,7 @@ namespace Dpm.Stage.Unit
 
 		public int Id { get; protected set; }
 
-		public UnitRegion Region { get; protected set; } = UnitRegion.None;
+		public UnitRegion Region { get; set; } = UnitRegion.None;
 
 		public Vector2 Position
 		{

@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using Dpm.CoreAdapter;
 using Dpm.Stage.Event;
 using Dpm.Stage.Room;
-using Dpm.Stage.Unit.State;
+using Dpm.Stage.Unit.AI;
 using Dpm.Utility.Constants;
-using Dpm.Utility.Extensions;
 using Dpm.Utility.Pool;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -14,17 +13,22 @@ namespace Dpm.Stage.Unit
 {
 	public class UnitManager : IDisposable
 	{
+		public static UnitManager Instance => StageScene.Instance.UnitManager;
+
 		private List<IUnit> _units = new();
+
 		private Party _allyParty;
+
+		public Party AllyParty => _allyParty;
+
 		private Party _enemyParty;
+
+		public Party EnemyParty => _enemyParty;
 
 		public void Dispose()
 		{
-			_allyParty?.Dispose();
-			_allyParty = null;
-
-			_enemyParty?.Dispose();
-			_enemyParty = null;
+			DespawnParty(ref _allyParty);
+			DespawnParty(ref _enemyParty);
 
 			// 모든 유닛 해제
 			foreach (var unit in _units)
@@ -38,20 +42,79 @@ namespace Dpm.Stage.Unit
 
 		public void SpawnAllies(SpawnArea spawnArea)
 		{
-			if (TrySpawnParty("ally", spawnArea, out var party))
+			if (_allyParty == null && TrySpawnParty("ally", spawnArea, out var party))
 			{
 				_allyParty = party;
 			}
+		}
+
+		public void SpawnEnemies(SpawnArea spawnArea)
+		{
+			if (_enemyParty == null && TrySpawnParty("enemy", spawnArea, out var party))
+			{
+				_enemyParty = party;
+			}
+		}
+
+		public void DespawnEnemies()
+		{
+			DespawnParty(ref _enemyParty);
+		}
+
+		private void DespawnParty(ref Party party)
+		{
+			if (party == null)
+			{
+				return;
+			}
+
+			foreach (var enemy in _enemyParty.Members)
+			{
+				DespawnCharacter(enemy);
+			}
+
+			party.Dispose();
+			party = null;
 		}
 
 		private bool TrySpawnParty(string partySpecName, SpawnArea spawnArea, out Party party)
 		{
 			UnitRegion region;
 
+			PartySpec partySpec;
+
 			// TODO : partySpecName으로 파티원 생성
 			if (partySpecName == "ally")
 			{
 				region = UnitRegion.Ally;
+
+				// FIXME : 임시
+				partySpec = new PartySpec
+				{
+					poolSpecNames = new []
+					{
+						"character_wizard",
+						"character_wizard",
+						"character_wizard",
+						"character_wizard",
+					}
+				};
+			}
+			else if (partySpecName == "enemy")
+			{
+				region = UnitRegion.Enemy;
+
+				// FIXME : 임시
+				partySpec = new PartySpec
+				{
+					poolSpecNames = new[]
+					{
+						"character_orc_warrior",
+						"character_orc_warrior",
+						"character_orc_warrior",
+						"character_orc_warrior",
+					}
+				};
 			}
 			else
 			{
@@ -63,9 +126,9 @@ namespace Dpm.Stage.Unit
 			var members = new List<Character>();
 
 			// FIXME
-			for (int i = 0; i < 4; i++)
+			foreach (var prefabSpecName in partySpec.poolSpecNames)
 			{
-				if (TrySpawnCharacter("character_wizard", spawnArea.RandomPos, spawnArea.Direction,
+				if (TrySpawnCharacter(prefabSpecName, spawnArea.RandomPos, spawnArea.Direction,
 					    out var member))
 				{
 					members.Add(member);
@@ -77,7 +140,7 @@ namespace Dpm.Stage.Unit
 			return true;
 		}
 
-		public bool TrySpawnCharacter(string poolSpecName, Vector2 spawnPos, Direction direction, out Character character)
+		private bool TrySpawnCharacter(string poolSpecName, Vector2 spawnPos, Direction direction, out Character character)
 		{
 			var pool = GameObjectPool.Get(poolSpecName);
 

@@ -42,6 +42,8 @@ namespace Dpm.Stage.Unit.State
 
 		public void UpdateFrame(float dt)
 		{
+			_character.DecisionMaker.UpdateFrame(dt);
+			
 			// FIXME : 테스트 코드
 			if (_character.Region == UnitRegion.Ally)
 			{

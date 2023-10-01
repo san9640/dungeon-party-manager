@@ -1,6 +1,7 @@
 ﻿using System;
 using Dpm.Stage.Event;
 using Dpm.Stage.Render;
+using Dpm.Stage.Unit.AI;
 using Dpm.Stage.Unit.State;
 using Dpm.Utility.Constants;
 using UnityEngine;
@@ -20,9 +21,13 @@ namespace Dpm.Stage.Unit
 			set => Animator.LookDirection = value;
 		}
 
+		public IDecisionMaker DecisionMaker { get; private set; }
+
 		private void Awake()
 		{
 			OnInit();
+
+			DecisionMaker = new DecisionMaker();
 		}
 
 		public void Dispose()

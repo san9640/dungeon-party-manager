@@ -16,6 +16,8 @@ namespace Dpm.Stage.Render
 			public Sprite[] sprites;
 
 			public Sprite this[int index] => sprites[index % sprites.Length];
+
+			public bool IsLastFrame(int index) => sprites.Length == index + 1;
 		}
 
 		[SerializeField]
@@ -26,12 +28,17 @@ namespace Dpm.Stage.Render
 
 		private Dictionary<string, SpriteAnimationInfo> _animDict;
 
+		[SerializeField]
+		private bool isLoop = true;
+
 		private string _currentAnimName = "idle";
 		private float _currentAnimTimePassed = 0;
 
 		private const float TransitionSpriteDelay = 0.12f;
 
 		private Direction _lookDirection = Direction.Right;
+
+		private int _currentFrame = 0;
 
 		public Direction LookDirection
 		{
@@ -43,9 +50,15 @@ namespace Dpm.Stage.Render
 				{
 					_lookDirection = value;
 
-					renderer.flipX = _lookDirection == Direction.Left || _lookDirection == Direction.Down;
+					renderer.flipX = _lookDirection is Direction.Left or Direction.Down;
 				}
 			}
+		}
+
+		public float Rotation
+		{
+			get => transform.rotation.z;
+			set => transform.rotation = Quaternion.Euler(transform.rotation.x, transform.rotation.y, value);
 		}
 
 		private void Awake()
@@ -56,14 +69,31 @@ namespace Dpm.Stage.Render
 			Rebuild();
 		}
 
-		public void Update()
+		private void OnEnable()
 		{
-			_currentAnimTimePassed += Time.deltaTime;
-
-			Rebuild();
+			SetAnimation("idle", isLoop);
 		}
 
-		public void SetAnimation(string animName)
+		public void Update()
+		{
+			if (!isLoop && _animDict[_currentAnimName].IsLastFrame(_currentFrame))
+			{
+				return;
+			}
+
+			var prevFrame = _currentFrame;
+
+			_currentAnimTimePassed += Time.deltaTime;
+
+			_currentFrame = (int) (_currentAnimTimePassed / TransitionSpriteDelay);
+
+			if (prevFrame != _currentFrame)
+			{
+				Rebuild();
+			}
+		}
+
+		public void SetAnimation(string animName, bool loop = true)
 		{
 			if (!_animDict.ContainsKey(animName))
 			{
@@ -73,13 +103,10 @@ namespace Dpm.Stage.Render
 				return;
 			}
 
-			if (_currentAnimName == animName)
-			{
-				return;
-			}
-
 			_currentAnimName = animName;
 			_currentAnimTimePassed = 0;
+			_currentFrame = 0;
+			isLoop = loop;
 
 			Rebuild();
 		}
@@ -91,9 +118,7 @@ namespace Dpm.Stage.Render
 
 		private void Rebuild()
 		{
-			var currentFrame = (int) (_currentAnimTimePassed / TransitionSpriteDelay);
-
-			renderer.sprite = _animDict[_currentAnimName][currentFrame];
+			renderer.sprite = _animDict[_currentAnimName][_currentFrame];
 		}
 	}
 }

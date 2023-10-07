@@ -22,3 +22,7 @@ MonoBehaviour:
     path: Prefabs/Character/wizard/wizard
   - name: character_orc_warrior
     path: Prefabs/Character/orc_warrior/orc_warrior
+  - name: fx_hit_normal
+    path: Prefabs/Effect/fx_hit_normal
+  - name: projectile_bolt
+    path: Prefabs/Projectile/projectile_bolt

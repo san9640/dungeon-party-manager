@@ -26,6 +26,8 @@ namespace Dpm.Utility.Pool
 		/// </summary>
 		private float _timePassed = 0;
 
+		private readonly Dictionary<Type, object> _cachedComponents = new();
+
 		public void Initialize(GameObjectPool parent, float lifeTime)
 		{
 			_parent = parent;
@@ -67,6 +69,24 @@ namespace Dpm.Utility.Pool
 		void IDisposable.Dispose()
 		{
 			_parent = null;
+		}
+
+		public new T GetComponent<T>() where T : class
+		{
+			if (!_cachedComponents.TryGetValue(typeof(T), out var component))
+			{
+				component = gameObject.GetComponent<T>();
+
+				_cachedComponents.Add(typeof(T), component);
+
+				// 인터페이스나 부모 클래스의 형태로 접근하는 케이스에도 다대일 대응이 되도록 함
+				if (!_cachedComponents.ContainsKey(component.GetType()))
+				{
+					_cachedComponents.Add(component.GetType(), component);
+				}
+			}
+
+			return component as T;
 		}
 
 		public void UpdateFrame(float dt)
@@ -127,7 +147,7 @@ namespace Dpm.Utility.Pool
 			if (_spec.maxCount > 0 && _usingObjects.Count >= _spec.maxCount)
 			{
 #if UNITY_EDITOR
-				Debug.LogError($"[{ _spec.name } GameObjectPool] already using full of MaxCount.");
+				Debug.LogError($"[{ _spec.Name } GameObjectPool] already using full of MaxCount.");
 #endif
 				result = null;
 				return false;
@@ -159,10 +179,10 @@ namespace Dpm.Utility.Pool
 				{
 					_usingObjects.RemoveAt(i);
 
-					target.gameObject.SetActive(false);
-
 					// 그 동안 부모가 바뀌었을 가능성이 있으므로 ObjectPool을 부모로 다시 세팅한다.
 					target.transform.SetParent(transform);
+
+					target.gameObject.SetActive(false);
 
 					_pool.Push(target);
 

@@ -1,17 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Dpm.Utility.Pool
 {
 	[Serializable]
-	public struct GameObjectPoolSpec
+	public struct GameObjectPoolSpec : IGameSpec
 	{
 		/// <summary>
 		/// 스펙명
 		/// </summary>
-		public string name;
+		[SerializeField]
+		private string name;
+
+		public string Name => name;
 
 		/// <summary>
 		/// Prefab의 스펙명
@@ -30,13 +31,7 @@ namespace Dpm.Utility.Pool
 	}
 
 	[CreateAssetMenu(menuName = "GameObjectPoolSpec", fileName = "GameObjectPoolSpec.asset")]
-	public class GameObjectPoolSpecHolder : ScriptableObject
+	public class GameObjectPoolSpecHolder : SpecsHolderBase<GameObjectPoolSpec>
 	{
-		public List<GameObjectPoolSpec> specs;
-
-		private IReadOnlyDictionary<string, GameObjectPoolSpec> _nameToSpec;
-
-		public IReadOnlyDictionary<string, GameObjectPoolSpec> NameToSpec =>
-			_nameToSpec ??= specs.ToDictionary(spec => spec.name);
 	}
 }

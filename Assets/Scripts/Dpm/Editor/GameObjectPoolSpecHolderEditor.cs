@@ -23,10 +23,10 @@ namespace Dpm.Editor
 
 			foreach (var spec in _holder.specs)
 			{
-				if (_specNames.Add(spec.name))
+				if (_specNames.Add(spec.Name))
 					continue;
 
-				sameSpecName = spec.name;
+				sameSpecName = spec.Name;
 
 				break;
 			}

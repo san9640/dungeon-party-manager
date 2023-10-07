@@ -15,8 +15,6 @@ namespace Dpm.Stage.Unit
 
 		UnitRegion Region { get; }
 
-		Vector2 Position { get; set; }
-
 		IState CurrentState { get; }
 	}
 }

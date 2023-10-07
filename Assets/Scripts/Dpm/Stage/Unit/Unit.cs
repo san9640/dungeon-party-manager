@@ -51,6 +51,16 @@ namespace Dpm.Stage.Unit
 			Region = UnitRegion.Neutral;
 		}
 
+		public bool OnSimulateCrash(ICustomCollider other)
+		{
+			return other switch
+			{
+				IUnit => true,
+				IProjectile projectile => Region.IsOppositeParty(projectile.Shooter.Region),
+				_ => false
+			};
+		}
+
 		public virtual void OnEvent(Core.Interface.Event e)
 		{
 			if (e is StateChangeEvent sce)

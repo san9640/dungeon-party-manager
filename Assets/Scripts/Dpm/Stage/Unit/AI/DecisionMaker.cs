@@ -36,7 +36,7 @@ namespace Dpm.Stage.Unit.AI
             CalculateAt(_skillCalculators, ref maxScore, ref maxScoredCalculator);
             
             // FIXME : 움직이며 공격하기 등의 다른 동작을 동시에 실행할 수 있어야 함
-            maxScoredCalculator?.Activate();
+            maxScoredCalculator?.Execute();
         }
 
         private void AddCalculator(Dictionary<Type, IAICalculator> calculators, IAICalculator calculator)

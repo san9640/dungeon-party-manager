@@ -4,6 +4,6 @@ namespace Dpm.Stage.Unit.AI.Calculator
     {
         float Calculate();
 
-        void Activate();
+        void Execute();
     }
 }

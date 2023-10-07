@@ -12,5 +12,7 @@ namespace Core.Interface
 		/// <typeparam name="T">에셋 타입</typeparam>
 		/// <returns>로드 성공 여부</returns>
 		bool TryGet<T>(string specName, out T result) where T : UnityEngine.Object;
+
+		T UnsafeGet<T>(string specName) where T : UnityEngine.Object;
 	}
 }

@@ -53,6 +53,13 @@ namespace Core.Base.Resource
 			return false;
 		}
 
+		public T UnsafeGet<T>(string specName) where T : Object
+		{
+			TryGet<T>(specName, out var result);
+
+			return result;
+		}
+
 		public void Dispose()
 		{
 			_resources.Clear();

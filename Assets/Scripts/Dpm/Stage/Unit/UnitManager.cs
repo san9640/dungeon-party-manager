@@ -39,6 +39,26 @@ namespace Dpm.Stage.Unit
 			_units = null;
 		}
 
+		public Party GetMyParty(UnitRegion region)
+		{
+			return region switch
+			{
+				UnitRegion.Ally => _allyParty,
+				UnitRegion.Enemy => _enemyParty,
+				_ => null
+			};
+		}
+
+		public Party GetOppositeParty(UnitRegion region)
+		{
+			return region switch
+			{
+				UnitRegion.Ally => _enemyParty,
+				UnitRegion.Enemy => _allyParty,
+				_ => null
+			};
+		}
+
 		public void SpawnAllies(SpawnArea spawnArea)
 		{
 			if (_allyParty == null && TrySpawnParty("ally", spawnArea, out var party))

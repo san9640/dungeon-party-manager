@@ -14,6 +14,8 @@ namespace Dpm.Stage.Unit.State
 	{
 		private Character _character;
 
+		private float _testTimePassed;
+
 		public override void Enter()
 		{
 			CoreService.FrameUpdate.RegisterUpdate(this, _character.Id);
@@ -43,7 +45,7 @@ namespace Dpm.Stage.Unit.State
 		public void UpdateFrame(float dt)
 		{
 			_character.DecisionMaker.UpdateFrame(dt);
-			
+
 			// FIXME : 테스트 코드
 			if (_character.Region == UnitRegion.Ally)
 			{
@@ -53,10 +55,23 @@ namespace Dpm.Stage.Unit.State
 
 				var moveDir = new Vector2(xMove, yMove).normalized;
 
-				StagePhysicsManager.Instance.MoveUnit(_character, moveDir, dist);
+				StagePhysicsManager.Instance.Move(_character, moveDir, dist);
 			}
 			else if (_character.Region == UnitRegion.Enemy)
 			{
+				_testTimePassed += dt;
+
+				if (_testTimePassed > 1)
+				{
+					var enemyParty = UnitManager.Instance.AllyParty.Members;
+
+					var target = enemyParty[Random.Range(0, enemyParty.Count)];
+
+					ProjectileManager.Instance.Shoot("bolt", _character, target);
+
+					_testTimePassed -= 1;
+				}
+
 				for (var key = KeyCode.Alpha1; key <= KeyCode.Alpha4; key++)
 				{
 					if (Input.GetKeyDown(key) &&

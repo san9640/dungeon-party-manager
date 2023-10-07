@@ -15,7 +15,7 @@ namespace Dpm.Stage.Event
 			base.Dispose();
 		}
 
-		public static RemoveFromPartitionEvent Create(IUnit target)
+		public static RemoveFromPartitionEvent Create(ICustomCollider target)
 		{
 			var e = Pool.GetOrCreate();
 			e.Collider = target;

@@ -51,54 +51,56 @@ namespace Dpm.Stage.Physics
 			_colliders.Remove(rpe.Collider);
 		}
 
-		public bool SimulateMove(Bounds2D bounds, Vector2 dir, float magnitude,
-			UnitRegion canCollideUnitRegions, out Vector2 endPos)
+		public void Move(ICustomCollider collider, Vector2 dir, float magnitude)
+		{
+			var result = SimulateMove(collider, dir, magnitude);
+
+			collider.Position = result.endPos;
+
+			if (result.crasher != null)
+			{
+				CoreService.Event.Send(result.crasher, CrashedEvent.Create(collider));
+				CoreService.Event.Send(collider, CrashedEvent.Create(result.crasher));
+			}
+		}
+
+		public MoveResult SimulateMove(ICustomCollider collider, Vector2 dir, float magnitude)
 		{
 			var moveDiff = dir * magnitude;
+			var bounds = collider.Bounds;
 
-			// 너무 조금 움직이는 것은 계산하지 않음
-			if (moveDiff.IsAlmostZero())
+			var xMoveResult = SimulateMoveAxis(collider, bounds.center, moveDiff.x, true);
+			var yMoveResult = SimulateMoveAxis(collider, xMoveResult.endPos, moveDiff.y, false);
+
+			var result = new MoveResult
 			{
-				endPos = bounds.center;
-				return false;
-			}
+				// 시뮬레이션 결과물에 좀 더 가까운 y 충돌 대상으로 넣어줌
+				// FIXME : 충돌 결과를 한 개만 뱉게 되어있음.
+				crasher = yMoveResult.crasher ?? xMoveResult.crasher,
+				endPos = yMoveResult.endPos,
+			};
 
-			var xCrashed = SimulateMoveAxis(bounds, moveDiff.x, canCollideUnitRegions, true, out endPos);
-
-			bounds.center = endPos;
-
-			var zCrashed = SimulateMoveAxis(bounds, moveDiff.y, canCollideUnitRegions, false, out endPos);
-
-			return xCrashed || zCrashed;
+			return result;
 		}
 
-		public bool MoveUnit(IUnit unit, Vector2 dir, float magnitude)
+		private MoveResult SimulateMoveAxis(ICustomCollider collider, Vector2 position, float diff, bool isXAxis)
 		{
-			// FIXME : 투사체 등의 옵션에 따라 다르게 동작하게 만들기
-			var canCollideUnitRegions = UnitRegion.All;
+			var bounds = collider.Bounds;
+			bounds.center = position;
 
-			var crashed = SimulateMove(unit.Bounds, dir, magnitude,
-				canCollideUnitRegions, out var endPos);
-
-			unit.Position = endPos;
-
-			return crashed;
-		}
-
-		private bool SimulateMoveAxis(Bounds2D bounds, float diff,
-			UnitRegion canCollideUnitRegions, bool isXAxis, out Vector2 endPos)
-		{
 			var axisIndex = isXAxis ? 0 : 1;
 			var anotherAxisIndex = 1 - axisIndex;
 			var anotherAxisMin = bounds.Min[anotherAxisIndex];
 			var anotherAxisMax = bounds.Max[anotherAxisIndex];
 			float newCenterAxis;
 
+			var result = new MoveResult();
+
 			if (diff == 0)
 			{
-				endPos = bounds.center;
+				result.endPos = bounds.center;
 
-				return false;
+				return result;
 			}
 
 			if (diff > 0)
@@ -109,9 +111,7 @@ namespace Dpm.Stage.Physics
 
 				foreach (var other in _colliders)
 				{
-					// 충돌할 타입과 다르면 패스
-					if (other is IUnit otherUnit &&
-					    (otherUnit.Region & canCollideUnitRegions) == UnitRegion.None)
+					if (!(collider.OnSimulateCrash(other) || other.OnSimulateCrash(collider)))
 					{
 						continue;
 					}
@@ -130,6 +130,7 @@ namespace Dpm.Stage.Physics
 							if (newResultBoundMax < resultBoundsMax)
 							{
 								resultBoundsMax = newResultBoundMax;
+								result.crasher = other;
 							}
 						}
 					}
@@ -146,9 +147,7 @@ namespace Dpm.Stage.Physics
 
 				foreach (var other in _colliders)
 				{
-					// 충돌할 타입과 다르면 패스
-					if (other is IUnit otherUnit &&
-					    (otherUnit.Region & canCollideUnitRegions) == UnitRegion.None)
+					if (!(collider.OnSimulateCrash(other) || other.OnSimulateCrash(collider)))
 					{
 						continue;
 					}
@@ -167,6 +166,7 @@ namespace Dpm.Stage.Physics
 							if (newResultBoundMin > resultBoundsMin)
 							{
 								resultBoundsMin = newResultBoundMin;
+								result.crasher = other;
 							}
 						}
 					}
@@ -175,11 +175,11 @@ namespace Dpm.Stage.Physics
 				newCenterAxis = resultBoundsMin + bounds.extents[axisIndex];
 			}
 
-			endPos = isXAxis ?
+			result.endPos = isXAxis ?
 				new Vector2(newCenterAxis, bounds.center[anotherAxisIndex]) :
 				new Vector2(bounds.center[anotherAxisIndex], newCenterAxis);
 
-			return false;
+			return result;
 		}
 	}
 }

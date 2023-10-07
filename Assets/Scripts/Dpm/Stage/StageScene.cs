@@ -42,6 +42,8 @@ namespace Dpm.Stage
 
 		private StageUIManager _stageUIManager;
 
+		public ProjectileManager ProjectileManager { get; private set; }
+
 		public IEnumerator LoadAsync()
 		{
 			State = StageState.Loading;
@@ -51,11 +53,7 @@ namespace Dpm.Stage
 			PhysicsManager = new StagePhysicsManager();
 			UnitManager = new UnitManager();
 
-			if (!CoreService.Asset.TryGet<GameObject>("field", out var prefab))
-			{
-				yield break;
-			}
-
+			var prefab = CoreService.Asset.UnsafeGet<GameObject>("field");
 			var roomGo = Object.Instantiate(prefab);
 
 			_room = roomGo.GetComponent<GameRoom>();
@@ -70,6 +68,8 @@ namespace Dpm.Stage
 
 			UnitManager.SpawnAllies(_room.AllySpawnArea);
 			UnitManager.SpawnEnemies(_room.EnemySpawnArea);
+
+			ProjectileManager = new ProjectileManager();
 
 			_stageUIManager = StageUIManager.Instance;
 			_stageUIManager.Init();
@@ -165,6 +165,8 @@ namespace Dpm.Stage
 			{
 				return;
 			}
+
+			State = StageState.InBattle;
 
 			CoreService.Event.Publish(BattleStartEvent.Instance);
 

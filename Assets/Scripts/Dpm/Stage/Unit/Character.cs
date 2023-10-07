@@ -50,6 +50,14 @@ namespace Dpm.Stage.Unit
 				// Unit.OnEvent에서 해당 이벤트에 대한 처리를 하지 않도록 리턴
 				return;
 			}
+			else if (e is DamageEvent de)
+			{
+				if (CurrentState is CharacterBattleState)
+				{
+					// TODO : Apply Damage
+					Debug.Log($"{gameObject} damaged -{de.Damage} from {de.Sender}");
+				}
+			}
 
 			base.OnEvent(e);
 		}

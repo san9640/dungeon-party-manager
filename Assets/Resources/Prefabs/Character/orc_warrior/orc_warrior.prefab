@@ -9,8 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5168812303477577833}
-  - component: {fileID: 3882286803537967029}
   - component: {fileID: 5497921561294762807}
+  - component: {fileID: 1533740816593719764}
   m_Layer: 0
   m_Name: orc_warrior
   m_TagString: Untagged
@@ -34,19 +34,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3882286803537967029
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 465871064250678237}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b7f554bbcbf440049dfdbda78bf275ad, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  boundsSize: {x: 1, y: 1}
 --- !u!114 &5497921561294762807
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -60,6 +47,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 3183678427376916790}
+--- !u!114 &1533740816593719764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 465871064250678237}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0027c76e3a5742b79e328f25bc1435a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bounds:
+    extents: {x: 0.4, y: 0.5}
+    center: {x: 0, y: 0}
 --- !u!1001 &5176865678457129890
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -77,7 +79,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5720088995280981158, guid: e9e46b5cffde27144af6f47779c32b45, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -0.095
       objectReference: {fileID: 0}
     - target: {fileID: 5720088995280981158, guid: e9e46b5cffde27144af6f47779c32b45, type: 3}
       propertyPath: m_LocalPosition.y

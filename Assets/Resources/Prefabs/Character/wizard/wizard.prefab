@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8788578697740612874}
   - component: {fileID: 6275060584024738479}
-  - component: {fileID: 5848336944974397237}
+  - component: {fileID: 2921840160238228405}
   m_Layer: 0
   m_Name: wizard
   m_TagString: Untagged
@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 345978056638413473}
---- !u!114 &5848336944974397237
+--- !u!114 &2921840160238228405
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -56,10 +56,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 8788578697740612872}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b7f554bbcbf440049dfdbda78bf275ad, type: 3}
+  m_Script: {fileID: 11500000, guid: 0027c76e3a5742b79e328f25bc1435a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boundsSize: {x: 1, y: 1}
+  bounds:
+    extents: {x: 0.5, y: 0.5}
+    center: {x: 0, y: 0}
 --- !u!1001 &8013153284656883765
 PrefabInstance:
   m_ObjectHideFlags: 0

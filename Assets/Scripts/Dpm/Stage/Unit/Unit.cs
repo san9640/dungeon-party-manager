@@ -5,10 +5,10 @@ using Dpm.Stage.Physics;
 using Dpm.Stage.Unit.State;
 using Dpm.Utility.State;
 using UnityEngine;
+using CustomCollider2D = Dpm.Stage.Physics.CustomCollider2D;
 
 namespace Dpm.Stage.Unit
 {
-	[RequireComponent(typeof(UnitSpec))]
 	public class Unit : MonoBehaviour, IUnit
 	{
 		public string Name { get; protected set; }
@@ -39,16 +39,9 @@ namespace Dpm.Stage.Unit
 
 		private void Awake()
 		{
-			OnInit();
-		}
+			var boundsHolder = GetComponent<CustomCollider2D>();
 
-		public virtual void OnInit()
-		{
-			var spec = GetComponent<UnitSpec>();
-
-			Bounds = new Bounds2D(transform.position, spec.boundsSize);
-
-			Region = UnitRegion.Neutral;
+			Bounds = boundsHolder.bounds;
 		}
 
 		public bool OnSimulateCrash(ICustomCollider other)

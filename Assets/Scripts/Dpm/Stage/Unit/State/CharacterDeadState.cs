@@ -10,15 +10,14 @@ namespace Dpm.Stage.Unit.State
 
 		public override void Enter()
 		{
-			// TODO?
-			// _character.Animator.SetAnimation("dead");
+			_character.Animator.Rotation = 90;
 
 			CoreService.Event.Publish(CharacterEliminatedEvent.Create(_character));
 		}
 
 		public override void Exit()
 		{
-			_character.Animator.RemoveAnimation();
+			_character.Animator.Rotation = 0;
 		}
 
 		public override void Dispose()

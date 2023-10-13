@@ -7,12 +7,12 @@ namespace Dpm.Editor
 	[CustomEditor(typeof(GameObjectPoolSpec))]
 	public class GameObjectPoolSpecHolderEditor : UnityEditor.Editor
 	{
-		private GameObjectPoolSpecHolder _holder;
+		private GameObjectPoolSpecTable _table;
 		private readonly HashSet<string> _specNames = new();
 
 		private void OnEnable()
 		{
-			_holder = target as GameObjectPoolSpecHolder;
+			_table = target as GameObjectPoolSpecTable;
 		}
 
 		public override void OnInspectorGUI()
@@ -21,7 +21,7 @@ namespace Dpm.Editor
 
 			string sameSpecName = null;
 
-			foreach (var spec in _holder.specs)
+			foreach (var spec in _table.specs)
 			{
 				if (_specNames.Add(spec.Name))
 					continue;

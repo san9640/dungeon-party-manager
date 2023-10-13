@@ -25,6 +25,8 @@ namespace Dpm.Editor
 		public override void OnInspectorGUI()
 		{
 			base.OnInspectorGUI();
+
+			// TODO
 		}
 	}
 }

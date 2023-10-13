@@ -1,9 +1,17 @@
 ﻿using System;
+using Core.Interface;
+using Dpm.Stage.Spec;
 
 namespace Dpm.Stage.Unit.Battle
 {
-	public interface IBattleAction : IDisposable
+	public interface IBattleAction : IDisposable, IEventListener
 	{
-		void Attack();
+		BattleActionSpec Spec { get; }
+
+		void Init(Character character, BattleActionSpec spec);
+
+		void Reset();
+
+		float Dps { get; }
 	}
 }

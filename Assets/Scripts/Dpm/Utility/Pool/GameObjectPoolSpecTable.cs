@@ -30,8 +30,8 @@ namespace Dpm.Utility.Pool
 		public float lifeTime;
 	}
 
-	[CreateAssetMenu(menuName = "GameObjectPoolSpec", fileName = "GameObjectPoolSpec.asset")]
-	public class GameObjectPoolSpecHolder : SpecsHolderBase<GameObjectPoolSpec>
+	[CreateAssetMenu(menuName = "GameObjectPoolSpec", fileName = "GameObjectPoolSpecTable")]
+	public class GameObjectPoolSpecTable : SpecTableBase<GameObjectPoolSpec>
 	{
 	}
 }

@@ -51,7 +51,7 @@ namespace Dpm.Stage.Physics
 			_colliders.Remove(rpe.Collider);
 		}
 
-		public void Move(ICustomCollider collider, Vector2 dir, float magnitude)
+		public MoveResult Move(ICustomCollider collider, Vector2 dir, float magnitude)
 		{
 			var result = SimulateMove(collider, dir, magnitude);
 
@@ -62,6 +62,8 @@ namespace Dpm.Stage.Physics
 				CoreService.Event.Send(result.crasher, CrashedEvent.Create(collider));
 				CoreService.Event.Send(collider, CrashedEvent.Create(result.crasher));
 			}
+
+			return result;
 		}
 
 		public MoveResult SimulateMove(ICustomCollider collider, Vector2 dir, float magnitude)

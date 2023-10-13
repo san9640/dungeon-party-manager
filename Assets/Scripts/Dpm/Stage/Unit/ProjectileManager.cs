@@ -7,25 +7,35 @@ using UnityEngine;
 
 namespace Dpm.Stage.Unit
 {
+	public struct ProjectileInfo
+	{
+		public int damage;
+
+		public IUnit shooter;
+
+		public IUnit target;
+	}
+
 	public class ProjectileManager
 	{
+
 		public static ProjectileManager Instance => StageScene.Instance.ProjectileManager;
 
 		private readonly Dictionary<IProjectile, PooledGameObject> _usingProjectiles = new();
 
-		private ProjectileSpecsHolder SpecsHolder
+		private ProjectileSpecTable SpecTable
 		{
 			get
 			{
-				var holder = CoreService.Asset.UnsafeGet<ScriptableObject>("ProjectileSpec");
+				var table = CoreService.Asset.UnsafeGet<ScriptableObject>("ProjectileSpecTable");
 
-				return holder as ProjectileSpecsHolder;
+				return table as ProjectileSpecTable;
 			}
 		}
 
-		public IProjectile Spawn(string projectileSpecName)
+		private IProjectile Spawn(string projectileSpecName)
 		{
-			if (!SpecsHolder.NameToSpec.TryGetValue(projectileSpecName, out var spec))
+			if (!SpecTable.NameToSpec.TryGetValue(projectileSpecName, out var spec))
 			{
 				return null;
 			}
@@ -49,15 +59,15 @@ namespace Dpm.Stage.Unit
 			return projectile;
 		}
 
-		public void Shoot(string projectileSpecName, IUnit shooter, IUnit target)
+		public void Shoot(string projectileSpecName, ProjectileInfo info)
 		{
 			var projectile = Spawn(projectileSpecName);
 
-			var toTargetDir = (target.Position - shooter.Position).normalized;
+			var toTargetDir = (info.target.Position - info.shooter.Position).normalized;
 
-			projectile.Position = shooter.Position + toTargetDir * 0.7f;
+			projectile.Position = info.shooter.Position + toTargetDir * 0.7f;
 
-			CoreService.Event.SendImmediate(projectile, RequestShootEvent.Create(shooter, target));
+			CoreService.Event.SendImmediate(projectile, RequestMoveProjectileEvent.Create(info));
 		}
 
 		public void Despawn(IProjectile projectile)

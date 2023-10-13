@@ -1,5 +1,6 @@
 ﻿using Dpm.Stage.Unit;
 using Dpm.Utility.Event;
+using UnityEngine;
 
 namespace Dpm.Stage.Event
 {
@@ -15,6 +16,16 @@ namespace Dpm.Stage.Event
 
 			e.Sender = sender;
 			e.Damage = damage;
+
+			return e;
+		}
+
+		public static DamageEvent Create(IUnit sender, float damage)
+		{
+			var e = Pool.GetOrCreate();
+
+			e.Sender = sender;
+			e.Damage = Mathf.CeilToInt(damage);
 
 			return e;
 		}

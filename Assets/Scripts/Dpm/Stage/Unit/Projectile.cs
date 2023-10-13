@@ -55,6 +55,15 @@ namespace Dpm.Stage.Unit
 
 		public ProjectileSpec Spec { get; set; }
 
+		private int _damage;
+
+		private void Awake()
+		{
+			var boundsHolder = GetComponent<CustomCollider2D>();
+
+			Bounds = boundsHolder.bounds;
+		}
+
 		public void Dispose()
 		{
 			_stateMachine.ChangeState(null);
@@ -65,6 +74,11 @@ namespace Dpm.Stage.Unit
 		{
 			if (other is IUnit unit)
 			{
+				if (unit.Region == UnitRegion.Neutral)
+				{
+					return true;
+				}
+
 				return Shooter.Region.IsOppositeParty(unit.Region);
 			}
 
@@ -82,20 +96,21 @@ namespace Dpm.Stage.Unit
 			{
 				// 데미지 이벤트 전송
 				CoreService.Event.SendImmediate(ce.Crasher,
-					DamageEvent.Create(Shooter, Spec.defaultDamage));
+					DamageEvent.Create(Shooter, _damage));
 
 				GameObjectPool.Get(Spec.hitFxSpecName).TrySpawn(Position.ConvertToVector3(), out _);
 
 				ProjectileManager.Instance.Despawn(this);
 			}
-			else if (e is RequestShootEvent rse)
+			else if (e is RequestMoveProjectileEvent rse)
 			{
-				Shooter = rse.Shooter;
+				Shooter = rse.Info.shooter;
+				_damage = rse.Info.damage;
 
 				IState moveState = Spec.type switch
 				{
-					ProjectileType.Follow => ProjectileFollowState.Create(this, rse.Target),
-					ProjectileType.Linear => ProjectileMoveState.Create(this, rse.Target),
+					ProjectileType.Follow => ProjectileFollowState.Create(this, rse.Info.target),
+					ProjectileType.Linear => ProjectileMoveState.Create(this, rse.Info.target),
 					_ => null
 				};
 

@@ -9,7 +9,7 @@ namespace Dpm.Utility
 		public string Name { get; }
 	}
 
-	public abstract class SpecsHolderBase<T> : ScriptableObject where T : IGameSpec
+	public abstract class SpecTableBase<T> : ScriptableObject where T : IGameSpec
 	{
 		public List<T> specs;
 

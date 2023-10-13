@@ -237,7 +237,7 @@ namespace Dpm.Utility.Pool
 				return null;
 			}
 
-			if (!(specAsset is GameObjectPoolSpecHolder specHolder) ||
+			if (!(specAsset is GameObjectPoolSpecTable specHolder) ||
 			    !specHolder.NameToSpec.TryGetValue(specName, out var spec))
 			{
 #if UNITY_EDITOR

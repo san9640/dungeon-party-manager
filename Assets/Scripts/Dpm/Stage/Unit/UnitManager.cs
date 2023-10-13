@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Dpm.CoreAdapter;
 using Dpm.Stage.Event;
 using Dpm.Stage.Room;
+using Dpm.Stage.Spec;
 using Dpm.Utility.Constants;
 using Dpm.Utility.Pool;
 using Unity.VisualScripting;
@@ -112,10 +113,10 @@ namespace Dpm.Stage.Unit
 				{
 					poolSpecNames = new []
 					{
-						"character_wizard",
-						"character_wizard",
-						"character_wizard",
-						"character_wizard",
+						"wizard",
+						"wizard",
+						"wizard",
+						"wizard",
 					}
 				};
 			}
@@ -128,10 +129,10 @@ namespace Dpm.Stage.Unit
 				{
 					poolSpecNames = new[]
 					{
-						"character_orc_warrior",
-						"character_orc_warrior",
-						"character_orc_warrior",
-						"character_orc_warrior",
+						"orc_warrior",
+						"orc_warrior",
+						"orc_warrior",
+						"orc_warrior",
 					}
 				};
 			}
@@ -159,9 +160,11 @@ namespace Dpm.Stage.Unit
 			return true;
 		}
 
-		private bool TrySpawnCharacter(string poolSpecName, Vector2 spawnPos, Direction direction, out Character character)
+		private bool TrySpawnCharacter(string characterSpecName, Vector2 spawnPos, Direction direction, out Character character)
 		{
-			var pool = GameObjectPool.Get(poolSpecName);
+			var characterSpec = SpecUtility.GetCharacterSpec(characterSpecName);
+
+			var pool = GameObjectPool.Get(characterSpec.poolSpecName);
 
 			if (pool.IsUnityNull() || !pool.TrySpawn(Vector3.zero, out var go))
 			{
@@ -173,6 +176,8 @@ namespace Dpm.Stage.Unit
 			character.Direction = direction;
 			character.Position = spawnPos;
 
+			character.Init(characterSpec);
+
 			RegisterUnit(character);
 
 			return true;
@@ -181,6 +186,8 @@ namespace Dpm.Stage.Unit
 		public void DespawnCharacter(Character character)
 		{
 			UnregisterUnit(character);
+
+			character.Dispose();
 
 			var pooledGo = character.GetComponent<PooledGameObject>();
 

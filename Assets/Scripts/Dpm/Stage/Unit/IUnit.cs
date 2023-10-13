@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Dpm.Stage.Unit
 {
 
-	public interface IUnit : ICustomCollider, IEventListener
+	public interface IUnit : ICustomCollider
 	{
 		int Id { get; }
 

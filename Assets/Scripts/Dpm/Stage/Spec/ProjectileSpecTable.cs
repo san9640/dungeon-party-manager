@@ -19,11 +19,10 @@ namespace Dpm.Stage.Spec
 		public float speed;
 		public ProjectileType type;
 		public string hitFxSpecName;
-		public int defaultDamage;
 	}
 
-	[CreateAssetMenu(menuName = "StageSpecs/Projectile", fileName = "ProjectileSpecsHolder")]
-	public class ProjectileSpecsHolder :  SpecsHolderBase<ProjectileSpec>
+	[CreateAssetMenu(menuName = "StageSpecs/Projectile", fileName = "ProjectileSpecTable")]
+	public class ProjectileSpecTable :  SpecTableBase<ProjectileSpec>
 	{
 	}
 }

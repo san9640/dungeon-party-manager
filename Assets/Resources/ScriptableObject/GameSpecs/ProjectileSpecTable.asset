@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3307b73253b84638b68016642ed03cc5, type: 3}
-  m_Name: ProjectileSpec
+  m_Name: ProjectileSpecTable
   m_EditorClassIdentifier: 
   specs:
   - name: bolt
@@ -18,4 +18,3 @@ MonoBehaviour:
     speed: 5
     type: 1
     hitFxSpecName: fx_hit_normal
-    defaultDamage: 10

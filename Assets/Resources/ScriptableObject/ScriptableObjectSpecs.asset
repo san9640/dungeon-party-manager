@@ -16,5 +16,13 @@ MonoBehaviour:
   specs:
   - name: GameObjectPoolSpec
     path: ScriptableObject/GameObjectPoolSpec
-  - name: ProjectileSpec
-    path: ScriptableObject/ProjectileSpec
+  - name: CharacterSpecTable
+    path: ScriptableObject/GameSpecs/CharacterSpecTable
+  - name: AttackSpecTable
+    path: ScriptableObject/GameSpecs/AttackSpecTable
+  - name: ProjectileSpecTable
+    path: ScriptableObject/GameSpecs/ProjectileSpecTable
+  - name: MoveSpecTable
+    path: ScriptableObject/GameSpecs/MoveSpecTable
+  - name: BattleActionSpecTable
+    path: ScriptableObject/GameSpecs/BattleActionSpecTable

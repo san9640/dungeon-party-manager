@@ -34,9 +34,10 @@ namespace Dpm.Stage.Render
 		private string _currentAnimName = "idle";
 		private float _currentAnimTimePassed = 0;
 
-		private const float TransitionSpriteDelay = 0.12f;
-
 		private Direction _lookDirection = Direction.Right;
+
+		[SerializeField]
+		private float transitionSpriteDelay = 0.12f;
 
 		private int _currentFrame = 0;
 
@@ -60,6 +61,8 @@ namespace Dpm.Stage.Render
 			get => transform.rotation.z;
 			set => transform.rotation = Quaternion.Euler(transform.rotation.x, transform.rotation.y, value);
 		}
+
+		public Sprite Portrait => _animDict["idle"].sprites[0];
 
 		private void Awake()
 		{
@@ -85,7 +88,7 @@ namespace Dpm.Stage.Render
 
 			_currentAnimTimePassed += Time.deltaTime;
 
-			_currentFrame = (int) (_currentAnimTimePassed / TransitionSpriteDelay);
+			_currentFrame = (int) (_currentAnimTimePassed / transitionSpriteDelay);
 
 			if (prevFrame != _currentFrame)
 			{

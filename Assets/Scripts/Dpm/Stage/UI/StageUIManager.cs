@@ -5,6 +5,7 @@ using Dpm.Stage.Event;
 using Dpm.Stage.UI.Event;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 
 namespace Dpm.Stage.UI
 {
@@ -31,7 +32,7 @@ namespace Dpm.Stage.UI
 		private GameObject battleStartButton;
 
 		[SerializeField]
-		private PartyControlUI partyControlUI;
+		private StageBottomUI bottomUI;
 
 		[SerializeField]
 		private EventSystem eventSystem;
@@ -58,6 +59,8 @@ namespace Dpm.Stage.UI
 		public void Init()
 		{
 			ChangeState(StageUIState.NoneInteractable);
+
+			bottomUI.Init();
 
 			CoreService.Event.Subscribe<ScreenFadeInEndEvent>(OnScreenFadeInEnd);
 			CoreService.Event.Subscribe<ScreenFadeOutStartEvent>(OnScreenFadeOutStart);
@@ -143,7 +146,7 @@ namespace Dpm.Stage.UI
 				case StageUIState.None:
 					eventSystem.enabled = false;
 					pauseUI.gameObject.SetActive(false);
-					partyControlUI.gameObject.SetActive(false);
+					bottomUI.gameObject.SetActive(false);
 					pauseButton.gameObject.SetActive(false);
 
 					break;
@@ -151,7 +154,7 @@ namespace Dpm.Stage.UI
 				case StageUIState.NoneInteractable:
 					eventSystem.enabled = false;
 					pauseUI.gameObject.SetActive(false);
-					partyControlUI.gameObject.SetActive(true);
+					bottomUI.gameObject.SetActive(true);
 					pauseButton.gameObject.SetActive(true);
 
 					break;
@@ -159,7 +162,7 @@ namespace Dpm.Stage.UI
 				case StageUIState.Interactable:
 					eventSystem.enabled = true;
 					pauseUI.gameObject.SetActive(false);
-					partyControlUI.gameObject.SetActive(true);
+					bottomUI.gameObject.SetActive(true);
 					pauseButton.gameObject.SetActive(true);
 
 					break;
@@ -167,7 +170,7 @@ namespace Dpm.Stage.UI
 				case StageUIState.Paused:
 					eventSystem.enabled = true;
 					pauseUI.gameObject.SetActive(true);
-					partyControlUI.gameObject.SetActive(false);
+					bottomUI.gameObject.SetActive(false);
 					pauseButton.gameObject.SetActive(false);
 
 					break;

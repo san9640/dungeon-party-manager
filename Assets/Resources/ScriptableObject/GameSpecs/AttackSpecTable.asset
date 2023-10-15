@@ -18,10 +18,8 @@ MonoBehaviour:
     - type: 0
       weightFactorInfo:
         defaultValue: 0.5
-    battleActionSpecName: wizard_battle_action
-  - name: fist_melee_attack
+  - name: weak_melee_attack
     calculatorInfos:
     - type: 0
       weightFactorInfo:
         defaultValue: 0.5
-    battleActionSpecName: weak_melee_attack

@@ -19,6 +19,7 @@ MonoBehaviour:
     damage: 10
     type: 1
     meleeFx: 
+    meleeHitFx: 
     meleeDuration: 0
     meleeAttackAngle: 0
     rangedProjectileName: bolt
@@ -29,6 +30,7 @@ MonoBehaviour:
     damage: 8
     type: 0
     meleeFx: 
+    meleeHitFx: fx_hit_normal
     meleeDuration: 0.2
     meleeAttackAngle: 90
     rangedProjectileName: 

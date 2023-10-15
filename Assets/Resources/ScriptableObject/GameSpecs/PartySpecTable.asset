@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27eb31d8ade84c77b1bd3e6f96b63339, type: 3}
+  m_Name: PartySpecTable
+  m_EditorClassIdentifier: 
+  specs:
+  - name: ally
+    region: 1
+    spawnInfos:
+    - characterSpecName: wizard
+  - name: enemy
+    region: 2
+    spawnInfos:
+    - characterSpecName: orc_warrior

@@ -27,7 +27,7 @@ namespace Dpm.Stage.Unit.Battle.BattleAction
 			get
 			{
 				var totalDelay = Spec.attackDelay / _character.AttackSpeed;
-				var totalDamage = Spec.damage * _character.DamageFactor;
+				var totalDamage = _character.AttackDamage;
 
 				return totalDamage / totalDelay;
 			}
@@ -71,7 +71,7 @@ namespace Dpm.Stage.Unit.Battle.BattleAction
 				ProjectileManager.Instance.Shoot(Spec.rangedProjectileName, new ProjectileInfo
 				{
 					shooter = _character,
-					damage = Mathf.FloorToInt(_character.DamageFactor * Spec.damage),
+					damage = _character.AttackDamage,
 					target = rae.Target
 				});
 			}

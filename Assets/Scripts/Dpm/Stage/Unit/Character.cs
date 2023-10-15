@@ -48,6 +48,8 @@ namespace Dpm.Stage.Unit
 
 		public float DamageFactor { get; private set; }
 
+		public int AttackDamage => Mathf.FloorToInt(DamageFactor * BattleAction.Spec.damage);
+
 		public float AttackSpeed { get; private set; }
 
 		public float MoveSpeed { get; private set; }
@@ -129,6 +131,8 @@ namespace Dpm.Stage.Unit
 				if (CurrentState is CharacterBattleState && !IsDead)
 				{
 					Hp = Mathf.Max(Hp - de.Damage, 0);
+
+					CoreService.Event.Publish(HpChangedEvent.Create(this));
 
 					if (IsDead)
 					{

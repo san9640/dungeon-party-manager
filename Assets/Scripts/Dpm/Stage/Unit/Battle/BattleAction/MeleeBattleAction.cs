@@ -29,7 +29,7 @@ namespace Dpm.Stage.Unit.Battle.BattleAction
 			get
 			{
 				var totalDelay = (Spec.meleeDuration + Spec.attackDelay) / _character.AttackSpeed;
-				var totalDamage = Spec.damage * _character.DamageFactor;
+				var totalDamage = _character.AttackDamage;
 
 				return totalDamage / totalDelay;
 			}
@@ -75,7 +75,7 @@ namespace Dpm.Stage.Unit.Battle.BattleAction
 
 				// FIXME : 여기서 공격 적합성 검사를 하고 데미지를 입혀야 함 (공격 범위 안에 들어왔는지)
 				CoreService.Event.SendImmediate(rae.Target,
-					DamageEvent.Create(_character, Spec.damage * _character.DamageFactor));
+					DamageEvent.Create(_character, _character.AttackDamage));
 			}
 		}
 

@@ -2,6 +2,7 @@
 using Dpm.Stage.Event;
 using Dpm.Stage.Spec;
 using Dpm.Utility.Extensions;
+using UnityEditor;
 using UnityEngine;
 
 namespace Dpm.Stage.Unit.AI.Calculator.Move
@@ -103,6 +104,11 @@ namespace Dpm.Stage.Unit.AI.Calculator.Move
 			}
 
 			CoreService.Event.SendImmediate(_character, RequestMoveEvent.Create(_targetPos.Value));
+		}
+
+		public void DrawCurrent()
+		{
+			AIDebugUtility.DrawMoveAIInfo(_character, _targetPos);
 		}
 	}
 }

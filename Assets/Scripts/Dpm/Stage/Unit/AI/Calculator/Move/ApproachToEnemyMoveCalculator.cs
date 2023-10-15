@@ -4,6 +4,8 @@ using Dpm.Stage.Event;
 using Dpm.Stage.Physics;
 using Dpm.Stage.Spec;
 using Dpm.Utility.Constants;
+using Dpm.Utility.Extensions;
+using UnityEditor;
 using UnityEngine;
 
 namespace Dpm.Stage.Unit.AI.Calculator.Move
@@ -72,6 +74,11 @@ namespace Dpm.Stage.Unit.AI.Calculator.Move
 		{
 			_character = null;
 			_targetPos = null;
+		}
+
+		public void DrawCurrent()
+		{
+			AIDebugUtility.DrawMoveAIInfo(_character, _targetPos);
 		}
 	}
 }

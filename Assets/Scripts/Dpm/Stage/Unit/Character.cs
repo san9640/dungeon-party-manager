@@ -9,6 +9,8 @@ using Dpm.Stage.Unit.Battle;
 using Dpm.Stage.Unit.Battle.BattleAction;
 using Dpm.Stage.Unit.State;
 using Dpm.Utility.Constants;
+using Dpm.Utility.Extensions;
+using UnityEditor;
 using UnityEngine;
 using CustomCollider2D = Dpm.Stage.Physics.CustomCollider2D;
 
@@ -143,9 +145,17 @@ namespace Dpm.Stage.Unit
 			(CurrentState as IUpdatable)?.UpdateFrame(dt);
 		}
 
-		// public void OnDrawGizmos()
-		// {
-		//
-		// }
+		public void OnDrawGizmos()
+		{
+			if (CurrentState is CharacterBattleState)
+			{
+				// var style = new GUIStyle();
+
+				// style.normal.textColor = Color.red;
+				// Handles.Label(Position.ConvertToVector3(), gameObject.name);
+
+				(DecisionMaker as IDebugDrawable)?.DrawCurrent();
+			}
+		}
 	}
 }

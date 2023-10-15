@@ -2,6 +2,8 @@
 using Dpm.Stage.Event;
 using Dpm.Stage.Physics;
 using Dpm.Stage.Spec;
+using Dpm.Utility.Extensions;
+using UnityEditor;
 using UnityEngine;
 
 namespace Dpm.Stage.Unit.AI.Calculator.Attack
@@ -99,6 +101,11 @@ namespace Dpm.Stage.Unit.AI.Calculator.Attack
 			}
 
 			CoreService.Event.SendImmediate(_character, RequestAttackTargetEvent.Create(CurrentTarget));
+		}
+
+		public void DrawCurrent()
+		{
+			AIDebugUtility.DrawAttackAIInfo(_character, CurrentTarget);
 		}
 	}
 }

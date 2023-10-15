@@ -7,7 +7,7 @@ using Dpm.Stage.Unit.AI.Calculator.Move;
 
 namespace Dpm.Stage.Unit.AI
 {
-    public class DecisionMaker : IDecisionMaker
+    public class DecisionMaker : IDecisionMaker, IDebugDrawable
     {
         private readonly Dictionary<Type, IAIMoveCalculator> _moveCalculators = new();
 
@@ -15,10 +15,14 @@ namespace Dpm.Stage.Unit.AI
 
         private readonly Dictionary<Type, IAICalculator> _skillCalculators = new();
 
+        private Character _character;
+
         public IUnit CurrentAttackTarget { get; private set; }
 
         public void Init(Character character, MoveSpec moveSpec, AttackSpec attackSpec)
         {
+            _character = character;
+
             foreach (var moveInfo in moveSpec.calculatorInfos)
             {
                 // FIXME
@@ -73,6 +77,8 @@ namespace Dpm.Stage.Unit.AI
             }
 
             _skillCalculators.Clear();
+
+            _character = null;
         }
 
         public void UpdateFrame(float dt)
@@ -115,6 +121,23 @@ namespace Dpm.Stage.Unit.AI
             maxScoredCalculator?.Execute();
 
             CurrentAttackTarget = null;
+        }
+
+        public void DrawCurrent()
+        {
+            foreach (var kv in _attackCalculators)
+            {
+                var calculator = kv.Value;
+
+                calculator.DrawCurrent();
+            }
+
+            foreach (var kv in _moveCalculators)
+            {
+                var calculator = kv.Value;
+
+                calculator.DrawCurrent();
+            }
         }
     }
 }

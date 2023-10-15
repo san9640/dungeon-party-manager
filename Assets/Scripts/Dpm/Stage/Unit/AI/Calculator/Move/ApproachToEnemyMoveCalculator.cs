@@ -50,7 +50,7 @@ namespace Dpm.Stage.Unit.AI.Calculator.Move
 
 			var toTargetDir = (currentAttackTarget.Position - _character.Position).normalized;
 
-			_targetPos = requiredMoveDist * toTargetDir;
+			_targetPos = requiredMoveDist * toTargetDir + _character.Position;
 
 			var requiredMoveDuration = requiredMoveDist / _character.MoveSpeed;
 			var score = AICalculatorUtility.ClampScore(MaxScoreMinDuration / requiredMoveDuration);

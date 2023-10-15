@@ -55,6 +55,7 @@ namespace Dpm.Stage.Unit
 			var boundsHolder = GetComponent<CustomCollider2D>();
 
 			Bounds = boundsHolder.bounds;
+			Position = transform.position;
 		}
 
 		public void Dispose()
@@ -79,7 +80,7 @@ namespace Dpm.Stage.Unit
 
 			MoveSpeed = spec.moveSpeed;
 
-			var battleActionSpec = SpecUtility.GetBattleActionSpec(spec.battleActionSpecName);
+			var battleActionSpec = SpecUtility.GetSpec<BattleActionSpec>(spec.battleActionSpecName);
 
 			BattleAction = battleActionSpec.type switch
 			{
@@ -90,8 +91,8 @@ namespace Dpm.Stage.Unit
 
 			BattleAction?.Init(this, battleActionSpec);
 
-			var moveSpec = SpecUtility.GetMoveSpec(spec.moveSpecName);
-			var attackSpec = SpecUtility.GetAttackSpec(spec.attackSpecName);
+			var moveSpec = SpecUtility.GetSpec<MoveSpec>(spec.moveSpecName);
+			var attackSpec = SpecUtility.GetSpec<AttackSpec>(spec.attackSpecName);
 
 			DecisionMaker.Init(this, moveSpec, attackSpec);
 		}
@@ -141,5 +142,10 @@ namespace Dpm.Stage.Unit
 		{
 			(CurrentState as IUpdatable)?.UpdateFrame(dt);
 		}
+
+		// public void OnDrawGizmos()
+		// {
+		//
+		// }
 	}
 }

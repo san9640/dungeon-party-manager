@@ -9,6 +9,13 @@ using UnityEngine;
 
 namespace Dpm.Stage.Physics
 {
+	[Flags]
+	public enum CrashOption
+	{
+		None = 0,
+		CrashOnOverlap = 1 << 0,
+	}
+
 	public class StagePhysicsManager : IDisposable
 	{
 		/// <summary>
@@ -37,8 +44,10 @@ namespace Dpm.Stage.Physics
 				return;
 			}
 
-			_colliders.Remove(ape.Collider);
-			_colliders.Add(ape.Collider);
+			if (!_colliders.Contains(ape.Collider))
+			{
+				_colliders.Add(ape.Collider);
+			}
 		}
 
 		private void OnRemoveFromPartition(Core.Interface.Event e)
@@ -51,9 +60,9 @@ namespace Dpm.Stage.Physics
 			_colliders.Remove(rpe.Collider);
 		}
 
-		public MoveResult Move(ICustomCollider collider, Vector2 dir, float magnitude)
+		public MoveResult Move(ICustomCollider collider, Vector2 dir, float magnitude, CrashOption option = CrashOption.None)
 		{
-			var result = SimulateMove(collider, dir, magnitude);
+			var result = SimulateMove(collider, dir, magnitude, option);
 
 			collider.Position = result.endPos;
 
@@ -66,35 +75,56 @@ namespace Dpm.Stage.Physics
 			return result;
 		}
 
-		public MoveResult SimulateMove(ICustomCollider collider, Vector2 dir, float magnitude)
+		public MoveResult SimulateMove(ICustomCollider collider, Vector2 dir, float magnitude, CrashOption option = CrashOption.None)
 		{
+			var crashOnOverlap = (option & CrashOption.CrashOnOverlap) != CrashOption.None;
+
+			if (crashOnOverlap)
+			{
+				ICustomCollider crasher = null;
+
+				foreach (var other in _colliders)
+				{
+					if (!(collider.OnSimulateCrash(other) || other.OnSimulateCrash(collider)))
+					{
+						continue;
+					}
+
+					if (PhysicsUtility.IsOverlapped(collider, other))
+					{
+						crasher = other;
+						break;
+					}
+				}
+
+				if (crasher != null)
+				{
+					return new MoveResult
+					{
+						crasher = crasher,
+						endPos = collider.Position,
+					};
+				}
+			}
+
 			var moveDiff = dir * magnitude;
 			var bounds = collider.Bounds;
-
 			var xMoveResult = SimulateMoveAxis(collider, bounds.center, moveDiff.x, true);
 			var yMoveResult = SimulateMoveAxis(collider, xMoveResult.endPos, moveDiff.y, false);
 
-			var result = new MoveResult
+			return new MoveResult
 			{
 				// 시뮬레이션 결과물에 좀 더 가까운 y 충돌 대상으로 넣어줌
 				// FIXME : 충돌 결과를 한 개만 뱉게 되어있음.
 				crasher = yMoveResult.crasher ?? xMoveResult.crasher,
 				endPos = yMoveResult.endPos,
 			};
-
-			return result;
 		}
 
 		private MoveResult SimulateMoveAxis(ICustomCollider collider, Vector2 position, float diff, bool isXAxis)
 		{
 			var bounds = collider.Bounds;
 			bounds.center = position;
-
-			var axisIndex = isXAxis ? 0 : 1;
-			var anotherAxisIndex = 1 - axisIndex;
-			var anotherAxisMin = bounds.Min[anotherAxisIndex];
-			var anotherAxisMax = bounds.Max[anotherAxisIndex];
-			float newCenterAxis;
 
 			var result = new MoveResult();
 
@@ -104,6 +134,12 @@ namespace Dpm.Stage.Physics
 
 				return result;
 			}
+
+			var axisIndex = isXAxis ? 0 : 1;
+			var anotherAxisIndex = 1 - axisIndex;
+			var anotherAxisMin = bounds.Min[anotherAxisIndex];
+			var anotherAxisMax = bounds.Max[anotherAxisIndex];
+			float newCenterAxis;
 
 			if (diff > 0)
 			{

@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using Core.Base.Resource;
+using Object = UnityEngine.Object;
 
 namespace Core.Interface
 {
@@ -14,5 +17,7 @@ namespace Core.Interface
 		bool TryGet<T>(string specName, out T result) where T : UnityEngine.Object;
 
 		T UnsafeGet<T>(string specName) where T : UnityEngine.Object;
+
+		IReadOnlyDictionary<string, Object> GetResourceHolder<T>();
 	}
 }

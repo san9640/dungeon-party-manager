@@ -29,7 +29,7 @@ namespace Dpm.Stage.Spec
 	}
 
 	[CreateAssetMenu(menuName = "StageSpecs/Move", fileName = "MoveSpecTable")]
-	public class MoveSpecTable : SpecTableBase<MoveSpec>
+	public class MoveSpecTable : SpecTableBase<MoveSpec>, IGameSpecTable
 	{
 	}
 }

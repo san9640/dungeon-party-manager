@@ -5,6 +5,7 @@ using Dpm.Common;
 using Dpm.CoreAdapter;
 using Dpm.MainMenu;
 using Dpm.Stage;
+using Dpm.Stage.Spec;
 using Dpm.Utility.Pool;
 using UnityEngine;
 
@@ -64,6 +65,8 @@ namespace Dpm
 			_instance = this;
 
 			_service = new CoreService(this, assetSpecsHolderPaths);
+
+			SpecUtility.CacheSpecData();
 
 			// 씬 이동이나 씬 전체 해제 등의 행위로 날아가지 않도록 세팅
 			DontDestroyOnLoad(this);

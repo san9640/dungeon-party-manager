@@ -33,7 +33,7 @@ namespace Dpm.Stage.Spec
 	}
 
 	[CreateAssetMenu(menuName = "StageSpecs/Character", fileName = "CharacterSpecTable")]
-	public class CharacterSpecTable : SpecTableBase<CharacterSpec>
+	public class CharacterSpecTable : SpecTableBase<CharacterSpec>, IGameSpecTable
 	{
 	}
 }

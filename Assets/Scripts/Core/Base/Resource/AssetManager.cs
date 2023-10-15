@@ -60,6 +60,16 @@ namespace Core.Base.Resource
 			return result;
 		}
 
+		public IReadOnlyDictionary<string, Object> GetResourceHolder<T>()
+		{
+			if (_resources.TryGetValue(typeof(T), out var resHolder))
+			{
+				return resHolder;
+			}
+
+			return null;
+		}
+
 		public void Dispose()
 		{
 			_resources.Clear();

@@ -21,6 +21,7 @@ namespace Dpm.Stage.Physics
 
 		public Vector2 extents;
 
+		[HideInInspector]
 		public Vector2 center;
 
 		public Bounds2D(Vector2 center, Vector2 size)

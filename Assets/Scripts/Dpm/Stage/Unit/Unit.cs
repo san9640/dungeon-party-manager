@@ -3,6 +3,7 @@ using Dpm.CoreAdapter;
 using Dpm.Stage.Event;
 using Dpm.Stage.Physics;
 using Dpm.Stage.Unit.State;
+using Dpm.Utility.Extensions;
 using Dpm.Utility.State;
 using UnityEngine;
 using CustomCollider2D = Dpm.Stage.Physics.CustomCollider2D;
@@ -27,7 +28,7 @@ namespace Dpm.Stage.Unit
 
 				Bounds = bounds;
 
-				transform.position = new Vector3(value.x, value.y, 0);
+				transform.position = value.ConvertToVector3();
 			}
 		}
 
@@ -42,6 +43,7 @@ namespace Dpm.Stage.Unit
 			var boundsHolder = GetComponent<CustomCollider2D>();
 
 			Bounds = boundsHolder.bounds;
+			Position = transform.position;
 		}
 
 		public bool OnSimulateCrash(ICustomCollider other)
@@ -69,5 +71,12 @@ namespace Dpm.Stage.Unit
 				_stateMachine.ChangeState(null);
 			}
 		}
+		//
+		// public void OnDrawGizmos()
+		// {
+		// 	Gizmos.color = Color.magenta;
+		//
+		// 	Gizmos.DrawCube(Bounds.center.ConvertToVector3(), Bounds.Size.ConvertToVector3());
+		// }
 	}
 }

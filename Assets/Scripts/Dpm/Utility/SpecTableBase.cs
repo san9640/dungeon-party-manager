@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -9,8 +10,19 @@ namespace Dpm.Utility
 		public string Name { get; }
 	}
 
-	public abstract class SpecTableBase<T> : ScriptableObject where T : IGameSpec
+	public interface ISpecTable
 	{
+		Type SpecType { get; }
+	}
+
+	public interface IGameSpecTable
+	{
+	}
+
+	public abstract class SpecTableBase<T> : ScriptableObject, ISpecTable where T : IGameSpec
+	{
+		public Type SpecType => typeof(T);
+
 		public List<T> specs;
 
 		private IReadOnlyDictionary<string, T> _nameToSpec;

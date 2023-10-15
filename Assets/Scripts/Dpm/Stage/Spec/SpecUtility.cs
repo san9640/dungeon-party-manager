@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Dpm.CoreAdapter;
 using Dpm.Utility;
 using UnityEngine;
@@ -7,33 +8,46 @@ namespace Dpm.Stage.Spec
 {
 	public static class SpecUtility
 	{
-		// FIXME : Type을 가져오면 알아서 specTable에 접근할 수 있도록 한개로 묶어줘야 함
-		public static MoveSpec GetMoveSpec(string specName)
-		{
-			var specTable = CoreService.Asset.UnsafeGet<ScriptableObject>("MoveSpecTable") as MoveSpecTable;
+		private static Dictionary<Type, string> _typeToAssetName;
 
-			return specTable.NameToSpec[specName];
+		public static void CacheSpecData()
+		{
+			if (_typeToAssetName != null)
+			{
+				return;
+			}
+
+			_typeToAssetName = new();
+
+			var allSpecs = CoreService.Asset.GetResourceHolder<ScriptableObject>();
+
+			try
+			{
+				foreach (var kv in allSpecs)
+				{
+					if (kv.Value is IGameSpecTable and ISpecTable specTable)
+					{
+						_typeToAssetName.Add(specTable.SpecType, kv.Key);
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				Debug.LogError("Cannot Find ScriptableObject SpecHolder.");
+				Debug.LogError(e);
+			}
 		}
 
-		public static AttackSpec GetAttackSpec(string specName)
+		public static T GetSpec<T>(string specName) where T : struct, IGameSpec
 		{
-			var specTable = CoreService.Asset.UnsafeGet<ScriptableObject>("AttackSpecTable") as AttackSpecTable;
+			if (_typeToAssetName.TryGetValue(typeof(T), out var tableSpecName))
+			{
+				var specTable = CoreService.Asset.UnsafeGet<ScriptableObject>(tableSpecName) as SpecTableBase<T>;
 
-			return specTable.NameToSpec[specName];
-		}
+				return specTable.NameToSpec[specName];
+			}
 
-		public static BattleActionSpec GetBattleActionSpec(string specName)
-		{
-			var specTable = CoreService.Asset.UnsafeGet<ScriptableObject>("BattleActionSpecTable") as BattleActionSpecTable;
-
-			return specTable.NameToSpec[specName];
-		}
-
-		public static CharacterSpec GetCharacterSpec(string specName)
-		{
-			var specTable = CoreService.Asset.UnsafeGet<ScriptableObject>("CharacterSpecTable") as CharacterSpecTable;
-
-			return specTable.NameToSpec[specName];
+			return default;
 		}
 	}
 }

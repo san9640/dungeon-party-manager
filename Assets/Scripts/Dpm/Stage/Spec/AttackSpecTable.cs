@@ -31,7 +31,7 @@ namespace Dpm.Stage.Spec
 	}
 
 	[CreateAssetMenu(menuName = "StageSpecs/Attack", fileName = "AttackSpecTable")]
-	public class AttackSpecTable : SpecTableBase<AttackSpec>
+	public class AttackSpecTable : SpecTableBase<AttackSpec>, IGameSpecTable
 	{
 	}
 }

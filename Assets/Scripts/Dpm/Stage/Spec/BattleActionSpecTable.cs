@@ -27,6 +27,8 @@ namespace Dpm.Stage.Spec
 
 		public string meleeFx;
 
+		public string meleeHitFx;
+
 		public float meleeDuration;
 
 		public float meleeAttackAngle;
@@ -37,7 +39,7 @@ namespace Dpm.Stage.Spec
 	}
 
 	[CreateAssetMenu(menuName = "StageSpecs/BattleAction", fileName = "BattleActionSpecTable")]
-	public class BattleActionSpecTable : SpecTableBase<BattleActionSpec>
+	public class BattleActionSpecTable : SpecTableBase<BattleActionSpec>, IGameSpecTable
 	{
 	}
 }

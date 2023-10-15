@@ -3,6 +3,8 @@ using Dpm.CoreAdapter;
 using Dpm.Stage.Event;
 using Dpm.Stage.Physics;
 using Dpm.Stage.Spec;
+using Dpm.Utility.Extensions;
+using Dpm.Utility.Pool;
 
 namespace Dpm.Stage.Unit.Battle.BattleAction
 {
@@ -66,6 +68,10 @@ namespace Dpm.Stage.Unit.Battle.BattleAction
 				}
 
 				_currentState = State.Attacking;
+
+				var hitFxPool = GameObjectPool.Get(Spec.meleeHitFx);
+
+				hitFxPool.TrySpawn(rae.Target.Position.ConvertToVector3(), out _);
 
 				// FIXME : 여기서 공격 적합성 검사를 하고 데미지를 입혀야 함 (공격 범위 안에 들어왔는지)
 				CoreService.Event.SendImmediate(rae.Target,

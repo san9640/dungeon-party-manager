@@ -22,7 +22,7 @@ namespace Dpm.Stage.Spec
 	}
 
 	[CreateAssetMenu(menuName = "StageSpecs/Projectile", fileName = "ProjectileSpecTable")]
-	public class ProjectileSpecTable :  SpecTableBase<ProjectileSpec>
+	public class ProjectileSpecTable :  SpecTableBase<ProjectileSpec>, IGameSpecTable
 	{
 	}
 }

@@ -44,7 +44,8 @@ namespace Dpm.Stage.Unit.State
 		{
 			var dist = _projectile.Speed * dt;
 
-			StagePhysicsManager.Instance.Move(_projectile, _moveDir, dist);
+			// 발사 위치가 특정 유닛과 겹쳐있을 가능성이 존재하여 겹쳐있을 경우에도 충돌 검사가 되도록 함
+			StagePhysicsManager.Instance.Move(_projectile, _moveDir, dist, CrashOption.CrashOnOverlap);
 		}
 
 		public static ProjectileMoveState Create(IProjectile projectile, Vector2 targetPos)

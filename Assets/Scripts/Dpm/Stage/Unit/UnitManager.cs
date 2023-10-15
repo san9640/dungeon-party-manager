@@ -99,70 +99,26 @@ namespace Dpm.Stage.Unit
 
 		private bool TrySpawnParty(string partySpecName, SpawnArea spawnArea, out Party party)
 		{
-			UnitRegion region;
-
-			PartySpec partySpec;
-
-			// TODO : partySpecName으로 파티원 생성
-			if (partySpecName == "ally")
-			{
-				region = UnitRegion.Ally;
-
-				// FIXME : 임시
-				partySpec = new PartySpec
-				{
-					poolSpecNames = new []
-					{
-						"wizard",
-						"wizard",
-						"wizard",
-						"wizard",
-					}
-				};
-			}
-			else if (partySpecName == "enemy")
-			{
-				region = UnitRegion.Enemy;
-
-				// FIXME : 임시
-				partySpec = new PartySpec
-				{
-					poolSpecNames = new[]
-					{
-						"orc_warrior",
-						"orc_warrior",
-						"orc_warrior",
-						"orc_warrior",
-					}
-				};
-			}
-			else
-			{
-				party = null;
-
-				return false;
-			}
-
+			var partySpec = SpecUtility.GetSpec<PartySpec>(partySpecName);
 			var members = new List<Character>();
 
-			// FIXME
-			foreach (var prefabSpecName in partySpec.poolSpecNames)
+			foreach (var spawnInfo in partySpec.spawnInfos)
 			{
-				if (TrySpawnCharacter(prefabSpecName, spawnArea.RandomPos, spawnArea.Direction,
+				if (TrySpawnCharacter(spawnInfo.characterSpecName, spawnArea.RandomPos, spawnArea.Direction,
 					    out var member))
 				{
 					members.Add(member);
 				}
 			}
 
-			party = new Party(region, members);
+			party = new Party(partySpec.region, members);
 
 			return true;
 		}
 
 		private bool TrySpawnCharacter(string characterSpecName, Vector2 spawnPos, Direction direction, out Character character)
 		{
-			var characterSpec = SpecUtility.GetCharacterSpec(characterSpecName);
+			var characterSpec = SpecUtility.GetSpec<CharacterSpec>(characterSpecName);
 
 			var pool = GameObjectPool.Get(characterSpec.poolSpecName);
 

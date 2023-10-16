@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using Dpm.CoreAdapter;
+using Dpm.Stage.Event;
 using Dpm.Stage.Spec;
 using Dpm.Stage.Unit.AI.Calculator;
 using Dpm.Stage.Unit.AI.Calculator.Attack;
@@ -13,7 +15,9 @@ namespace Dpm.Stage.Unit.AI
 
         private readonly Dictionary<Type, IAIAttackCalculator> _attackCalculators = new();
 
-        private readonly Dictionary<Type, IAICalculator> _skillCalculators = new();
+        private readonly Dictionary<Type, IAICalculator> _abilityCalculators = new();
+
+        private readonly Dictionary<IAICalculator, SliderWeightFactorInfo> _factorInfos = new();
 
         private Character _character;
 
@@ -33,9 +37,16 @@ namespace Dpm.Stage.Unit.AI
                     _ => null
                 };
 
+                if (calculator == null)
+                {
+                    continue;
+                }
+
                 calculator.Init(character, moveInfo);
 
                 _moveCalculators.Add(calculator.GetType(), calculator);
+
+                _factorInfos.Add(calculator, moveInfo.weightFactorInfo);
             }
 
             foreach (var attackInfo in attackSpec.calculatorInfos)
@@ -49,14 +60,25 @@ namespace Dpm.Stage.Unit.AI
                     _ => null
                 };
 
+                if (calculator == null)
+                {
+                    continue;
+                }
+
                 calculator.Init(character, attackInfo);
 
                 _attackCalculators.Add(calculator.GetType(), calculator);
+
+                _factorInfos.Add(calculator, attackInfo.weightFactorInfo);
             }
+
+            CoreService.Event.Subscribe<ChangeAICalculatorFactorEvent>(OnChangeAICalculatorFactor);
         }
 
         public void Dispose()
         {
+            CoreService.Event.Unsubscribe<ChangeAICalculatorFactorEvent>(OnChangeAICalculatorFactor);
+
             foreach (var kv in _moveCalculators)
             {
                 kv.Value.Dispose();
@@ -71,14 +93,31 @@ namespace Dpm.Stage.Unit.AI
 
             _attackCalculators.Clear();
 
-            foreach (var kv in _skillCalculators)
+            foreach (var kv in _abilityCalculators)
             {
                 kv.Value.Dispose();
             }
 
-            _skillCalculators.Clear();
+            _abilityCalculators.Clear();
 
             _character = null;
+        }
+
+        private void OnChangeAICalculatorFactor(Core.Interface.Event e)
+        {
+            if (e is not ChangeAICalculatorFactorEvent cfe || cfe.Character != _character)
+            {
+                return;
+            }
+
+            var calculator = GetCalculatorTyped(cfe.AICalculatorType);
+
+            if (calculator != null && _factorInfos.TryGetValue(calculator, out var factorInfo))
+            {
+                factorInfo.defaultValue = cfe.Value;
+
+                _factorInfos[calculator] = factorInfo;
+            }
         }
 
         public void UpdateFrame(float dt)
@@ -91,6 +130,8 @@ namespace Dpm.Stage.Unit.AI
                 var calculator = kv.Value;
 
                 var score = calculator.Calculate();
+
+                score *= GetScoreFactor(calculator);
 
                 if (maxScore < score)
                 {
@@ -110,6 +151,8 @@ namespace Dpm.Stage.Unit.AI
 
                 var score = calculator.Calculate();
 
+                score *= GetScoreFactor(calculator);
+
                 if (maxScore < score)
                 {
                     maxScore = score;
@@ -121,6 +164,50 @@ namespace Dpm.Stage.Unit.AI
             maxScoredCalculator?.Execute();
 
             CurrentAttackTarget = null;
+        }
+
+        private float GetScoreFactor(IAICalculator calculator)
+        {
+            if (_factorInfos.TryGetValue(calculator, out var factorInfo))
+            {
+                return factorInfo.defaultValue;
+            }
+
+            return 0;
+        }
+
+        public float GetScoreFactor(Type calculatorType)
+        {
+            var calculator = GetCalculatorTyped(calculatorType);
+
+            return calculator != null ? GetScoreFactor(calculator) : 0.5f;
+        }
+
+        private IAICalculator GetCalculatorTyped(Type calculatorType)
+        {
+            IAICalculator calculator = null;
+
+            if (_moveCalculators.TryGetValue(calculatorType, out var moveCalculator))
+            {
+                calculator = moveCalculator;
+            }
+            else if (_attackCalculators.TryGetValue(calculatorType, out var attackCalculator))
+            {
+                calculator = attackCalculator;
+            }
+            else if (_abilityCalculators.TryGetValue(calculatorType, out var abilityCalculator))
+            {
+                calculator = abilityCalculator;
+            }
+
+            return calculator;
+        }
+
+        public bool IsUsingTyped(Type calculatorType)
+        {
+            return _moveCalculators.ContainsKey(calculatorType) ||
+                   _attackCalculators.ContainsKey(calculatorType) ||
+                   _abilityCalculators.ContainsKey(calculatorType);
         }
 
         public void DrawCurrent()

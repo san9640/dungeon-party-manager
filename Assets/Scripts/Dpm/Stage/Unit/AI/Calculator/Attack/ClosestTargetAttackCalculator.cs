@@ -90,7 +90,7 @@ namespace Dpm.Stage.Unit.AI.Calculator.Attack
 				score = AICalculatorUtility.ClampScore(minToAverage / attackableToAverage);
 			}
 
-			return score * _info.weightFactorInfo.defaultValue;
+			return score;
 		}
 
 		public void Execute()

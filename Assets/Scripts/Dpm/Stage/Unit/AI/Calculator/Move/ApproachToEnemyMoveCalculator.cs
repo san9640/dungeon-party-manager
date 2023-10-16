@@ -57,7 +57,7 @@ namespace Dpm.Stage.Unit.AI.Calculator.Move
 			var requiredMoveDuration = requiredMoveDist / _character.MoveSpeed;
 			var score = AICalculatorUtility.ClampScore(MaxScoreMinDuration / requiredMoveDuration);
 
-			return score * _info.weightFactorInfo.defaultValue;
+			return score;
 		}
 
 		public void Execute()

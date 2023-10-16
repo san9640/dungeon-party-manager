@@ -93,7 +93,7 @@ namespace Dpm.Stage.Unit.AI.Calculator.Move
 
 			_targetPos = _character.Position + attackPowerSum.normalized;
 
-			return score * _info.weightFactorInfo.defaultValue;
+			return score;
 		}
 
 		public void Execute()

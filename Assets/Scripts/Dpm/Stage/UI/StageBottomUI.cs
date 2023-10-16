@@ -1,8 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using Dpm.CoreAdapter;
 using Dpm.Stage.Event;
+using Dpm.Stage.UI.Calculator;
+using Dpm.Stage.UI.Calculator.Attack;
+using Dpm.Stage.UI.Calculator.Move;
 using Dpm.Stage.Unit;
+using Dpm.Stage.Unit.AI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -28,7 +33,23 @@ namespace Dpm.Stage.UI
 		[SerializeField]
 		private TextMeshProUGUI asdText;
 
-		private Character CurrentMember {
+		[SerializeField]
+		private Button moveAIButton;
+
+		[SerializeField]
+		private Button attackAIButton;
+
+		[SerializeField]
+		private Button abilityAIButton;
+
+		[SerializeField]
+		private List<AICalculatorUIBase> aiCalculatorUIs;
+
+		private float _aiCalculatorUIMaxY;
+
+		private const float AICalculatorUIYGap = -10f;
+
+		public Character CurrentMember {
 			get
 			{
 				var members = UnitManager.Instance.AllyParty.Members;
@@ -47,6 +68,20 @@ namespace Dpm.Stage.UI
 			_currentMemberIndex = 0;
 
 			UpdateMemberInfo();
+
+			_aiCalculatorUIMaxY = float.MinValue;
+
+			foreach (var ui in aiCalculatorUIs)
+			{
+				ui.Init();
+
+				if (ui.RectTransform.localPosition.y > _aiCalculatorUIMaxY)
+				{
+					_aiCalculatorUIMaxY = ui.RectTransform.localPosition.y;
+				}
+			}
+
+			ChangeAIContents(AICalculatorType.Move);
 
 			CoreService.Event.Subscribe<HpChangedEvent>(OnHpChanged);
 		}
@@ -80,9 +115,83 @@ namespace Dpm.Stage.UI
 			}
 
 			UpdateMemberInfo();
+
+			// FIXME : 편의성 아작남
+			ChangeAIContents(AICalculatorType.Move);
 		}
 
-		public void OnHpChanged(Core.Interface.Event e)
+		public void OnMoveAIButton()
+		{
+			OnChangeAITabButton(AICalculatorType.Move);
+		}
+
+		public void OnAttackAIButton()
+		{
+			OnChangeAITabButton(AICalculatorType.Attack);
+		}
+
+		public void OnAbilityAIButton()
+		{
+			OnChangeAITabButton(AICalculatorType.Ability);
+		}
+
+		private void OnChangeAITabButton(AICalculatorType type)
+		{
+			ChangeAIContents(type);
+		}
+
+		private Button GetAIChangeButton(AICalculatorType type)
+		{
+			return type switch
+			{
+				AICalculatorType.Move => moveAIButton,
+				AICalculatorType.Attack => attackAIButton,
+				AICalculatorType.Ability => abilityAIButton,
+				_ => null
+			};
+		}
+
+		private void ChangeAIContents(AICalculatorType type)
+		{
+			moveAIButton.interactable = true;
+			attackAIButton.interactable = true;
+			abilityAIButton.interactable = true;
+
+			var changeButton = GetAIChangeButton(type);
+
+			changeButton.interactable = false;
+
+			// 필요한 Calculator들만 켜주고 나머지는 끈다.
+			var nextY = _aiCalculatorUIMaxY;
+
+			var character = StageUIManager.Instance.BottomUI.CurrentMember;
+
+			var decisionMaker = character.DecisionMaker;
+
+			foreach (var ui in aiCalculatorUIs)
+			{
+				if (ui.AIType == type && decisionMaker.IsUsingTyped(ui.CalculatorType))
+				{
+					ui.gameObject.SetActive(true);
+
+					var origin = ui.RectTransform.localPosition;
+
+					ui.RectTransform.localPosition = new Vector3(origin.x, nextY, origin.z);
+
+					nextY = nextY - ui.RectTransform.sizeDelta.y + AICalculatorUIYGap;
+
+					var scoreFactor = decisionMaker.GetScoreFactor(ui.CalculatorType);
+
+					ui.FactorValue = scoreFactor;
+				}
+				else
+				{
+					ui.gameObject.SetActive(false);
+				}
+			}
+		}
+
+		private void OnHpChanged(Core.Interface.Event e)
 		{
 			if (!(e is HpChangedEvent hce) || hce.Character != CurrentMember)
 			{

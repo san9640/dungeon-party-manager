@@ -34,6 +34,8 @@ namespace Dpm.Stage.UI
 		[SerializeField]
 		private StageBottomUI bottomUI;
 
+		public StageBottomUI BottomUI => bottomUI;
+
 		[SerializeField]
 		private EventSystem eventSystem;
 
@@ -72,6 +74,8 @@ namespace Dpm.Stage.UI
 			CoreService.Event.Unsubscribe<ScreenFadeInEndEvent>(OnScreenFadeInEnd);
 			CoreService.Event.Unsubscribe<ScreenFadeOutStartEvent>(OnScreenFadeOutStart);
 			CoreService.Event.Unsubscribe<ResumeButtonPressedEvent>(OnResumeButtonPressedEvent);
+
+			bottomUI.Dispose();
 		}
 
 		public void OnBattleStartButtonPressed()

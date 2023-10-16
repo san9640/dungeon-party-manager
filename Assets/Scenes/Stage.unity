@@ -667,7 +667,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.000018921504}
+  m_AnchoredPosition: {x: 0, y: 0.000039111477}
   m_SizeDelta: {x: 0, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &311716290
@@ -852,6 +852,7 @@ GameObject:
   - component: {fileID: 338129298}
   - component: {fileID: 338129300}
   - component: {fileID: 338129299}
+  - component: {fileID: 338129301}
   m_Layer: 0
   m_Name: ApproachToEnemyMove
   m_TagString: Untagged
@@ -919,6 +920,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 338129297}
   m_CullTransparentMesh: 1
+--- !u!114 &338129301
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 338129297}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57dfcd5e337945b7917ed06fa50bfdf2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  factorSlider: {fileID: 494147327}
 --- !u!1 &355867129
 GameObject:
   m_ObjectHideFlags: 0
@@ -1540,6 +1554,7 @@ GameObject:
   - component: {fileID: 490023307}
   - component: {fileID: 490023309}
   - component: {fileID: 490023308}
+  - component: {fileID: 490023310}
   m_Layer: 0
   m_Name: ClosestAttack
   m_TagString: Untagged
@@ -1607,6 +1622,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 490023306}
   m_CullTransparentMesh: 1
+--- !u!114 &490023310
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 490023306}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d308b426176d447cbd530c0800a8db19, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  factorSlider: {fileID: 2011016491}
 --- !u!1 &492302673
 GameObject:
   m_ObjectHideFlags: 0
@@ -1834,7 +1862,19 @@ MonoBehaviour:
   m_Value: 0.5
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 338129301}
+        m_TargetAssemblyTypeName: Dpm.Stage.UI.Calculator.AICalculatorUIBase, Assembly-CSharp
+        m_MethodName: OnFactorChanged
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &583407317
 GameObject:
   m_ObjectHideFlags: 0
@@ -3035,7 +3075,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 792482760}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1511951431}
+        m_TargetAssemblyTypeName: Dpm.Stage.UI.StageBottomUI, Assembly-CSharp
+        m_MethodName: OnAttackAIButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &792482760
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3891,7 +3943,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 921298161}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1511951431}
+        m_TargetAssemblyTypeName: Dpm.Stage.UI.StageBottomUI, Assembly-CSharp
+        m_MethodName: OnMoveAIButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &921298161
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5207,6 +5271,13 @@ MonoBehaviour:
   mpText: {fileID: 1789120683}
   atkText: {fileID: 2015962920}
   asdText: {fileID: 841346772}
+  moveAIButton: {fileID: 921298160}
+  attackAIButton: {fileID: 792482759}
+  abilityAIButton: {fileID: 1625271943}
+  aiCalculatorUIs:
+  - {fileID: 338129301}
+  - {fileID: 1629154244}
+  - {fileID: 490023310}
 --- !u!1 &1535298252
 GameObject:
   m_ObjectHideFlags: 0
@@ -5843,7 +5914,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1625271944}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1511951431}
+        m_TargetAssemblyTypeName: Dpm.Stage.UI.StageBottomUI, Assembly-CSharp
+        m_MethodName: OnAbilityAIButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1625271944
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5893,6 +5976,7 @@ GameObject:
   - component: {fileID: 1629154241}
   - component: {fileID: 1629154243}
   - component: {fileID: 1629154242}
+  - component: {fileID: 1629154244}
   m_Layer: 0
   m_Name: RetreatMove
   m_TagString: Untagged
@@ -5960,6 +6044,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1629154240}
   m_CullTransparentMesh: 1
+--- !u!114 &1629154244
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1629154240}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f91e64d8c6184a0c8ef906d92b4aa928, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  factorSlider: {fileID: 1769223822}
 --- !u!1 &1630296358
 GameObject:
   m_ObjectHideFlags: 0
@@ -6799,7 +6896,19 @@ MonoBehaviour:
   m_Value: 0.5
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1629154244}
+        m_TargetAssemblyTypeName: Dpm.Stage.UI.Calculator.AICalculatorUIBase, Assembly-CSharp
+        m_MethodName: OnFactorChanged
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1789120681
 GameObject:
   m_ObjectHideFlags: 0
@@ -7019,7 +7128,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1476077746}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9991633
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -7889,7 +7998,19 @@ MonoBehaviour:
   m_Value: 0.5
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 490023310}
+        m_TargetAssemblyTypeName: Dpm.Stage.UI.Calculator.AICalculatorUIBase, Assembly-CSharp
+        m_MethodName: OnFactorChanged
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &2015962918
 GameObject:
   m_ObjectHideFlags: 0

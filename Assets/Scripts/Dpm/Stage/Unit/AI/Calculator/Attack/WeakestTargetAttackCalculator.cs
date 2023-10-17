@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Dpm.Stage.Unit.AI.Calculator.Attack
 {
-	public class StrongestTargetAttackCalculator : IAIAttackCalculator
+	public class WeakestTargetAttackCalculator : IAIAttackCalculator
 	{
 		private AttackCalculatorInfo _info;
 
@@ -36,8 +36,8 @@ namespace Dpm.Stage.Unit.AI.Calculator.Attack
 
 		public void Execute()
 		{
-		}
 
+		}
 		public void DrawCurrent()
 		{
 		}

@@ -25,6 +25,8 @@ namespace Dpm.Stage.Unit
 
 		public Party EnemyParty => _enemyParty;
 
+		private int _nextUnitId = 1;
+
 		public void Dispose()
 		{
 			DespawnParty(ref _allyParty);
@@ -136,6 +138,8 @@ namespace Dpm.Stage.Unit
 
 			RegisterUnit(character);
 
+			character.Name = $"{characterSpecName}_{character.Id}";
+
 			return true;
 		}
 
@@ -153,6 +157,8 @@ namespace Dpm.Stage.Unit
 		public void RegisterUnit(IUnit unit)
 		{
 			_units.Add(unit);
+
+			unit.Id = _nextUnitId++;
 
 			CoreService.Event.SendImmediate(unit, UnitRegisteredEvent.Instance);
 		}

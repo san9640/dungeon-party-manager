@@ -26,7 +26,7 @@ namespace Dpm.Stage.Unit
 				var v3Dir = value.ConvertToVector3();
 				var rotation = Quaternion.FromToRotation(Vector3.right, v3Dir);
 
-				animator.Rotation = rotation.eulerAngles.z;
+				animator.Rotation = rotation.eulerAngles.y;
 			}
 		}
 
@@ -110,7 +110,7 @@ namespace Dpm.Stage.Unit
 				IState moveState = Spec.type switch
 				{
 					ProjectileType.Follow => ProjectileFollowState.Create(this, rse.Info.target),
-					ProjectileType.Linear => ProjectileMoveState.Create(this, rse.Info.target),
+					ProjectileType.Linear => ProjectileMoveState.Create(this, rse.Info.targetPos),
 					_ => null
 				};
 

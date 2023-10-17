@@ -6,6 +6,7 @@ using Dpm.Stage.Spec;
 using Dpm.Stage.Unit.AI.Calculator;
 using Dpm.Stage.Unit.AI.Calculator.Attack;
 using Dpm.Stage.Unit.AI.Calculator.Move;
+using Dpm.Utility.Constants;
 
 namespace Dpm.Stage.Unit.AI
 {
@@ -42,12 +43,17 @@ namespace Dpm.Stage.Unit.AI
                     continue;
                 }
 
-                calculator.Init(character, moveInfo);
-
-                _moveCalculators.Add(calculator.GetType(), calculator);
-
-                _factorInfos.Add(calculator, moveInfo.weightFactorInfo);
+                AddMoveCalculator(calculator, moveInfo);
             }
+
+            // AddMoveCalculator(new DefaultMoveCalculator(), new MoveCalculatorInfo
+            // {
+            //     type = MoveType.Default,
+            //     weightFactorInfo = new SliderWeightFactorInfo
+            //     {
+            //         defaultValue = 0.5f,
+            //     }
+            // });
 
             foreach (var attackInfo in attackSpec.calculatorInfos)
             {
@@ -55,8 +61,8 @@ namespace Dpm.Stage.Unit.AI
                 IAIAttackCalculator calculator = attackInfo.type switch
                 {
                     AttackTargetSearchingType.Closest => new ClosestTargetAttackCalculator(),
-                    // AttackTargetSearchingType.Strongest => new ClosestTargetAttackCalculator(),
-                    // AttackTargetSearchingType.Weakest => new ClosestTargetAttackCalculator(),
+                    AttackTargetSearchingType.Strongest => new StrongestTargetAttackCalculator(),
+                    AttackTargetSearchingType.Weakest => new WeakestTargetAttackCalculator(),
                     _ => null
                 };
 
@@ -73,6 +79,15 @@ namespace Dpm.Stage.Unit.AI
             }
 
             CoreService.Event.Subscribe<ChangeAICalculatorFactorEvent>(OnChangeAICalculatorFactor);
+        }
+
+        private void AddMoveCalculator(IAIMoveCalculator calculator, MoveCalculatorInfo moveInfo)
+        {
+            calculator.Init(_character, moveInfo);
+
+            _moveCalculators.Add(calculator.GetType(), calculator);
+
+            _factorInfos.Add(calculator, moveInfo.weightFactorInfo);
         }
 
         public void Dispose()
@@ -160,8 +175,19 @@ namespace Dpm.Stage.Unit.AI
                 }
             }
 
-            // FIXME : 움직이며 공격하기 등의 다른 동작을 동시에 실행할 수 있어야 함
             maxScoredCalculator?.Execute();
+
+            if (CurrentAttackTarget != null)
+            {
+                if (CurrentAttackTarget.Position.x < _character.Position.x)
+                {
+                    _character.Animator.LookDirection = Direction.Left;
+                }
+                else
+                {
+                    _character.Animator.LookDirection = Direction.Right;
+                }
+            }
 
             CurrentAttackTarget = null;
         }

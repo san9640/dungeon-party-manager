@@ -54,8 +54,8 @@ namespace Dpm.Stage.Unit.AI.Calculator
 			if (killDelay > deadDelay)
 			{
 				// 0 ~ 0.5
-				var totalDamage = deadDelay * toDps;
-				var damageRatio = totalDamage / fromHp;
+				var totalDamage = deadDelay * fromDps;
+				var damageRatio = totalDamage / toHp;
 
 				// 받을 수 있는 데미지가 높을수록 점수가 높아야 함
 				return 0.5f * damageRatio;
@@ -63,8 +63,8 @@ namespace Dpm.Stage.Unit.AI.Calculator
 			else
 			{
 				// 0.5 ~ 1.0
-				var totalDamage = deadDelay * fromDps;
-				var damageRatio = totalDamage / toHp;
+				var totalDamage = killDelay * toDps;
+				var damageRatio = totalDamage / fromHp;
 
 				// 넣을 수 있는 데미지가 높을수록 점수가 낮아야 함
 				return 0.5f + 0.5f * (1 - damageRatio);

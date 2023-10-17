@@ -24,7 +24,8 @@ namespace Dpm.Stage.Unit.AI.Calculator.Attack
 			_info = info;
 			CurrentTarget = null;
 
-			_attackableDist = Mathf.Max(_character.BattleAction.Spec.attackRange - AICalculatorConstants.AttackDistEpsilon, 0f);
+			_attackableDist = Mathf.Max(
+				_character.BattleAction.Spec.attackRange - AICalculatorConstants.AttackDistEpsilon, 0f);
 		}
 
 		public void Dispose()
@@ -100,7 +101,7 @@ namespace Dpm.Stage.Unit.AI.Calculator.Attack
 				return;
 			}
 
-			CoreService.Event.SendImmediate(_character, RequestAttackTargetEvent.Create(CurrentTarget));
+			CoreService.Event.Send(_character, RequestAttackTargetEvent.Create(CurrentTarget));
 		}
 
 		public void DrawCurrent()

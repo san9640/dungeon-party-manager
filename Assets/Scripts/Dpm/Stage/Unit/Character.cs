@@ -151,12 +151,22 @@ namespace Dpm.Stage.Unit
 
 		public void OnDrawGizmos()
 		{
+			var style = new GUIStyle
+			{
+				normal =
+				{
+					textColor = Color.red
+				},
+				fontSize = 20,
+			};
+
+			// Handles.Label(screenPosition, $"[{Id}]", style);
+			Handles.Label(Position.ConvertToVector3(), $"[{Id}]", style);
+
 			if (CurrentState is CharacterBattleState)
 			{
-				// var style = new GUIStyle();
-
-				// style.normal.textColor = Color.red;
-				// Handles.Label(Position.ConvertToVector3(), gameObject.name);
+				Handles.color = Region == UnitRegion.Ally ? Color.cyan : Color.yellow;
+				Handles.DrawWireDisc(Position.ConvertToVector3(), Vector3.forward, BattleAction.Spec.attackRange);
 
 				(DecisionMaker as IDebugDrawable)?.DrawCurrent();
 			}

@@ -12,9 +12,13 @@ namespace Dpm.Stage.Unit
 {
 	public class Unit : MonoBehaviour, IUnit
 	{
-		public string Name { get; protected set; }
+		public string Name
+		{
+			get => gameObject.name;
+			set => gameObject.name = value;
+		}
 
-		public int Id { get; protected set; }
+		public int Id { get; set; }
 
 		public UnitRegion Region { get; set; } = UnitRegion.None;
 

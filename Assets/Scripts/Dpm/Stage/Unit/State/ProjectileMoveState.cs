@@ -57,15 +57,5 @@ namespace Dpm.Stage.Unit.State
 
 			return state;
 		}
-
-		public static ProjectileMoveState Create(IProjectile projectile, IUnit target)
-		{
-			var state = Pool.GetOrCreate();
-
-			state._projectile = projectile;
-			state._targetPos = target.Position;
-
-			return state;
-		}
 	}
 }

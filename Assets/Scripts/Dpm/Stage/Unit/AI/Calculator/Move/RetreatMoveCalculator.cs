@@ -25,6 +25,7 @@ namespace Dpm.Stage.Unit.AI.Calculator.Move
 		public void Dispose()
 		{
 			_targetPos = null;
+			_character = null;
 		}
 
 		public float Calculate()
@@ -91,7 +92,7 @@ namespace Dpm.Stage.Unit.AI.Calculator.Move
 
 			var score = dpsGapScore * 0.5f + hpScore * 0.5f;
 
-			_targetPos = _character.Position + attackPowerSum.normalized;
+			_targetPos = _character.Position + attackPowerSum.normalized * 5f;
 
 			return score;
 		}

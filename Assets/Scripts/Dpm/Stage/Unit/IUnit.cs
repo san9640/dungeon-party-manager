@@ -9,9 +9,9 @@ namespace Dpm.Stage.Unit
 
 	public interface IUnit : ICustomCollider
 	{
-		int Id { get; }
+		int Id { get; set; }
 
-		string Name { get; }
+		string Name { get; set; }
 
 		UnitRegion Region { get; }
 

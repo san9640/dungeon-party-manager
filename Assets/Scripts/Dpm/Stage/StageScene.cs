@@ -63,6 +63,7 @@ namespace Dpm.Stage
 			// FIXME : Register 방식을 변경하고 싶음
 			foreach (var unit in _room.Units)
 			{
+				unit.Region = UnitRegion.Neutral;
 				UnitManager.RegisterUnit(unit);
 			}
 

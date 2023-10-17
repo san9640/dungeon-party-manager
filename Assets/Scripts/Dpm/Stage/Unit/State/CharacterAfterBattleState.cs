@@ -61,6 +61,18 @@ namespace Dpm.Stage.Unit.State
 				var moveDir = new Vector2(xMove, yMove).normalized;
 
 				StagePhysicsManager.Instance.Move(_character, moveDir, dist);
+
+				if (Input.GetKeyDown(KeyCode.Q))
+				{
+					var info = new ProjectileInfo
+					{
+						damage = 0,
+						shooter = _character,
+						targetPos = _character.Position + Vector2.left
+					};
+
+					ProjectileManager.Instance.Shoot("bolt", info);
+				}
 			}
 		}
 	}

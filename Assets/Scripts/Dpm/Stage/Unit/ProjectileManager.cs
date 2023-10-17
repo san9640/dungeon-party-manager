@@ -14,6 +14,8 @@ namespace Dpm.Stage.Unit
 		public IUnit shooter;
 
 		public IUnit target;
+
+		public Vector2 targetPos;
 	}
 
 	public class ProjectileManager
@@ -63,7 +65,12 @@ namespace Dpm.Stage.Unit
 		{
 			var projectile = Spawn(projectileSpecName);
 
-			var toTargetDir = (info.target.Position - info.shooter.Position).normalized;
+			if (info.target != null)
+			{
+				info.targetPos = info.target.Position;
+			}
+
+			var toTargetDir = (info.targetPos - info.shooter.Position).normalized;
 
 			projectile.Position = info.shooter.Position + toTargetDir * 0.7f;
 

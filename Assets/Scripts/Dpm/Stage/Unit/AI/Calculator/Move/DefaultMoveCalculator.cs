@@ -1,16 +1,12 @@
-﻿using Core.Interface;
-using Dpm.CoreAdapter;
+﻿using Dpm.CoreAdapter;
 using Dpm.Stage.Event;
 using Dpm.Stage.Physics;
 using Dpm.Stage.Spec;
-using Dpm.Utility.Constants;
-using Dpm.Utility.Extensions;
-using UnityEditor;
 using UnityEngine;
 
 namespace Dpm.Stage.Unit.AI.Calculator.Move
 {
-	public class ApproachToEnemyMoveCalculator : IAIMoveCalculator
+	public class DefaultMoveCalculator : IAIMoveCalculator
 	{
 		private MoveCalculatorInfo _info;
 
@@ -18,13 +14,12 @@ namespace Dpm.Stage.Unit.AI.Calculator.Move
 
 		private Vector2? _targetPos;
 
-		private const float MaxScoreMinDuration = 0.5f;
-
 		private float _attackableDist;
 
 		public void Init(Character character, MoveCalculatorInfo info)
 		{
 			_info = info;
+			_targetPos = null;
 			_character = character;
 
 			_attackableDist = Mathf.Max(_character.BattleAction.Spec.attackRange - AICalculatorConstants.AttackDistEpsilon, 0f);
@@ -32,8 +27,8 @@ namespace Dpm.Stage.Unit.AI.Calculator.Move
 
 		public void Dispose()
 		{
-			_character = null;
 			_targetPos = null;
+			_character = null;
 		}
 
 		public float Calculate()
@@ -56,12 +51,11 @@ namespace Dpm.Stage.Unit.AI.Calculator.Move
 				return AICalculatorConstants.MinInnerScore;
 			}
 
-			_targetPos = currentAttackTarget.Position;
+			var toTargetDir = (currentAttackTarget.Position - _character.Position).normalized;
 
-			var requiredMoveDuration = requiredMoveDist / _character.MoveSpeed;
-			var score = AICalculatorUtility.ClampScore(MaxScoreMinDuration / requiredMoveDuration);
+			_targetPos = requiredMoveDist * toTargetDir + _character.Position;
 
-			return score;
+			return 0.01f;
 		}
 
 		public void Execute()

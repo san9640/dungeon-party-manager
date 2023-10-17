@@ -5,6 +5,7 @@ using Dpm.Stage.Event;
 using Dpm.Stage.Unit;
 using Dpm.Utility.Constants;
 using Dpm.Utility.Extensions;
+using Dpm.Utility.Pool;
 using UnityEngine;
 
 namespace Dpm.Stage.Physics
@@ -24,6 +25,10 @@ namespace Dpm.Stage.Physics
 		private readonly List<ICustomCollider> _colliders = new();
 
 		public static StagePhysicsManager Instance => Game.Instance.Stage.PhysicsManager;
+
+		private readonly Queue<(Vector2Int node, Vector2Int firstNode, int depth)> _bfsQueue = new();
+
+		private readonly HashSet<int> _visitedIds = new();
 
 		public StagePhysicsManager()
 		{
@@ -218,6 +223,95 @@ namespace Dpm.Stage.Physics
 				new Vector2(bounds.center[anotherAxisIndex], newCenterAxis);
 
 			return result;
+		}
+
+		private static Vector2Int[] _bfsDirections =
+		{
+			Vector2Int.right,
+			Vector2Int.left,
+			Vector2Int.down,
+			Vector2Int.up,
+		};
+
+		public bool TryFindPath(Character character, Vector2 targetPos, out Vector2 result)
+		{
+			var nodeOffset = character.Bounds.Size;
+			var found = false;
+			result = Vector2.zero;
+
+			_bfsQueue.Enqueue((Vector2Int.zero, Vector2Int.zero, 0));
+
+			var targetBounds = new Bounds2D(targetPos, nodeOffset);
+
+			while (_bfsQueue.TryDequeue(out var currentNodeInfo))
+			{
+				var currentNode = currentNodeInfo.node;
+				var firstNode = currentNodeInfo.depth == 1 ? currentNodeInfo.firstNode : currentNode;
+				var currentPos = character.Position +
+				                 currentNode.x * nodeOffset.x * Vector2.right +
+				                 currentNode.y * nodeOffset.y * Vector2.up;
+
+				// 적당히 거리가 가까워졌으면 탈출. 어차피 자주 불릴 것이라 대충 방향만 찾으면 됨
+				if (targetBounds.Min.x <= currentPos.x && currentPos.x < targetBounds.Max.x &&
+				    targetBounds.Min.y <= currentPos.y && currentPos.y < targetBounds.Max.y)
+				{
+					result = firstNode;
+					found = true;
+					break;
+				}
+
+				for (var i = 0; i < 4; i++)
+				{
+					var curDir = _bfsDirections[i];
+					var nextNode = currentNode + curDir;
+
+					if (_visitedIds.Contains(GetNodeId(nextNode)))
+					{
+						continue;
+					}
+
+					var nextPos = currentPos + curDir.x * nodeOffset.x * Vector2.right +
+					              curDir.y * nodeOffset.y * Vector2.up;
+
+					var crashed = false;
+
+					foreach (var other in _colliders)
+					{
+						if (other is Character otherCharacter)
+						{
+							if (character.Region.IsOppositeParty(otherCharacter.Region) || character.Id == otherCharacter.Id)
+							{
+								continue;
+							}
+						}
+
+						crashed = (character.OnSimulateCrash(other) || other.OnSimulateCrash(character)) &&
+						          PhysicsUtility.IsOverlapped(new Bounds2D(nextPos, character.Bounds.Size), other.Bounds);
+
+						if (crashed)
+						{
+							break;
+						}
+					}
+
+					if (!crashed)
+					{
+						_bfsQueue.Enqueue((nextNode, firstNode, currentNodeInfo.depth + 1));
+					}
+
+					_visitedIds.Add(GetNodeId(nextNode));
+				}
+			}
+
+			_bfsQueue.Clear();
+			_visitedIds.Clear();
+
+			return found;
+		}
+
+		private int GetNodeId(Vector2Int node)
+		{
+			return node.x + 100 + (node.y + 100) * 10000;
 		}
 	}
 }

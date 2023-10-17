@@ -19,6 +19,8 @@ namespace Dpm.Stage.Unit.State
 
 		private Vector2? _moveTargetPos;
 
+		private bool _needPathFinding;
+
 		public override void Enter()
 		{
 			CoreService.Event.Subscribe<BattleEndEvent>(OnBattleEnd);
@@ -51,6 +53,7 @@ namespace Dpm.Stage.Unit.State
 			if (e is RequestMoveEvent rme)
 			{
 				_moveTargetPos = rme.TargetPos;
+				_needPathFinding = rme.FindingPath;
 			}
 		}
 
@@ -78,73 +81,19 @@ namespace Dpm.Stage.Unit.State
 					var result = StagePhysicsManager.Instance.Move(_character, moveDir, moveDist);
 
 					// 다른 유닛이랑 충돌했을 경우에만 방향을 조금 틀어줌
-					if (result.crasher is IUnit)
+					if (_needPathFinding && result.crasher is IUnit)
 					{
-						var targetPos = moveDist * moveDir;
-						var blockedDist = moveDist - (targetPos - prevPos).magnitude;
+						var blockedDist = moveDist - (_character.Position - prevPos).magnitude;
 
 						// 물리 계산이 완벽하지 않아서, blockedDist가 0보다 작을 수도 있음...
-						if (blockedDist > 0)
+						if (blockedDist > 0 &&
+						    StagePhysicsManager.Instance.TryFindPath(_character, _moveTargetPos.Value, out var pathDir))
 						{
-							var toCrasher = result.crasher.Position - _character.Position;
-
-							if (Mathf.Abs(toCrasher.x) > Mathf.Abs(toCrasher.y))
-							{
-								moveDir = Vector2.right * (moveDir.y > 0 ? 1 : -1);
-							}
-							else
-							{
-								moveDir = Vector2.up * (moveDir.x > 0 ? 1 : -1);
-							}
-
-							StagePhysicsManager.Instance.Move(_character, moveDir, blockedDist);
+							StagePhysicsManager.Instance.Move(_character, pathDir, blockedDist);
 						}
 					}
 				}
 			}
-
-			// // FIXME : 테스트 코드
-			// if (_character.Region == UnitRegion.Ally)
-			// {
-			// 	var dist = dt * 3;
-			// 	var xMove = Input.GetAxis("Horizontal");
-			// 	var yMove = Input.GetAxis("Vertical");
-			//
-			// 	var moveDir = new Vector2(xMove, yMove).normalized;
-			//
-			// 	StagePhysicsManager.Instance.Move(_character, moveDir, dist);
-			// }
-			// else if (_character.Region == UnitRegion.Enemy)
-			// {
-			// 	_testTimePassed += dt;
-			//
-			// 	if (_testTimePassed > 1)
-			// 	{
-			// 		var enemyParty = UnitManager.Instance.AllyParty.Members;
-			//
-			// 		var target = enemyParty[Random.Range(0, enemyParty.Count)];
-			//
-			// 		ProjectileManager.Instance.Shoot("bolt", new ProjectileInfo
-			// 		{
-			// 			target =
-			// 		});
-			//
-			// 		_testTimePassed -= 1;
-			// 	}
-			//
-			// 	for (var key = KeyCode.Alpha1; key <= KeyCode.Alpha4; key++)
-			// 	{
-			// 		if (Input.GetKeyDown(key) &&
-			// 		    ReferenceEquals(_character, UnitManager.Instance.EnemyParty.Members[key - KeyCode.Alpha1]))
-			// 		{
-			// 			var deadState = CharacterDeadState.Create(_character);
-			//
-			// 			CoreService.Event.Send(_character, StateChangeEvent.Create(deadState));
-			//
-			// 			break;
-			// 		}
-			// 	}
-			// }
 		}
 
 		private void OnBattleEnd(Core.Interface.Event e)

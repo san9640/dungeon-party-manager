@@ -17,7 +17,13 @@ MonoBehaviour:
     region: 1
     spawnInfos:
     - characterSpecName: wizard
+    - characterSpecName: wizard
+    - characterSpecName: wizard
+    - characterSpecName: wizard
   - name: enemy
     region: 2
     spawnInfos:
+    - characterSpecName: orc_warrior
+    - characterSpecName: orc_warrior
+    - characterSpecName: orc_warrior
     - characterSpecName: orc_warrior

@@ -38,6 +38,12 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Bottom Effect
+    uniqueID: 1145502965
+    locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Top Effect
+    uniqueID: 2400108579
     locked: 0

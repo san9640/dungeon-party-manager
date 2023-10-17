@@ -111,3 +111,8 @@ MonoBehaviour:
     - {fileID: 21300000, guid: e81f226e03988b643b59b294a93e1d1b, type: 3}
     - {fileID: 21300000, guid: 72b93ed4765dcd146a4e3c447981542a, type: 3}
     - {fileID: 21300000, guid: 96833c24d8ca9ba428628e904832c5dd, type: 3}
+  - name: dead
+    sprites:
+    - {fileID: 21300000, guid: 3173a77b372fc4c4aa4e16285af0874d, type: 3}
+  isLoop: 1
+  transitionSpriteDelay: 0.12

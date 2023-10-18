@@ -106,7 +106,8 @@ namespace Dpm.Stage.Unit
 
 			foreach (var spawnInfo in partySpec.spawnInfos)
 			{
-				if (TrySpawnCharacter(spawnInfo.characterSpecName, spawnArea.RandomPos, spawnArea.Direction,
+				if (TrySpawnCharacter(spawnInfo.characterSpecName,
+					    spawnArea[spawnInfo.spawnIndex.x, spawnInfo.spawnIndex.y], spawnArea.Direction,
 					    out var member))
 				{
 					members.Add(member);

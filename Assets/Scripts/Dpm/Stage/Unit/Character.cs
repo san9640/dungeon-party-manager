@@ -30,6 +30,10 @@ namespace Dpm.Stage.Unit
 			set => Animator.LookDirection = value;
 		}
 
+		public Vector2 OriginPos { get; private set; }
+
+		public Direction OriginDir { get; private set; }
+
 		public IDecisionMaker DecisionMaker { get; } = new DecisionMaker();
 
 		public IBattleAction BattleAction { get; private set; }
@@ -110,6 +114,9 @@ namespace Dpm.Stage.Unit
 
 			if (e is UnitRegisteredEvent)
 			{
+				OriginPos = Position;
+				OriginDir = Direction;
+
 				_stateMachine.ChangeState(CharacterWaitBattleState.Create(this));
 
 				CoreService.FrameUpdate.RegisterUpdate(this, Id);

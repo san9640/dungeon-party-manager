@@ -13,6 +13,9 @@ namespace Dpm.Stage.Unit.State
 
 		public override void Enter()
 		{
+			_character.Position = _character.OriginPos;
+			_character.Direction = _character.OriginDir;
+
 			CoreService.Event.Subscribe<BattleStartEvent>(OnBattleStart);
 		}
 

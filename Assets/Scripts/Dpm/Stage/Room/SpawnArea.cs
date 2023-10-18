@@ -7,6 +7,8 @@ namespace Dpm.Stage.Room
 {
 	public class SpawnArea : MonoBehaviour
 	{
+		public static int SpawnPosSize = 2;
+
 		[SerializeField]
 		private Vector2 minOffset;
 
@@ -38,31 +40,86 @@ namespace Dpm.Stage.Room
 
 		public Direction Direction => direction;
 
-		/// <summary>
-		/// TODO : 테스트용 코드이므로 지워야 함
-		/// </summary>
-		public Vector2 RandomPos
+		public Vector2 this[int xIndex, int yIndex]
 		{
 			get
 			{
-				var x = Random.Range(Min.x, Max.x);
-				var y = Random.Range(Min.y, Max.y);
+				var offset = new Vector2(xIndex, yIndex) * SpawnPosSize;
 
-				return new Vector2(x, y);
+				if (Direction == Direction.Right)
+				{
+					offset.x = -offset.x;
+				}
+
+				return offset + Pivot;
 			}
 		}
+
+		private Vector2 Pivot
+		{
+			get
+			{
+				if (_pivot.HasValue)
+				{
+					return _pivot.Value;
+				}
+
+				var min = transform.position + new Vector3(minOffset.x, minOffset.y, 0);
+				var max = transform.position + new Vector3(maxOffset.x, maxOffset.y, 0);
+				var center = (min + max) / 2;
+
+				var pivot = Direction == Direction.Left ?
+					new Vector2(min.x + SpawnPosSize * 0.5f, center.y) :
+					new Vector2(max.x - SpawnPosSize * 0.5f, center.y);
+
+				_pivot = pivot;
+
+				return pivot;
+			}
+		}
+
+		private Vector2? _pivot;
 
 #if UNITY_EDITOR
 		private void OnDrawGizmos()
 		{
-			Gizmos.color = Color.blue;
+			if (Application.isPlaying)
+			{
+				return;
+			}
 
 			var min = transform.position + new Vector3(minOffset.x, minOffset.y, 0);
 			var max = transform.position + new Vector3(maxOffset.x, maxOffset.y, 0);
 			var center = (min + max) / 2;
 			var size = max - min;
 
+			Gizmos.color = Color.blue;
 			Gizmos.DrawWireCube(center, size);
+
+			var pivot = Direction == Direction.Left ?
+				new Vector3(min.x + SpawnPosSize * 0.5f, center.y, 0) :
+				new Vector3(max.x - SpawnPosSize * 0.5f, center.y, 0);
+
+			var maxXCount = Mathf.FloorToInt((size.x - SpawnPosSize) / SpawnPosSize);
+			var maxYHalfCount = Mathf.FloorToInt((size.y - SpawnPosSize) * 0.5f / SpawnPosSize);
+
+			for (var x = 0; x <= maxXCount; x++)
+			{
+				for (var y = -maxYHalfCount; y <= maxYHalfCount; y++)
+				{
+					var offset = new Vector3(x, y, 0) * SpawnPosSize;
+
+					if (Direction == Direction.Right)
+					{
+						offset.x = -offset.x;
+					}
+
+					var drawPos = pivot + offset;
+
+					Gizmos.color = (x == 0 && y == 0) ? Color.green : Color.white;
+					Gizmos.DrawWireCube(drawPos, new Vector3(1, 1, 0));
+				}
+			}
 		}
 #endif
 	}

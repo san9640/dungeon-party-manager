@@ -11,6 +11,7 @@ namespace Dpm.Stage.Spec
 		public string characterSpecName;
 
 		// TODO : 엘리트 옵션 등 추가
+		public Vector2Int spawnIndex;
 	}
 
 	[Serializable]

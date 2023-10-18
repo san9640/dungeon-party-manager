@@ -2,10 +2,12 @@
 using Dpm.Common.Event;
 using Dpm.CoreAdapter;
 using Dpm.Stage.Event;
+using Dpm.Stage.Render;
 using Dpm.Stage.UI.Event;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 
 namespace Dpm.Stage.UI
 {
@@ -37,11 +39,26 @@ namespace Dpm.Stage.UI
 		public StageBottomUI BottomUI => bottomUI;
 
 		[SerializeField]
+		private Button bottomUIShowButton;
+
+		[SerializeField]
+		private Button bottomUIHideButton;
+
+		[SerializeField]
 		private EventSystem eventSystem;
 
 		private bool _canStartBattle = false;
 
 		public StageUIState CurrentState { get; private set; } = StageUIState.None;
+
+		private enum BottomUIState
+		{
+			Hidden,
+			Showing,
+			Disabled,
+		}
+
+		private BottomUIState _currentBottomUIState = BottomUIState.Disabled;
 
 		/// <summary>
 		/// FIXME : 싱글톤이 아닌 다른 방식을 쓰는 게 낫지 않을까?
@@ -60,9 +77,9 @@ namespace Dpm.Stage.UI
 
 		public void Init()
 		{
-			ChangeState(StageUIState.NoneInteractable);
-
 			bottomUI.Init();
+
+			ChangeState(StageUIState.NoneInteractable);
 
 			CoreService.Event.Subscribe<ScreenFadeInEndEvent>(OnScreenFadeInEnd);
 			CoreService.Event.Subscribe<ScreenFadeOutStartEvent>(OnScreenFadeOutStart);
@@ -99,6 +116,16 @@ namespace Dpm.Stage.UI
 			battleStartButton.SetActive(false);
 
 			CoreService.Event.Publish(PauseButtonPressedEvent.Instance);
+		}
+
+		public void OnBottomUIShowButtonPressed()
+		{
+			ChangeBottomUIState(BottomUIState.Showing);
+		}
+
+		public void OnBottomUIHideButtonPressed()
+		{
+			ChangeBottomUIState(BottomUIState.Hidden);
 		}
 
 		private void OnScreenFadeInEnd(Core.Interface.Event e)
@@ -150,32 +177,74 @@ namespace Dpm.Stage.UI
 				case StageUIState.None:
 					eventSystem.enabled = false;
 					pauseUI.gameObject.SetActive(false);
-					bottomUI.gameObject.SetActive(false);
 					pauseButton.gameObject.SetActive(false);
+
+					ChangeBottomUIState(BottomUIState.Disabled);
 
 					break;
 
 				case StageUIState.NoneInteractable:
 					eventSystem.enabled = false;
 					pauseUI.gameObject.SetActive(false);
-					bottomUI.gameObject.SetActive(true);
 					pauseButton.gameObject.SetActive(true);
+
+					ChangeBottomUIState(BottomUIState.Hidden);
 
 					break;
 
 				case StageUIState.Interactable:
 					eventSystem.enabled = true;
 					pauseUI.gameObject.SetActive(false);
-					bottomUI.gameObject.SetActive(true);
 					pauseButton.gameObject.SetActive(true);
+
+					ChangeBottomUIState(BottomUIState.Hidden);
 
 					break;
 
 				case StageUIState.Paused:
 					eventSystem.enabled = true;
 					pauseUI.gameObject.SetActive(true);
-					bottomUI.gameObject.SetActive(false);
 					pauseButton.gameObject.SetActive(false);
+
+					ChangeBottomUIState(BottomUIState.Disabled);
+
+					break;
+			}
+		}
+
+		private void ChangeBottomUIState(BottomUIState nextState)
+		{
+			if (_currentBottomUIState == nextState)
+			{
+				return;
+			}
+
+			_currentBottomUIState = nextState;
+
+			switch (_currentBottomUIState)
+			{
+				case BottomUIState.Hidden:
+					bottomUI.gameObject.SetActive(false);
+					bottomUIShowButton.gameObject.SetActive(true);
+					bottomUIHideButton.gameObject.SetActive(false);
+
+					StageCamera.Instance.ChangeToDefaultMode();
+
+					break;
+				case BottomUIState.Showing:
+					bottomUI.gameObject.SetActive(true);
+					bottomUIShowButton.gameObject.SetActive(false);
+					bottomUIHideButton.gameObject.SetActive(true);
+
+					StageCamera.Instance.ChangeToControlMode();
+
+					break;
+				case BottomUIState.Disabled:
+					bottomUI.gameObject.SetActive(false);
+					bottomUIShowButton.gameObject.SetActive(false);
+					bottomUIHideButton.gameObject.SetActive(false);
+
+					StageCamera.Instance.ChangeToDefaultMode();
 
 					break;
 			}

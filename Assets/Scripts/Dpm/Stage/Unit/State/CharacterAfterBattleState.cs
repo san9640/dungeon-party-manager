@@ -52,6 +52,7 @@ namespace Dpm.Stage.Unit.State
 
 		public void UpdateFrame(float dt)
 		{
+			// FIXME : 테스트용 코드
 			if (_character.Region == UnitRegion.Ally)
 			{
 				var dist = dt * 3;

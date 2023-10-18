@@ -36,6 +36,8 @@ namespace Dpm.Stage.Unit.State
 			CoreService.Event.PublishImmediate(RemoveFromPartitionEvent.Create(_character));
 
 			CoreService.Event.Unsubscribe<BattleEndEvent>(OnBattleEnd);
+
+			_character.Animator.RemoveAnimation();
 		}
 
 		public override void Dispose()
@@ -69,9 +71,12 @@ namespace Dpm.Stage.Unit.State
 				if (diff.IsAlmostZero())
 				{
 					_moveTargetPos = null;
+					_character.Animator.RemoveAnimation();
 				}
 				else
 				{
+					_character.Animator.SetAnimation("run");
+
 					var moveDir = diff.normalized;
 					var leftoverDist = diff.magnitude;
 					var prevPos = _character.Position;

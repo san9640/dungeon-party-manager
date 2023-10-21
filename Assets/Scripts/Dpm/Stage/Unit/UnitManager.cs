@@ -27,6 +27,8 @@ namespace Dpm.Stage.Unit
 
 		private int _nextUnitId = 1;
 
+		private readonly Dictionary<Character, PooledGameObject> _statBars = new();
+
 		public void Dispose()
 		{
 			DespawnParty(ref _allyParty);
@@ -40,6 +42,8 @@ namespace Dpm.Stage.Unit
 
 			_units?.Clear();
 			_units = null;
+
+			_statBars.Clear();
 		}
 
 		public Party GetMyParty(UnitRegion region)
@@ -141,6 +145,20 @@ namespace Dpm.Stage.Unit
 
 			character.Name = $"{characterSpecName}_{character.Id}";
 
+			var statBarPool = GameObjectPool.Get("field_ui_stat_bar");
+
+			if (!statBarPool.IsUnityNull() && statBarPool.TrySpawn(Vector3.zero, out var statBarGo))
+			{
+				var statBar = statBarGo.GetComponent<FieldUIStatBar>();
+
+				statBar.transform.parent = character.transform;
+				statBar.transform.localPosition = new Vector3(0, -character.Bounds.extents.y, 0);
+
+				statBar.Init(character);
+
+				_statBars.Add(character, statBarGo);
+			}
+
 			return true;
 		}
 
@@ -149,6 +167,17 @@ namespace Dpm.Stage.Unit
 			UnregisterUnit(character);
 
 			character.Dispose();
+
+			if (_statBars.TryGetValue(character, out var statBarGo))
+			{
+				var statBar = statBarGo.GetComponent<FieldUIStatBar>();
+
+				statBar.Dispose();
+
+				statBarGo.Deactivate();
+
+				_statBars.Remove(character);
+			}
 
 			var pooledGo = character.GetComponent<PooledGameObject>();
 

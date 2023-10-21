@@ -61,3 +61,7 @@ MonoBehaviour:
     prefabSpecName: character_orc_shaman
     maxCount: 4
     lifeTime: -1
+  - name: field_ui_stat_bar
+    prefabSpecName: stat_bar
+    maxCount: -1
+    lifeTime: -1

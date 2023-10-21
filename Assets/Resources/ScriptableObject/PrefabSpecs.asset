@@ -15,7 +15,7 @@ MonoBehaviour:
   type: 0
   specs:
   - name: field
-    path: Prefabs/Field/Field
+    path: Prefabs/Field/field
   - name: field_door
     path: Prefabs/Field/door_unit
   - name: character_wizard
@@ -38,3 +38,5 @@ MonoBehaviour:
     path: Prefabs/Character/orc_ogre/orc_ogre
   - name: character_orc_shaman
     path: Prefabs/Character/orc_shaman/orc_shaman
+  - name: stat_bar
+    path: Prefabs/stat_bar

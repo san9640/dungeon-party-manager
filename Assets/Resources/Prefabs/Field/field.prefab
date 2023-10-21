@@ -317,6 +317,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3939276266004611012}
   - component: {fileID: 2374931010187358901}
+  - component: {fileID: 224115543593692487}
   m_Layer: 0
   m_Name: field
   m_TagString: Untagged
@@ -372,6 +373,22 @@ MonoBehaviour:
   - {fileID: 4974378983250163573}
   allySpawnArea: {fileID: 8875993687831935003}
   enemySpawnArea: {fileID: 824916103507562942}
+  battleZone: {fileID: 224115543593692487}
+--- !u!114 &224115543593692487
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3939276266004611019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0027c76e3a5742b79e328f25bc1435a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bounds:
+    extents: {x: 17.25, y: 8.5}
+    center: {x: 0, y: 0}
 --- !u!1 &3939276266140114123
 GameObject:
   m_ObjectHideFlags: 0

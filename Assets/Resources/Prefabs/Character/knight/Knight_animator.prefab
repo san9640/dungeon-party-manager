@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5284286486091163330}
   - component: {fileID: 7780347968723964564}
   m_Layer: 0
-  m_Name: Knight_animator
+  m_Name: knight_animator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

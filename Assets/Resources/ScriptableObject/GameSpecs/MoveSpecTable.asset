@@ -21,11 +21,17 @@ MonoBehaviour:
     - type: 1
       weightFactorInfo:
         defaultValue: 0.5
+    - type: 2
+      weightFactorInfo:
+        defaultValue: 0.5
   - name: melee_move
     calculatorInfos:
     - type: 0
       weightFactorInfo:
         defaultValue: 0.7
     - type: 1
+      weightFactorInfo:
+        defaultValue: 0.3
+    - type: 2
       weightFactorInfo:
         defaultValue: 0.3

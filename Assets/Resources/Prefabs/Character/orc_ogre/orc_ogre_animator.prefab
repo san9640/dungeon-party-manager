@@ -73,7 +73,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 0a3dac49cd8ecca4ea2272e0da1713cd, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -97,7 +97,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ff9350f431c448694f9427a006ec346, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  renderer: {fileID: 0}
-  animationInfo: []
+  renderer: {fileID: 752037821365308708}
+  animationInfo:
+  - name: idle
+    sprites:
+    - {fileID: 21300000, guid: 0a3dac49cd8ecca4ea2272e0da1713cd, type: 3}
+    - {fileID: 21300000, guid: 565067e7e278f614486891dba46a4349, type: 3}
+    - {fileID: 21300000, guid: 1da8f5b1814a694438daa71b7461b4e3, type: 3}
+    - {fileID: 21300000, guid: f25c9a7ae86978c47888cb057878a4ac, type: 3}
+  - name: run
+    sprites:
+    - {fileID: 21300000, guid: 483542718621a014db0401af590507a4, type: 3}
+    - {fileID: 21300000, guid: 5391a43ba63a902449c7e0317cbdeefe, type: 3}
+    - {fileID: 21300000, guid: f944ba576276b1141925e14978ae7b72, type: 3}
+    - {fileID: 21300000, guid: 282ed3adcb5a1e54da03714a706efb54, type: 3}
+  - name: dead
+    sprites:
+    - {fileID: 21300000, guid: 0a3dac49cd8ecca4ea2272e0da1713cd, type: 3}
   isLoop: 1
   transitionSpriteDelay: 0.12

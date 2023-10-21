@@ -33,9 +33,9 @@ namespace Dpm.Stage.Unit
 			DespawnParty(ref _enemyParty);
 
 			// 모든 유닛 해제
-			foreach (var unit in _units)
+			while (_units.Count > 0)
 			{
-				UnregisterUnit(unit);
+				UnregisterUnit(_units[0]);
 			}
 
 			_units?.Clear();
@@ -90,7 +90,7 @@ namespace Dpm.Stage.Unit
 				return;
 			}
 
-			foreach (var enemy in _enemyParty.Members)
+			foreach (var enemy in party.Members)
 			{
 				DespawnCharacter(enemy);
 			}

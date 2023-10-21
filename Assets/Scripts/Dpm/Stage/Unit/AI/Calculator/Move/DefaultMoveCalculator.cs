@@ -25,6 +25,8 @@ namespace Dpm.Stage.Unit.AI.Calculator.Move
 			_attackableDist = Mathf.Max(_character.BattleAction.Spec.attackRange - AICalculatorConstants.AttackDistEpsilon, 0f);
 		}
 
+		public Vector2? TargetPos { get; }
+
 		public void Dispose()
 		{
 			_targetPos = null;

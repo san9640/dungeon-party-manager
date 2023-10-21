@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using Dpm.Common;
 using Dpm.CoreAdapter;
 using Dpm.Stage.Event;
+using Dpm.Stage.Physics;
 using Dpm.Stage.Unit;
 using Dpm.Utility.Pool;
 using UnityEngine;
+using CustomCollider2D = Dpm.Stage.Physics.CustomCollider2D;
 
 namespace Dpm.Stage.Room
 {
@@ -120,6 +122,11 @@ namespace Dpm.Stage.Room
 		private SpawnArea enemySpawnArea;
 
 		public SpawnArea EnemySpawnArea => enemySpawnArea;
+
+		[SerializeField]
+		private CustomCollider2D battleZone;
+
+		public Bounds2D BattleZone => battleZone.bounds;
 
 		private void Awake()
 		{

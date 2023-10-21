@@ -26,7 +26,7 @@ namespace Dpm.Stage.Unit
 				var v3Dir = value.ConvertToVector3();
 				var rotation = Quaternion.FromToRotation(Vector3.right, v3Dir);
 
-				animator.Rotation = rotation.eulerAngles.y;
+				animator.Rotation = rotation.eulerAngles.y + rotation.eulerAngles.z;
 			}
 		}
 

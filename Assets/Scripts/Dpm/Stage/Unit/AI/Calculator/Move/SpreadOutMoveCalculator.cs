@@ -1,4 +1,5 @@
 ﻿using Dpm.Stage.Spec;
+using UnityEngine;
 
 namespace Dpm.Stage.Unit.AI.Calculator.Move
 {
@@ -7,6 +8,8 @@ namespace Dpm.Stage.Unit.AI.Calculator.Move
 		public void Init(Character character, MoveCalculatorInfo info)
 		{
 		}
+
+		public Vector2? TargetPos { get; }
 
 		public void Dispose()
 		{

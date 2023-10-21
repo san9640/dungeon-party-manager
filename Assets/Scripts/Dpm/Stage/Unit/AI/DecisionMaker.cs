@@ -7,6 +7,8 @@ using Dpm.Stage.Unit.AI.Calculator;
 using Dpm.Stage.Unit.AI.Calculator.Attack;
 using Dpm.Stage.Unit.AI.Calculator.Move;
 using Dpm.Utility.Constants;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Dpm.Stage.Unit.AI
 {
@@ -24,6 +26,13 @@ namespace Dpm.Stage.Unit.AI
 
         public IUnit CurrentAttackTarget { get; private set; }
 
+        private const float MinMoveCalculateDelay = 0.1f;
+        private const float MaxMoveCalculateDelay = 0.3f;
+
+        private float _currentMoveCalculateDelay = 0f;
+
+        private float _moveCalculateTimePassed = 0f;
+
         public void Init(Character character, MoveSpec moveSpec, AttackSpec attackSpec)
         {
             _character = character;
@@ -35,6 +44,7 @@ namespace Dpm.Stage.Unit.AI
                 {
                     MoveType.ApproachToEnemy => new ApproachToEnemyMoveCalculator(),
                     MoveType.Retreat => new RetreatMoveCalculator(),
+                    MoveType.AwayFromWall => new AwayFromWallMoveCalculator(),
                     _ => null
                 };
 
@@ -158,24 +168,39 @@ namespace Dpm.Stage.Unit.AI
 
             maxScoredCalculator?.Execute();
 
-            maxScore = -1f;
+            _moveCalculateTimePassed += dt;
 
-            foreach (var kv in _moveCalculators)
+            if (_moveCalculateTimePassed >= _currentMoveCalculateDelay)
             {
-                var calculator = kv.Value;
+                var targetDiff = Vector2.zero;
 
-                var score = calculator.Calculate();
-
-                score *= GetScoreFactor(calculator);
-
-                if (maxScore < score)
+                foreach (var kv in _moveCalculators)
                 {
-                    maxScore = score;
-                    maxScoredCalculator = calculator;
-                }
-            }
+                    var calculator = kv.Value;
 
-            maxScoredCalculator?.Execute();
+                    var score = calculator.Calculate();
+
+                    score *= GetScoreFactor(calculator);
+
+                    if (calculator.TargetPos.HasValue)
+                    {
+                        targetDiff += (calculator.TargetPos.Value - _character.Position).normalized * score;
+                    }
+
+                    // if (maxScore < score)
+                    // {
+                    //     maxScore = score;
+                    //     maxScoredCalculator = calculator;
+                    // }
+                }
+
+                // maxScoredCalculator?.Execute();
+
+                CoreService.Event.SendImmediate(_character, RequestMoveEvent.Create(targetDiff.normalized * 4f + _character.Position));
+
+                _moveCalculateTimePassed = 0f;
+                _currentMoveCalculateDelay = Random.Range(MinMoveCalculateDelay, MaxMoveCalculateDelay);
+            }
 
             if (CurrentAttackTarget != null)
             {

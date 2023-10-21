@@ -69,7 +69,34 @@ namespace Dpm.Stage.Unit.State
 					{
 						damage = 0,
 						shooter = _character,
+						targetPos = _character.Position + Vector2.down
+					};
+
+					ProjectileManager.Instance.Shoot("bolt", info);
+
+					info = new ProjectileInfo
+					{
+						damage = 0,
+						shooter = _character,
+						targetPos = _character.Position + Vector2.up
+					};
+
+					ProjectileManager.Instance.Shoot("bolt", info);
+
+					info = new ProjectileInfo
+					{
+						damage = 0,
+						shooter = _character,
 						targetPos = _character.Position + Vector2.left
+					};
+
+					ProjectileManager.Instance.Shoot("bolt", info);
+
+					info = new ProjectileInfo
+					{
+						damage = 0,
+						shooter = _character,
+						targetPos = _character.Position + Vector2.right
 					};
 
 					ProjectileManager.Instance.Shoot("bolt", info);

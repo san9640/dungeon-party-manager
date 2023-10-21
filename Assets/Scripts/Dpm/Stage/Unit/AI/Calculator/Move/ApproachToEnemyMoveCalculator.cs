@@ -18,6 +18,8 @@ namespace Dpm.Stage.Unit.AI.Calculator.Move
 
 		private Vector2? _targetPos;
 
+		public Vector2? TargetPos => _targetPos;
+
 		private const float MaxScoreMinDuration = 0.5f;
 
 		private float _attackableDist;

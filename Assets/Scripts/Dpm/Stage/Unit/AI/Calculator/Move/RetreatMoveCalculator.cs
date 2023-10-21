@@ -15,6 +15,8 @@ namespace Dpm.Stage.Unit.AI.Calculator.Move
 
 		private Vector2? _targetPos;
 
+		public Vector2? TargetPos => _targetPos;
+
 		public void Init(Character character, MoveCalculatorInfo info)
 		{
 			_info = info;
@@ -90,7 +92,7 @@ namespace Dpm.Stage.Unit.AI.Calculator.Move
 
 			var hpScore = 1 - _character.HpRatio;
 
-			var score = dpsGapScore * 0.5f + hpScore * 0.5f;
+			var score = dpsGapScore * hpScore;
 
 			_targetPos = _character.Position + attackPowerSum.normalized * 5f;
 

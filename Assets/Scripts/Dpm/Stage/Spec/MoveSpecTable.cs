@@ -9,7 +9,7 @@ namespace Dpm.Stage.Spec
 	{
 		ApproachToEnemy,
 		Retreat,
-		Default,
+		AwayFromWall,
 	}
 
 	[Serializable]

@@ -96,13 +96,18 @@ namespace Dpm.Stage.Render
 			}
 		}
 
-		public void SetAnimation(string animName, bool loop = true)
+		public void SetAnimation(string animName, bool loop = true, bool ignoreSameAnim = false)
 		{
 			if (!_animDict.ContainsKey(animName))
 			{
 #if UNITY_EDITOR
-				Debug.LogError($"Has no anim named [{animName}].");
+				Debug.LogError($"Has no anim named [{animName}] at {gameObject.name}.");
 #endif
+				return;
+			}
+
+			if (ignoreSameAnim && animName == _currentAnimName)
+			{
 				return;
 			}
 

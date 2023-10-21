@@ -239,6 +239,8 @@ namespace Dpm.Stage.Physics
 			var found = false;
 			result = Vector2.zero;
 
+			var maxSearchDepth = (character.Position - targetPos).magnitude + 3f;
+
 			_bfsQueue.Enqueue((Vector2Int.zero, Vector2Int.zero, 0));
 
 			var targetBounds = new Bounds2D(targetPos, nodeOffset);
@@ -258,6 +260,11 @@ namespace Dpm.Stage.Physics
 					result = firstNode;
 					found = true;
 					break;
+				}
+
+				if (currentNodeInfo.depth >= maxSearchDepth)
+				{
+					continue;
 				}
 
 				for (var i = 0; i < 4; i++)

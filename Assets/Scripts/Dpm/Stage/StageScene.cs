@@ -34,6 +34,8 @@ namespace Dpm.Stage
 
 		private GameRoom _room;
 
+		public Bounds2D BattleZone => _room.BattleZone;
+
 		public StageState State { get; private set; } = StageState.None;
 
 		public StagePhysicsManager PhysicsManager { get; private set; }

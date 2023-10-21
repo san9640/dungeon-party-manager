@@ -64,6 +64,7 @@ namespace Dpm.Stage.Unit.State
 			_character.DecisionMaker.UpdateFrame(dt);
 			(_character.BattleAction as IUpdatable)?.UpdateFrame(dt);
 
+			// FIXME : CharacterController 등으로 분리해야 함
 			if (_moveTargetPos.HasValue)
 			{
 				var diff = _moveTargetPos.Value - _character.Position;
@@ -75,7 +76,7 @@ namespace Dpm.Stage.Unit.State
 				}
 				else
 				{
-					_character.Animator.SetAnimation("run");
+					_character.Animator.SetAnimation("run", ignoreSameAnim: true);
 
 					var moveDir = diff.normalized;
 					var leftoverDist = diff.magnitude;

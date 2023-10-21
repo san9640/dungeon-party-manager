@@ -26,3 +26,15 @@ MonoBehaviour:
     path: Prefabs/Effect/fx_hit_normal
   - name: projectile_bolt
     path: Prefabs/Projectile/projectile_bolt
+  - name: character_bishop
+    path: Prefabs/Character/bishop/bishop
+  - name: character_knight
+    path: Prefabs/Character/knight/knight
+  - name: character_lizardman
+    path: Prefabs/Character/lizardman/lizardman
+  - name: character_orc_goblin
+    path: Prefabs/Character/orc_goblin/orc_goblin
+  - name: character_orc_ogre
+    path: Prefabs/Character/orc_ogre/orc_ogre
+  - name: character_orc_shaman
+    path: Prefabs/Character/orc_shaman/orc_shaman

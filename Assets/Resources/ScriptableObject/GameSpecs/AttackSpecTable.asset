@@ -18,9 +18,21 @@ MonoBehaviour:
     - type: 0
       weightFactorInfo:
         defaultValue: 0.5
+    - type: 1
+      weightFactorInfo:
+        defaultValue: 0.5
+    - type: 2
+      weightFactorInfo:
+        defaultValue: 0.5
   - name: knight_attack
     calculatorInfos:
     - type: 0
+      weightFactorInfo:
+        defaultValue: 0.5
+    - type: 1
+      weightFactorInfo:
+        defaultValue: 0.5
+    - type: 2
       weightFactorInfo:
         defaultValue: 0.5
   - name: bishop_attack
@@ -28,9 +40,21 @@ MonoBehaviour:
     - type: 0
       weightFactorInfo:
         defaultValue: 0.5
+    - type: 1
+      weightFactorInfo:
+        defaultValue: 0.5
+    - type: 2
+      weightFactorInfo:
+        defaultValue: 0.5
   - name: lizardman_attack
     calculatorInfos:
     - type: 0
+      weightFactorInfo:
+        defaultValue: 0.5
+    - type: 1
+      weightFactorInfo:
+        defaultValue: 0.5
+    - type: 2
       weightFactorInfo:
         defaultValue: 0.5
   - name: weak_melee_attack
@@ -38,9 +62,21 @@ MonoBehaviour:
     - type: 0
       weightFactorInfo:
         defaultValue: 0.5
+    - type: 1
+      weightFactorInfo:
+        defaultValue: 0.5
+    - type: 2
+      weightFactorInfo:
+        defaultValue: 0.5
   - name: medium_melee_attack
     calculatorInfos:
     - type: 0
+      weightFactorInfo:
+        defaultValue: 0.5
+    - type: 1
+      weightFactorInfo:
+        defaultValue: 0.5
+    - type: 2
       weightFactorInfo:
         defaultValue: 0.5
   - name: strong_melee_attack
@@ -48,8 +84,20 @@ MonoBehaviour:
     - type: 0
       weightFactorInfo:
         defaultValue: 0.5
+    - type: 1
+      weightFactorInfo:
+        defaultValue: 0.5
+    - type: 2
+      weightFactorInfo:
+        defaultValue: 0.5
   - name: strong_ranged_attack
     calculatorInfos:
     - type: 0
+      weightFactorInfo:
+        defaultValue: 0.5
+    - type: 1
+      weightFactorInfo:
+        defaultValue: 0.5
+    - type: 2
       weightFactorInfo:
         defaultValue: 0.5

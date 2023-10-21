@@ -33,6 +33,8 @@ namespace Dpm.Stage.Unit.AI
 
         private float _moveCalculateTimePassed = 0f;
 
+        private readonly Dictionary<IUnit, float> _attackTargetsBuffer = new();
+
         public void Init(Character character, MoveSpec moveSpec, AttackSpec attackSpec)
         {
             _character = character;
@@ -81,12 +83,26 @@ namespace Dpm.Stage.Unit.AI
                     continue;
                 }
 
-                calculator.Init(character, attackInfo);
-
-                _attackCalculators.Add(calculator.GetType(), calculator);
-
-                _factorInfos.Add(calculator, attackInfo.weightFactorInfo);
+                AddAttackCalculator(calculator, attackInfo);
             }
+
+            // AddAttackCalculator(new StrongestTargetAttackCalculator(), new AttackCalculatorInfo()
+            // {
+            //     type = AttackTargetSearchingType.Strongest,
+            //     weightFactorInfo = new SliderWeightFactorInfo
+            //     {
+            //         defaultValue = 0.5f,
+            //     }
+            // });
+            //
+            // AddAttackCalculator(new WeakestTargetAttackCalculator(), new AttackCalculatorInfo()
+            // {
+            //     type = AttackTargetSearchingType.Strongest,
+            //     weightFactorInfo = new SliderWeightFactorInfo
+            //     {
+            //         defaultValue = 0.5f,
+            //     }
+            // });
 
             CoreService.Event.Subscribe<ChangeAICalculatorFactorEvent>(OnChangeAICalculatorFactor);
         }
@@ -98,6 +114,15 @@ namespace Dpm.Stage.Unit.AI
             _moveCalculators.Add(calculator.GetType(), calculator);
 
             _factorInfos.Add(calculator, moveInfo.weightFactorInfo);
+        }
+
+        private void AddAttackCalculator(IAIAttackCalculator calculator, AttackCalculatorInfo attackInfo)
+        {
+            calculator.Init(_character, attackInfo);
+
+            _attackCalculators.Add(calculator.GetType(), calculator);
+
+            _factorInfos.Add(calculator, attackInfo.weightFactorInfo);
         }
 
         public void Dispose()
@@ -148,7 +173,6 @@ namespace Dpm.Stage.Unit.AI
         public void UpdateFrame(float dt)
         {
             IAICalculator maxScoredCalculator = null;
-            var maxScore = -1f;
 
             foreach (var kv in _attackCalculators)
             {
@@ -156,17 +180,37 @@ namespace Dpm.Stage.Unit.AI
 
                 var score = calculator.Calculate();
 
-                score *= GetScoreFactor(calculator);
-
-                if (maxScore < score)
+                if (calculator.CurrentTarget != null)
                 {
-                    maxScore = score;
-                    maxScoredCalculator = calculator;
-                    CurrentAttackTarget = calculator.CurrentTarget;
+                    score *= GetScoreFactor(calculator);
+
+                    if (!_attackTargetsBuffer.ContainsKey(calculator.CurrentTarget))
+                    {
+                        _attackTargetsBuffer.Add(calculator.CurrentTarget, 0f);
+                    }
+
+                    _attackTargetsBuffer[calculator.CurrentTarget] += score;
                 }
             }
 
-            maxScoredCalculator?.Execute();
+            var maxAttackScore = -1f;
+
+            foreach (var kv in _attackTargetsBuffer)
+            {
+                if (maxAttackScore < kv.Value)
+                {
+                    maxAttackScore = kv.Value;
+
+                    CurrentAttackTarget = kv.Key;
+                }
+            }
+
+            if (CurrentAttackTarget != null)
+            {
+                CoreService.Event.Send(_character, RequestAttackTargetEvent.Create(CurrentAttackTarget));
+            }
+
+            _attackTargetsBuffer.Clear();
 
             _moveCalculateTimePassed += dt;
 

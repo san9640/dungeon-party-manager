@@ -49,6 +49,8 @@ namespace Dpm.Stage.UI
 
 		private const float AICalculatorUIYGap = -10f;
 
+		private AICalculatorType _currentCalculatorTab;
+
 		public Character CurrentMember {
 			get
 			{
@@ -116,8 +118,7 @@ namespace Dpm.Stage.UI
 
 			UpdateMemberInfo();
 
-			// FIXME : 편의성 아작남
-			ChangeAIContents(AICalculatorType.Move);
+			ChangeAIContents(_currentCalculatorTab);
 		}
 
 		public void OnMoveAIButton()
@@ -153,6 +154,8 @@ namespace Dpm.Stage.UI
 
 		private void ChangeAIContents(AICalculatorType type)
 		{
+			_currentCalculatorTab = type;
+
 			moveAIButton.interactable = true;
 			attackAIButton.interactable = true;
 			abilityAIButton.interactable = true;

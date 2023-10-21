@@ -31,7 +31,43 @@ namespace Dpm.Stage.Unit.AI.Calculator.Attack
 
 		public float Calculate()
 		{
-			return 0;
+			CurrentTarget = null;
+
+			var oppositeParty = UnitManager.Instance.GetOppositeParty(_character.Region);
+
+			if (oppositeParty == null)
+			{
+				return AICalculatorConstants.MinInnerScore;
+			}
+
+			var minStrength = 2f;
+			Character minStrengthEnemy = null;
+
+			foreach (var enemy in oppositeParty.Members)
+			{
+				if (enemy.IsDead)
+				{
+					continue;
+				}
+
+				var strength = AICalculatorUtility.GetStrengthScore(_character, enemy);
+
+				if (strength < minStrength)
+				{
+					minStrength = strength;
+
+					minStrengthEnemy = enemy;
+				}
+			}
+
+			if (minStrength > 1.5f || minStrengthEnemy == null)
+			{
+				return AICalculatorConstants.MinInnerScore;
+			}
+
+			CurrentTarget = minStrengthEnemy;
+
+			return 1 - minStrengthEnemy.HpRatio;
 		}
 
 		public void Execute()

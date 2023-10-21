@@ -1,4 +1,7 @@
-﻿using Dpm.Stage.Spec;
+﻿using Dpm.CoreAdapter;
+using Dpm.Stage.Event;
+using Dpm.Stage.Physics;
+using Dpm.Stage.Spec;
 using UnityEngine;
 
 namespace Dpm.Stage.Unit.AI.Calculator.Attack
@@ -31,15 +34,99 @@ namespace Dpm.Stage.Unit.AI.Calculator.Attack
 
 		public float Calculate()
 		{
-			return 0;
+			CurrentTarget = null;
+
+			var oppositeParty = UnitManager.Instance.GetOppositeParty(_character.Region);
+
+			if (oppositeParty == null)
+			{
+				return AICalculatorConstants.MinInnerScore;
+			}
+
+			var maxStrength = -1f;
+			Character maxStrengthEnemy = null;
+
+			foreach (var enemy in oppositeParty.Members)
+			{
+				if (enemy.IsDead)
+				{
+					continue;
+				}
+
+				var strength = AICalculatorUtility.GetStrengthScore(_character, enemy);
+
+				if (strength > maxStrength)
+				{
+					maxStrength = strength;
+
+					maxStrengthEnemy = enemy;
+				}
+			}
+
+			if (maxStrength < 0 || maxStrengthEnemy == null)
+			{
+				return AICalculatorConstants.MinInnerScore;
+			}
+
+			CurrentTarget = maxStrengthEnemy;
+
+			return maxStrengthEnemy.HpRatio;
+
+			// var myParty = UnitManager.Instance.GetMyParty(_character.Region);
+			//
+			// var totalEnemyHp = 0f;
+			// var totalEnemyDps = 0f;
+			//
+			// foreach (var enemy in oppositeParty.Members)
+			// {
+			// 	if (enemy.IsDead)
+			// 	{
+			// 		continue;
+			// 	}
+			//
+			// 	totalEnemyHp += enemy.Hp;
+			// 	totalEnemyDps += enemy.BattleAction.Dps;
+			// }
+			//
+			// var totalAllyHp = 0f;
+			// var totalAllyDps = 0f;
+			//
+			// foreach (var ally in myParty.Members)
+			// {
+			// 	if (ally.IsDead)
+			// 	{
+			// 		continue;
+			// 	}
+			//
+			// 	totalAllyHp += ally.Hp;
+			// 	totalAllyDps += ally.BattleAction.Dps;
+			// }
+			//
+			// var dpsGapScore = AICalculatorUtility.GetDpsGapScore(
+			// 	totalAllyDps, totalAllyHp, totalEnemyDps, totalEnemyHp);
+			//
+			// var hpScore = _character.HpRatio;
+			//
+			// var score = (1 - dpsGapScore) * hpScore;
+			//
+			// return score;
+
+
 		}
 
 		public void Execute()
 		{
+			if (CurrentTarget == null)
+			{
+				return;
+			}
+
+			CoreService.Event.Send(_character, RequestAttackTargetEvent.Create(CurrentTarget));
 		}
 
 		public void DrawCurrent()
 		{
+			AIDebugUtility.DrawAttackAIInfo(_character, CurrentTarget);
 		}
 	}
 }

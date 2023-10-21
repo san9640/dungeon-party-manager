@@ -18,3 +18,18 @@ MonoBehaviour:
     speed: 5
     type: 1
     hitFxSpecName: fx_hit_normal
+  - name: fireball
+    bodySpecName: projectile_fireball
+    speed: 3
+    type: 1
+    hitFxSpecName: fx_hit_normal
+  - name: minibolt_white
+    bodySpecName: projectile_minibolt_white
+    speed: 7
+    type: 1
+    hitFxSpecName: fx_hit_normal
+  - name: fire_green
+    bodySpecName: projectile_fire_green
+    speed: 5
+    type: 1
+    hitFxSpecName: fx_hit_normal

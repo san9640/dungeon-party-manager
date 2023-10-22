@@ -75,8 +75,8 @@ MonoBehaviour:
     baseDamageFactor: 1
     baseAttackSpeed: 0.4
     moveSpeed: 4
-    battleActionSpecName: fist_battle_action
-    moveSpecName: melee_move
+    battleActionSpecName: orc_shaman_battle_action
+    moveSpecName: fragile_move
     attackSpecName: strong_ranged_attack
     specialSpecName: 
   - name: orc_warrior

@@ -31,8 +31,8 @@ MonoBehaviour:
     baseDamageFactor: 0.7
     baseAttackSpeed: 0.6
     moveSpeed: 3
-    battleActionSpecName: fist_battle_action
-    moveSpecName: melee_move
+    battleActionSpecName: bishop_battle_action
+    moveSpecName: fragile_move
     attackSpecName: bishop_attack
     specialSpecName: 
   - name: lizardman

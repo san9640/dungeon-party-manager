@@ -16,22 +16,10 @@ MonoBehaviour:
   - name: ally
     region: 1
     spawnInfos:
-    - characterSpecName: knight
-      spawnIndex: {x: 0, y: 0}
-    - characterSpecName: lizardman
-      spawnIndex: {x: 2, y: 2}
-    - characterSpecName: wizard
-      spawnIndex: {x: 4, y: 0}
     - characterSpecName: bishop
-      spawnIndex: {x: 2, y: -2}
+      spawnIndex: {x: 0, y: 0}
   - name: enemy
     region: 2
     spawnInfos:
     - characterSpecName: orc_ogre
       spawnIndex: {x: 0, y: 0}
-    - characterSpecName: orc_warrior
-      spawnIndex: {x: 2, y: 2}
-    - characterSpecName: orc_shaman
-      spawnIndex: {x: 4, y: 0}
-    - characterSpecName: orc_goblin
-      spawnIndex: {x: 2, y: -2}

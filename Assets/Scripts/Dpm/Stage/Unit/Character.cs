@@ -147,6 +147,19 @@ namespace Dpm.Stage.Unit
 					}
 				}
 			}
+			else if (e is HealEvent he)
+			{
+				var wasDead = IsDead;
+
+				Hp = Mathf.Min(Hp + he.Value, MaxHp);
+
+				CoreService.Event.Publish(HpChangedEvent.Create(this));
+
+				if (wasDead != IsDead && CurrentState is CharacterDeadState)
+				{
+					_stateMachine.ChangeState(CharacterAfterBattleState.Create(this));
+				}
+			}
 
 			base.OnEvent(e);
 		}

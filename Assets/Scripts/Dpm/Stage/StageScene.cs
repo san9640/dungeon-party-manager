@@ -209,6 +209,13 @@ namespace Dpm.Stage
 
 			yield return ScreenTransition.Instance.FadeOutAsync(1, this);
 
+			foreach (var ally in UnitManager.AllyParty.Members)
+			{
+				var healEvent = HealEvent.Create(ally, ally.MaxHp);
+
+				CoreService.Event.SendImmediate(ally, healEvent);
+			}
+
 			CoreService.Event.PublishImmediate(RoomChangeStartEvent.Instance);
 
 			UnitManager.DespawnEnemies();

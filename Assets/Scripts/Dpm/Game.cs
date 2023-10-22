@@ -62,6 +62,10 @@ namespace Dpm
 
 		private void Awake()
 		{
+#if UNITY_EDITOR
+			var gameStartTime = Time.realtimeSinceStartup;
+#endif
+
 			_instance = this;
 
 			_service = new CoreService(this, assetSpecsHolderPaths);
@@ -70,6 +74,10 @@ namespace Dpm
 
 			// 씬 이동이나 씬 전체 해제 등의 행위로 날아가지 않도록 세팅
 			DontDestroyOnLoad(this);
+
+#if UNITY_EDITOR
+			Debug.Log($"Load duration before launch : {Time.realtimeSinceStartup - gameStartTime}");
+#endif
 
 			CoreService.Coroutine.StartCoroutine(ActivateGame());
 		}
@@ -87,7 +95,14 @@ namespace Dpm
 				_ => new MainMenuScene()
 			};
 
+#if UNITY_EDITOR
+			var sceneChangeStartTime = Time.realtimeSinceStartup;
+#endif
 			yield return CoreService.Scene.EnterScene(scene);
+
+#if UNITY_EDITOR
+			Debug.Log($"Scene change duration : {Time.realtimeSinceStartup - sceneChangeStartTime}");
+#endif
 
 			yield return ScreenTransition.Instance.FadeInAsync(1f, this);
 
@@ -161,6 +176,10 @@ namespace Dpm
 		{
 			yield return ScreenTransition.Instance.FadeOutAsync(1f, this);
 
+#if UNITY_EDITOR
+			var sceneChangeStartTime = Time.realtimeSinceStartup;
+#endif
+
 			CoreService.Scene.ExitCurrentScene();
 
 			_service.OnSceneExited();
@@ -168,6 +187,10 @@ namespace Dpm
 			InstancePool.Dispose();
 
 			yield return CoreService.Scene.EnterScene(next);
+
+#if UNITY_EDITOR
+			Debug.Log($"Scene change duration : {Time.realtimeSinceStartup - sceneChangeStartTime}");
+#endif
 
 			yield return ScreenTransition.Instance.FadeInAsync(1f, this);
 

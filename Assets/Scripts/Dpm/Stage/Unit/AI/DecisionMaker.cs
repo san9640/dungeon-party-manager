@@ -22,6 +22,10 @@ namespace Dpm.Stage.Unit.AI
 
         private readonly Dictionary<IAICalculator, SliderWeightFactorInfo> _factorInfos = new();
 
+#if UNITY_EDITOR
+        public readonly Dictionary<IAICalculator, (float score, float sum, int frameCount)> ResultOnThisFrame = new();
+#endif
+
         private Character _character;
 
         public IUnit CurrentAttackTarget { get; private set; }
@@ -56,6 +60,10 @@ namespace Dpm.Stage.Unit.AI
                 }
 
                 AddMoveCalculator(calculator, moveInfo);
+
+#if UNITY_EDITOR
+                ResultOnThisFrame.Add(calculator, (0, 0, 0));
+#endif
             }
 
             // AddMoveCalculator(new DefaultMoveCalculator(), new MoveCalculatorInfo
@@ -84,6 +92,10 @@ namespace Dpm.Stage.Unit.AI
                 }
 
                 AddAttackCalculator(calculator, attackInfo);
+
+#if UNITY_EDITOR
+                ResultOnThisFrame.Add(calculator, (0, 0, 0));
+#endif
             }
 
             // AddAttackCalculator(new StrongestTargetAttackCalculator(), new AttackCalculatorInfo()
@@ -151,6 +163,10 @@ namespace Dpm.Stage.Unit.AI
             _abilityCalculators.Clear();
 
             _character = null;
+
+#if UNITY_EDITOR
+            ResultOnThisFrame.Clear();
+#endif
         }
 
         private void OnChangeAICalculatorFactor(Core.Interface.Event e)
@@ -179,6 +195,12 @@ namespace Dpm.Stage.Unit.AI
                 var calculator = kv.Value;
 
                 var score = calculator.Calculate();
+
+#if UNITY_EDITOR
+                var prev = ResultOnThisFrame[calculator];
+
+                ResultOnThisFrame[calculator] = (score, prev.sum + score, prev.frameCount + 1);
+#endif
 
                 if (calculator.CurrentTarget != null)
                 {
@@ -223,6 +245,12 @@ namespace Dpm.Stage.Unit.AI
                     var calculator = kv.Value;
 
                     var score = calculator.Calculate();
+
+#if UNITY_EDITOR
+                    var prev = ResultOnThisFrame[calculator];
+
+                    ResultOnThisFrame[calculator] = (score, prev.sum + score, prev.frameCount + 1);
+#endif
 
                     score *= GetScoreFactor(calculator);
 
@@ -278,7 +306,7 @@ namespace Dpm.Stage.Unit.AI
             return calculator != null ? GetScoreFactor(calculator) : 0.5f;
         }
 
-        private IAICalculator GetCalculatorTyped(Type calculatorType)
+        public IAICalculator GetCalculatorTyped(Type calculatorType)
         {
             IAICalculator calculator = null;
 

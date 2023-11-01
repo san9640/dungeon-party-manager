@@ -11,6 +11,10 @@ namespace Dpm.Stage.Spec
 		Closest,
 		Weakest,
 		Strongest,
+		LowHp,
+		HighHp,
+		Melee,
+		Ranged,
 	}
 
 	[Serializable]

@@ -114,16 +114,6 @@ namespace Dpm.Stage.Unit.AI.Calculator.Attack
 
 		}
 
-		public void Execute()
-		{
-			if (CurrentTarget == null)
-			{
-				return;
-			}
-
-			CoreService.Event.Send(_character, RequestAttackTargetEvent.Create(CurrentTarget));
-		}
-
 		public void DrawCurrent()
 		{
 			AIDebugUtility.DrawAttackAIInfo(_character, CurrentTarget);

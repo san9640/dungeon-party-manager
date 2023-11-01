@@ -17,9 +17,11 @@ namespace Dpm.Editor
 		private static List<Type> _aiTypes = new()
 		{
 			typeof(ClosestTargetAttackCalculator),
-			typeof(StrongestTargetAttackCalculator),
+			typeof(HighHpTargetAttackCalculator),
+			typeof(LowHpTargetAttackCalculator),
 			typeof(WeakestTargetAttackCalculator),
-			typeof(ApproachToEnemyMoveCalculator),
+			typeof(MeleeTargetAttackCalculator),
+			typeof(RangedTargetAttackCalculator),
 			typeof(AwayFromWallMoveCalculator),
 			typeof(RetreatMoveCalculator),
 		};

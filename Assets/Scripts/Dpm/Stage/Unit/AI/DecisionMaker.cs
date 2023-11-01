@@ -81,8 +81,12 @@ namespace Dpm.Stage.Unit.AI
                 IAIAttackCalculator calculator = attackInfo.type switch
                 {
                     AttackTargetSearchingType.Closest => new ClosestTargetAttackCalculator(),
-                    AttackTargetSearchingType.Strongest => new StrongestTargetAttackCalculator(),
-                    AttackTargetSearchingType.Weakest => new WeakestTargetAttackCalculator(),
+                    AttackTargetSearchingType.LowHp => new LowHpTargetAttackCalculator(),
+                    AttackTargetSearchingType.HighHp => new HighHpTargetAttackCalculator(),
+                    AttackTargetSearchingType.Ranged => new RangedTargetAttackCalculator(),
+                    AttackTargetSearchingType.Melee => new MeleeTargetAttackCalculator(),
+                    // AttackTargetSearchingType.Strongest => new StrongestTargetAttackCalculator(),
+                    // AttackTargetSearchingType.Weakest => new WeakestTargetAttackCalculator(),
                     _ => null
                 };
 

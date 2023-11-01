@@ -66,16 +66,6 @@ namespace Dpm.Stage.Unit.AI.Calculator.Move
 			return score;
 		}
 
-		public void Execute()
-		{
-			if (!_targetPos.HasValue)
-			{
-				return;
-			}
-
-			CoreService.Event.SendImmediate(_character, RequestMoveEvent.Create(_targetPos.Value));
-		}
-
 		public void DrawCurrent()
 		{
 			AIDebugUtility.DrawMoveAIInfo(_character, _targetPos);

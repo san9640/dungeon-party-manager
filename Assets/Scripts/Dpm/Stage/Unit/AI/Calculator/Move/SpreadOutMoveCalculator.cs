@@ -23,9 +23,5 @@ namespace Dpm.Stage.Unit.AI.Calculator.Move
 		{
 			return 0;
 		}
-
-		public void Execute()
-		{
-		}
 	}
 }

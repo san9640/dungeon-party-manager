@@ -1,9 +1,8 @@
 ﻿using Dpm.Stage.Spec;
-using UnityEngine;
 
 namespace Dpm.Stage.Unit.AI.Calculator.Attack
 {
-	public class WeakestTargetAttackCalculator : IAIAttackCalculator
+	public class HighHpTargetAttackCalculator : IAIAttackCalculator
 	{
 		private AttackCalculatorInfo _info;
 
@@ -11,16 +10,11 @@ namespace Dpm.Stage.Unit.AI.Calculator.Attack
 
 		public IUnit CurrentTarget { get; private set; }
 
-		private float _attackableDist;
-
 		public void Init(Character character, AttackCalculatorInfo info)
 		{
 			_character = character;
 			_info = info;
 			CurrentTarget = null;
-
-			_attackableDist = Mathf.Max(
-				_character.BattleAction.Spec.attackRange - AICalculatorConstants.AttackDistEpsilon, 0f);
 		}
 
 		public void Dispose()
@@ -40,8 +34,7 @@ namespace Dpm.Stage.Unit.AI.Calculator.Attack
 				return AICalculatorConstants.MinInnerScore;
 			}
 
-			var minStrength = 2f;
-			Character minStrengthEnemy = null;
+			var highestRatio = -1.0f;
 
 			foreach (var enemy in oppositeParty.Members)
 			{
@@ -50,28 +43,24 @@ namespace Dpm.Stage.Unit.AI.Calculator.Attack
 					continue;
 				}
 
-				var strength = AICalculatorUtility.GetStrengthScore(_character, enemy);
-
-				if (strength < minStrength)
+				if (highestRatio < enemy.HpRatio)
 				{
-					minStrength = strength;
-
-					minStrengthEnemy = enemy;
+					highestRatio = enemy.HpRatio;
+					CurrentTarget = enemy;
 				}
 			}
 
-			if (minStrength > 1.5f || minStrengthEnemy == null)
+			if (CurrentTarget == null)
 			{
 				return AICalculatorConstants.MinInnerScore;
 			}
 
-			CurrentTarget = minStrengthEnemy;
-
-			return 1 - minStrengthEnemy.HpRatio;
+			return highestRatio * highestRatio;
 		}
 
 		public void DrawCurrent()
 		{
+			AIDebugUtility.DrawAttackAIInfo(_character, CurrentTarget);
 		}
 	}
 }

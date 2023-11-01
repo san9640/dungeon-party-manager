@@ -1,9 +1,8 @@
 ﻿using Dpm.Stage.Spec;
-using UnityEngine;
 
 namespace Dpm.Stage.Unit.AI.Calculator.Attack
 {
-	public class WeakestTargetAttackCalculator : IAIAttackCalculator
+	public class RangedTargetAttackCalculator : IAIAttackCalculator
 	{
 		private AttackCalculatorInfo _info;
 
@@ -11,16 +10,11 @@ namespace Dpm.Stage.Unit.AI.Calculator.Attack
 
 		public IUnit CurrentTarget { get; private set; }
 
-		private float _attackableDist;
-
 		public void Init(Character character, AttackCalculatorInfo info)
 		{
 			_character = character;
 			_info = info;
 			CurrentTarget = null;
-
-			_attackableDist = Mathf.Max(
-				_character.BattleAction.Spec.attackRange - AICalculatorConstants.AttackDistEpsilon, 0f);
 		}
 
 		public void Dispose()
@@ -40,8 +34,8 @@ namespace Dpm.Stage.Unit.AI.Calculator.Attack
 				return AICalculatorConstants.MinInnerScore;
 			}
 
-			var minStrength = 2f;
-			Character minStrengthEnemy = null;
+			var maxDps = 0f;
+			var dpsSum = 0f;
 
 			foreach (var enemy in oppositeParty.Members)
 			{
@@ -50,28 +44,31 @@ namespace Dpm.Stage.Unit.AI.Calculator.Attack
 					continue;
 				}
 
-				var strength = AICalculatorUtility.GetStrengthScore(_character, enemy);
+				dpsSum += enemy.BattleAction.Dps;
 
-				if (strength < minStrength)
+				if (enemy.BattleAction.Spec.type != BattleActionAttackType.Ranged)
 				{
-					minStrength = strength;
+					continue;
+				}
 
-					minStrengthEnemy = enemy;
+				if (maxDps < enemy.BattleAction.Dps)
+				{
+					maxDps = enemy.BattleAction.Dps;
+					CurrentTarget = enemy;
 				}
 			}
 
-			if (minStrength > 1.5f || minStrengthEnemy == null)
+			if (CurrentTarget == null)
 			{
 				return AICalculatorConstants.MinInnerScore;
 			}
 
-			CurrentTarget = minStrengthEnemy;
-
-			return 1 - minStrengthEnemy.HpRatio;
+			return maxDps / dpsSum;
 		}
 
 		public void DrawCurrent()
 		{
+			AIDebugUtility.DrawAttackAIInfo(_character, CurrentTarget);
 		}
 	}
 }

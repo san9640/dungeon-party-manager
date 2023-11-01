@@ -18,10 +18,16 @@ MonoBehaviour:
     - type: 0
       weightFactorInfo:
         defaultValue: 0.5
-    - type: 1
+    - type: 3
       weightFactorInfo:
         defaultValue: 0.5
-    - type: 2
+    - type: 4
+      weightFactorInfo:
+        defaultValue: 0.5
+    - type: 5
+      weightFactorInfo:
+        defaultValue: 0.5
+    - type: 6
       weightFactorInfo:
         defaultValue: 0.5
   - name: knight_attack
@@ -29,10 +35,16 @@ MonoBehaviour:
     - type: 0
       weightFactorInfo:
         defaultValue: 0.5
-    - type: 1
+    - type: 3
       weightFactorInfo:
         defaultValue: 0.5
-    - type: 2
+    - type: 4
+      weightFactorInfo:
+        defaultValue: 0.5
+    - type: 5
+      weightFactorInfo:
+        defaultValue: 0.5
+    - type: 6
       weightFactorInfo:
         defaultValue: 0.5
   - name: bishop_attack
@@ -40,10 +52,16 @@ MonoBehaviour:
     - type: 0
       weightFactorInfo:
         defaultValue: 0.5
-    - type: 1
+    - type: 3
       weightFactorInfo:
         defaultValue: 0.5
-    - type: 2
+    - type: 4
+      weightFactorInfo:
+        defaultValue: 0.5
+    - type: 5
+      weightFactorInfo:
+        defaultValue: 0.5
+    - type: 6
       weightFactorInfo:
         defaultValue: 0.5
   - name: lizardman_attack
@@ -51,10 +69,16 @@ MonoBehaviour:
     - type: 0
       weightFactorInfo:
         defaultValue: 0.5
-    - type: 1
+    - type: 3
       weightFactorInfo:
         defaultValue: 0.5
-    - type: 2
+    - type: 4
+      weightFactorInfo:
+        defaultValue: 0.5
+    - type: 5
+      weightFactorInfo:
+        defaultValue: 0.5
+    - type: 6
       weightFactorInfo:
         defaultValue: 0.5
   - name: weak_melee_attack
@@ -62,10 +86,16 @@ MonoBehaviour:
     - type: 0
       weightFactorInfo:
         defaultValue: 0.5
-    - type: 1
+    - type: 3
       weightFactorInfo:
         defaultValue: 0.5
-    - type: 2
+    - type: 4
+      weightFactorInfo:
+        defaultValue: 0.5
+    - type: 5
+      weightFactorInfo:
+        defaultValue: 0.5
+    - type: 6
       weightFactorInfo:
         defaultValue: 0.5
   - name: medium_melee_attack
@@ -73,10 +103,16 @@ MonoBehaviour:
     - type: 0
       weightFactorInfo:
         defaultValue: 0.5
-    - type: 1
+    - type: 3
       weightFactorInfo:
         defaultValue: 0.5
-    - type: 2
+    - type: 4
+      weightFactorInfo:
+        defaultValue: 0.5
+    - type: 5
+      weightFactorInfo:
+        defaultValue: 0.5
+    - type: 6
       weightFactorInfo:
         defaultValue: 0.5
   - name: strong_melee_attack
@@ -84,10 +120,16 @@ MonoBehaviour:
     - type: 0
       weightFactorInfo:
         defaultValue: 0.5
-    - type: 1
+    - type: 3
       weightFactorInfo:
         defaultValue: 0.5
-    - type: 2
+    - type: 4
+      weightFactorInfo:
+        defaultValue: 0.5
+    - type: 5
+      weightFactorInfo:
+        defaultValue: 0.5
+    - type: 6
       weightFactorInfo:
         defaultValue: 0.5
   - name: strong_ranged_attack
@@ -95,9 +137,15 @@ MonoBehaviour:
     - type: 0
       weightFactorInfo:
         defaultValue: 0.5
-    - type: 1
+    - type: 3
       weightFactorInfo:
         defaultValue: 0.5
-    - type: 2
+    - type: 4
+      weightFactorInfo:
+        defaultValue: 0.5
+    - type: 5
+      weightFactorInfo:
+        defaultValue: 0.5
+    - type: 6
       weightFactorInfo:
         defaultValue: 0.5

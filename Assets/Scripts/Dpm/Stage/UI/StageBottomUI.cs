@@ -71,16 +71,16 @@ namespace Dpm.Stage.UI
 
 			UpdateMemberInfo();
 
-			_aiCalculatorUIMaxY = float.MinValue;
+			// _aiCalculatorUIMaxY = float.MinValue;
 
 			foreach (var ui in aiCalculatorUIs)
 			{
 				ui.Init();
 
-				if (ui.RectTransform.localPosition.y > _aiCalculatorUIMaxY)
-				{
-					_aiCalculatorUIMaxY = ui.RectTransform.localPosition.y;
-				}
+				// if (ui.RectTransform.localPosition.y > _aiCalculatorUIMaxY)
+				// {
+				// 	_aiCalculatorUIMaxY = ui.RectTransform.localPosition.y;
+				// }
 			}
 
 			ChangeAIContents(AICalculatorType.Move);
@@ -165,7 +165,7 @@ namespace Dpm.Stage.UI
 			changeButton.interactable = false;
 
 			// 필요한 Calculator들만 켜주고 나머지는 끈다.
-			var nextY = _aiCalculatorUIMaxY;
+			// var nextY = _aiCalculatorUIMaxY;
 
 			var character = StageUIManager.Instance.BottomUI.CurrentMember;
 
@@ -177,11 +177,11 @@ namespace Dpm.Stage.UI
 				{
 					ui.gameObject.SetActive(true);
 
-					var origin = ui.RectTransform.localPosition;
-
-					ui.RectTransform.localPosition = new Vector3(origin.x, nextY, origin.z);
-
-					nextY = nextY - ui.RectTransform.sizeDelta.y + AICalculatorUIYGap;
+					// var origin = ui.RectTransform.localPosition;
+					//
+					// ui.RectTransform.localPosition = new Vector3(origin.x, nextY, origin.z);
+					//
+					// nextY = nextY - ui.RectTransform.sizeDelta.y + AICalculatorUIYGap;
 
 					var scoreFactor = decisionMaker.GetScoreFactor(ui.CalculatorType);
 

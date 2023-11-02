@@ -40,3 +40,5 @@ MonoBehaviour:
     path: Prefabs/Character/orc_shaman/orc_shaman
   - name: stat_bar
     path: Prefabs/stat_bar
+  - name: fx_slash_1
+    path: Prefabs/Effect/fx_slash_1

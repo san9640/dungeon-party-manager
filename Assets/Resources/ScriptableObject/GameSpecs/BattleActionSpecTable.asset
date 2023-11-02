@@ -29,7 +29,7 @@ MonoBehaviour:
     attackDelay: 1
     damage: 8
     type: 0
-    meleeFx: 
+    meleeFx: fx_slash_1
     meleeHitFx: fx_hit_normal
     meleeDuration: 0.2
     meleeAttackAngle: 90

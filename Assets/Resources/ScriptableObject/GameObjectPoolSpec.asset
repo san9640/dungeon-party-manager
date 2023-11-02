@@ -65,3 +65,7 @@ MonoBehaviour:
     prefabSpecName: stat_bar
     maxCount: -1
     lifeTime: -1
+  - name: fx_slash_1
+    prefabSpecName: fx_slash_1
+    maxCount: -1
+    lifeTime: -1

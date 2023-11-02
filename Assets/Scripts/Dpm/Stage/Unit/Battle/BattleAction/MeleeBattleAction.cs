@@ -5,6 +5,7 @@ using Dpm.Stage.Physics;
 using Dpm.Stage.Spec;
 using Dpm.Utility.Extensions;
 using Dpm.Utility.Pool;
+using UnityEngine;
 
 namespace Dpm.Stage.Unit.Battle.BattleAction
 {
@@ -72,6 +73,17 @@ namespace Dpm.Stage.Unit.Battle.BattleAction
 				var hitFxPool = GameObjectPool.Get(Spec.meleeHitFx);
 
 				hitFxPool.TrySpawn(rae.Target.Position.ConvertToVector3(), out _);
+
+				var slashFxPool = GameObjectPool.Get(Spec.meleeFx);
+
+				var dir = (rae.Target.Position - _character.Position).normalized;
+
+				slashFxPool.TrySpawn((_character.Position + dir * 1.0f).ConvertToVector3(), out var slashFx);
+
+				var v3Dir = dir.ConvertToVector3();
+				var rotation = Quaternion.FromToRotation(Vector3.right, v3Dir);
+
+				slashFx.transform.rotation = Quaternion.Euler(0, 0, rotation.eulerAngles.y + rotation.eulerAngles.z);
 
 				// FIXME : 여기서 공격 적합성 검사를 하고 데미지를 입혀야 함 (공격 범위 안에 들어왔는지)
 				CoreService.Event.SendImmediate(rae.Target,

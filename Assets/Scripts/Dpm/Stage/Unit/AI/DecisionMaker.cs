@@ -193,8 +193,6 @@ namespace Dpm.Stage.Unit.AI
 
         public void UpdateFrame(float dt)
         {
-            IAICalculator maxScoredCalculator = null;
-
 #if DECESION_DEBUG
             var debugTextBuilder = new StringBuilder($"[{_character.Name}]\n");
 

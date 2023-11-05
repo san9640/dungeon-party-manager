@@ -44,10 +44,31 @@ namespace Dpm.Stage.Spec
 			{
 				var specTable = CoreService.Asset.UnsafeGet<ScriptableObject>(tableSpecName) as SpecTableBase<T>;
 
+				Debug.Assert(specTable != null, nameof(specTable) + " != null");
+
 				return specTable.NameToSpec[specName];
 			}
 
 			return default;
+		}
+
+		public static bool TryGetSpec<T>(string specName, out T result) where T : struct, IGameSpec
+		{
+			if (_typeToAssetName.TryGetValue(typeof(T), out var tableSpecName))
+			{
+				var specTable = CoreService.Asset.UnsafeGet<ScriptableObject>(tableSpecName) as SpecTableBase<T>;
+
+				Debug.Assert(specTable != null, nameof(specTable) + " != null");
+
+				if (specTable.NameToSpec.TryGetValue(specName, out result))
+				{
+					return true;
+				}
+			}
+
+			result = default;
+
+			return false;
 		}
 	}
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using Dpm.CoreAdapter;
 using Dpm.Stage.Event;
 using Dpm.Stage.Spec;
@@ -194,6 +195,14 @@ namespace Dpm.Stage.Unit.AI
         {
             IAICalculator maxScoredCalculator = null;
 
+#if DECESION_DEBUG
+            var debugTextBuilder = new StringBuilder($"[{_character.Name}]\n");
+
+            debugTextBuilder.AppendLine();
+            debugTextBuilder.AppendLine("-------------------------------------");
+            debugTextBuilder.AppendLine();
+#endif
+
             foreach (var kv in _attackCalculators)
             {
                 var calculator = kv.Value;
@@ -204,8 +213,18 @@ namespace Dpm.Stage.Unit.AI
                 var prev = ResultOnThisFrame[calculator];
 
                 ResultOnThisFrame[calculator] = (score, prev.sum + score, prev.frameCount + 1);
-#endif
+#if DECESION_DEBUG
+                var factor = GetScoreFactor(calculator);
 
+                debugTextBuilder.AppendLine($"<{kv.Key.Name}>");
+                debugTextBuilder.AppendLine($"AttackTarget : {calculator.CurrentTarget?.Name ?? "None"}");
+                debugTextBuilder.AppendLine($"CurrentScore : {ResultOnThisFrame[calculator].score}");
+                debugTextBuilder.AppendLine($"AverageScore : {ResultOnThisFrame[calculator].sum / ResultOnThisFrame[calculator].frameCount}");
+                debugTextBuilder.AppendLine($"Factor : {factor}");
+                debugTextBuilder.AppendLine($"Score X Factor : {ResultOnThisFrame[calculator].score * factor}");
+                debugTextBuilder.AppendLine();
+#endif
+#endif
                 if (calculator.CurrentTarget != null)
                 {
                     score *= GetScoreFactor(calculator);
@@ -219,10 +238,19 @@ namespace Dpm.Stage.Unit.AI
                 }
             }
 
+#if DECESION_DEBUG
+            if (_attackTargetsBuffer.Count > 0)
+            {
+                debugTextBuilder.AppendLine("Attack Scores to Enemy");
+            }
+#endif
             var maxAttackScore = -1f;
 
             foreach (var kv in _attackTargetsBuffer)
             {
+#if DECESION_DEBUG
+                debugTextBuilder.AppendLine($"To [{kv.Key.Name}] => Score : {kv.Value}");
+#endif
                 if (maxAttackScore < kv.Value)
                 {
                     maxAttackScore = kv.Value;
@@ -230,6 +258,12 @@ namespace Dpm.Stage.Unit.AI
                     CurrentAttackTarget = kv.Key;
                 }
             }
+
+#if DECESION_DEBUG
+            debugTextBuilder.AppendLine();
+            debugTextBuilder.AppendLine("-------------------------------------");
+            debugTextBuilder.AppendLine();
+#endif
 
             if (CurrentAttackTarget != null)
             {
@@ -254,6 +288,23 @@ namespace Dpm.Stage.Unit.AI
                     var prev = ResultOnThisFrame[calculator];
 
                     ResultOnThisFrame[calculator] = (score, prev.sum + score, prev.frameCount + 1);
+
+#if DECESION_DEBUG
+                    var factor = GetScoreFactor(calculator);
+
+                    debugTextBuilder.AppendLine($"{kv.Key.Name}");
+
+                    var targetDir = calculator.TargetPos.HasValue
+                        ? (calculator.TargetPos.Value - _character.Position).normalized
+                        : Vector2.zero;
+
+                    debugTextBuilder.AppendLine($"TargetDir : {targetDir}");
+                    debugTextBuilder.AppendLine($"CurrentScore : {ResultOnThisFrame[calculator].score}");
+                    debugTextBuilder.AppendLine($"AverageScore : {ResultOnThisFrame[calculator].sum / ResultOnThisFrame[calculator].frameCount}");
+                    debugTextBuilder.AppendLine($"Factor : {factor}");
+                    debugTextBuilder.AppendLine($"Score X Factor : {ResultOnThisFrame[calculator].score * factor}");
+                    debugTextBuilder.AppendLine();
+#endif
 #endif
 
                     score *= GetScoreFactor(calculator);
@@ -262,16 +313,17 @@ namespace Dpm.Stage.Unit.AI
                     {
                         targetDiff += (calculator.TargetPos.Value - _character.Position).normalized * score;
                     }
-
-                    // if (maxScore < score)
-                    // {
-                    //     maxScore = score;
-                    //     maxScoredCalculator = calculator;
-                    // }
                 }
 
-                // maxScoredCalculator?.Execute();
+#if DECESION_DEBUG
+                debugTextBuilder.AppendLine($"Calculated Move Direction : {targetDiff.normalized}");
 
+                debugTextBuilder.AppendLine();
+                debugTextBuilder.AppendLine("-------------------------------------");
+                debugTextBuilder.AppendLine();
+
+                Debug.Log(debugTextBuilder.ToString());
+#endif
                 CoreService.Event.SendImmediate(_character, RequestMoveEvent.Create(targetDiff.normalized * 4f + _character.Position));
 
                 _moveCalculateTimePassed = 0f;
@@ -307,7 +359,7 @@ namespace Dpm.Stage.Unit.AI
         {
             var calculator = GetCalculatorTyped(calculatorType);
 
-            return calculator != null ? GetScoreFactor(calculator) : 0.5f;
+            return calculator != null ? GetScoreFactor(calculator) : 0f;
         }
 
         public IAICalculator GetCalculatorTyped(Type calculatorType)

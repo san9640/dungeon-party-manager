@@ -113,6 +113,8 @@ namespace Dpm.Stage.Room
 
 		private readonly List<DoorHolder> _usingDoorHolders = new(5);
 
+		public int DoorCount => _usingDoorHolders.Count;
+
 		[SerializeField]
 		private SpawnArea allySpawnArea;
 
@@ -181,6 +183,7 @@ namespace Dpm.Stage.Room
 
 				// FIXME : 이런 식으로 할당하는 것이 괜찮은 걸까?
 				doorHolder.Door.Id = index;
+				doorHolder.Door.Index = _usingDoorHolders.Count;
 
 				_usingDoorHolders.Add(doorHolder);
 			}
@@ -220,9 +223,11 @@ namespace Dpm.Stage.Room
 				{
 					_state = State.Cleared;
 
-					_doorHolders[doorClickEvent.DoorIndex].Door.IsOpened = true;
+					var door = _doorHolders[doorClickEvent.DoorIndex].Door;
 
-					CoreService.Event.Publish(RoomClearedEvent.Instance);
+					door.IsOpened = true;
+
+					CoreService.Event.Publish(RoomClearedEvent.Create(door.Index));
 				}
 			}
 		}
@@ -238,6 +243,11 @@ namespace Dpm.Stage.Room
 			{
 				_state = State.WaitDoorOpen;
 			}
+		}
+
+		public void SetBuffText(int doorIndex, string text)
+		{
+			_usingDoorHolders[doorIndex].Door.BuffText = text;
 		}
 	}
 }

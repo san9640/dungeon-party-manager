@@ -1,15 +1,22 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using Core.Interface;
 using Dpm.Common;
 using Dpm.Common.Event;
 using Dpm.CoreAdapter;
+using Dpm.Stage.Buff;
 using Dpm.Stage.Event;
 using Dpm.Stage.Physics;
 using Dpm.Stage.Room;
+using Dpm.Stage.Spec;
 using Dpm.Stage.UI;
 using Dpm.Stage.UI.Event;
 using Dpm.Stage.Unit;
+using Dpm.Utility.Pool;
 using UnityEngine;
+using Object = UnityEngine.Object;
+using Random = UnityEngine.Random;
 using UnityScene = UnityEngine.SceneManagement.SceneManager;
 
 namespace Dpm.Stage
@@ -45,6 +52,15 @@ namespace Dpm.Stage
 		private StageUIManager _stageUIManager;
 
 		public ProjectileManager ProjectileManager { get; private set; }
+
+		private readonly List<BuffSpec> _currentDoorBuffs = new();
+
+		private static readonly string[] BuffNames =
+		{
+			"room_buff_max_hp",
+			"room_buff_attack_speed",
+			"room_buff_damage",
+		};
 
 		public IEnumerator LoadAsync()
 		{
@@ -128,7 +144,14 @@ namespace Dpm.Stage
 
 		private void OnRoomCleared(Core.Interface.Event e)
 		{
-			CoreService.Coroutine.StartCoroutine(MoveRoomAsync());
+			if (e is not RoomClearedEvent rce)
+			{
+				return;
+			}
+
+			var buff = _currentDoorBuffs[rce.DoorIndex];
+
+			CoreService.Coroutine.StartCoroutine(MoveRoomAsync(buff));
 		}
 
 		private void OnScreenFadeOutStart(Core.Interface.Event e)
@@ -196,6 +219,8 @@ namespace Dpm.Stage
 			{
 				State = StageState.AfterBattle;
 
+				// GenerateDoorBuffs();
+
 				CoreService.Event.Publish(BattleEndEvent.Create(UnitRegion.Ally));
 			}
 		}
@@ -203,7 +228,7 @@ namespace Dpm.Stage
 		/// <summary>
 		/// 클리어 이후 방을 이동하는 코루틴
 		/// </summary>
-		private IEnumerator MoveRoomAsync()
+		private IEnumerator MoveRoomAsync(BuffSpec buff)
 		{
 			State = StageState.Loading;
 
@@ -211,6 +236,19 @@ namespace Dpm.Stage
 
 			foreach (var ally in UnitManager.AllyParty.Members)
 			{
+				Core.Interface.Event buffEvent = buff.type switch
+				{
+					BuffType.AttackSpeed => AddAttackSpeedBuffEvent.Create(null, buff.value),
+					BuffType.Damage => AddDamageBuffEvent.Create(null, buff.value),
+					BuffType.MaxHp => AddMaxHpBuffEvent.Create(null, buff.IntValue),
+					_ => null
+				};
+
+				if (buffEvent != null)
+				{
+					CoreService.Event.SendImmediate(ally, buffEvent);
+				}
+
 				var healEvent = HealEvent.Create(ally, ally.MaxHp);
 
 				CoreService.Event.SendImmediate(ally, healEvent);
@@ -238,10 +276,48 @@ namespace Dpm.Stage
 		/// </summary>
 		private void GenerateRoom()
 		{
-			// FIXME
-			var doorCount = Random.Range(1, GameRoom.MaxDoorCount + 1);
+			var doorCount = 1 + Random.Range(0, Math.Min(BuffNames.Length, GameRoom.MaxDoorCount));
 
 			_room.Initialize(doorCount);
+
+			GenerateDoorBuffs();
+		}
+
+		private void GenerateDoorBuffs()
+		{
+			_currentDoorBuffs.Clear();
+
+			var pooledList = PooledList<int>.Get();
+
+			for (var i = 0; i < BuffNames.Length; i++)
+			{
+				pooledList.Add(i);
+			}
+
+			for (var i = 0; i < _room.DoorCount; i++)
+			{
+				var r = Random.Range(0, pooledList.Count);
+
+				var buffIndex = pooledList[r];
+				pooledList.RemoveAt(r);
+
+				var spedName = BuffNames[buffIndex];
+				var buff = SpecUtility.GetSpec<BuffSpec>(spedName);
+
+				var text = buff.type switch
+				{
+					BuffType.MaxHp => $"HP\n+{buff.IntValue}",
+					BuffType.Damage => $"ATK\nx{(buff.value + 1):N2}",
+					BuffType.AttackSpeed => $"ASD\nx{(buff.value + 1):N2}",
+					_ => string.Empty
+				};
+
+				_room.SetBuffText(i, text);
+
+				_currentDoorBuffs.Add(buff);
+			}
+
+			pooledList.Dispose();
 		}
 	}
 }

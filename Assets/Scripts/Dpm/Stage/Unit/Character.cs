@@ -1,6 +1,7 @@
 ﻿using System;
 using Core.Interface;
 using Dpm.CoreAdapter;
+using Dpm.Stage.Buff;
 using Dpm.Stage.Event;
 using Dpm.Stage.Render;
 using Dpm.Stage.Spec;
@@ -40,7 +41,11 @@ namespace Dpm.Stage.Unit
 
 		public int Hp { get; private set; }
 
-		public int MaxHp { get; private set; }
+		private readonly BuffAddCalculator _maxHpBuffCalculator = new();
+
+		public int MaxHp => _originMaxHp + _maxHpBuffCalculator.Value;
+
+		private int _originMaxHp;
 
 		public float HpRatio => Hp / (float)MaxHp;
 
@@ -50,11 +55,19 @@ namespace Dpm.Stage.Unit
 
 		public int MaxMp { get; private set; }
 
-		public float DamageFactor { get; private set; }
+		private float _originDamageFactor;
+
+		private readonly BuffMultiplyCalculator _damageBuffCalculator = new();
+
+		private float DamageFactor => _originDamageFactor * _damageBuffCalculator.Value;
 
 		public int AttackDamage => Mathf.FloorToInt(DamageFactor * BattleAction.Spec.damage);
 
-		public float AttackSpeed { get; private set; }
+		private float _originAttackSpeed;
+
+		private readonly BuffMultiplyCalculator _attackSpeedBuffCalculator = new();
+
+		public float AttackSpeed => _originAttackSpeed * _attackSpeedBuffCalculator.Value;
 
 		public float MoveSpeed { get; private set; }
 
@@ -63,7 +76,7 @@ namespace Dpm.Stage.Unit
 			var boundsHolder = GetComponent<CustomCollider2D>();
 
 			Bounds = boundsHolder.bounds;
-			Position = transform.position;
+			Position = transform.position.ConvertToVector2();
 		}
 
 		public void Dispose()
@@ -72,19 +85,23 @@ namespace Dpm.Stage.Unit
 
 			BattleAction?.Dispose();
 			BattleAction = null;
+
+			_maxHpBuffCalculator.Dispose();
+			_damageBuffCalculator.Dispose();
+			_attackSpeedBuffCalculator.Dispose();
 		}
 
 		public void Init(CharacterSpec spec)
 		{
-			MaxHp = spec.baseHp;
-			Hp = MaxHp;
+			_originMaxHp = spec.baseHp;
+			Hp = _originMaxHp;
 
 			MaxMp = spec.baseMp;
 			Mp = MaxMp;
 
-			DamageFactor = spec.baseDamageFactor;
+			_originDamageFactor = spec.baseDamageFactor;
 
-			AttackSpeed = spec.baseAttackSpeed;
+			_originAttackSpeed = spec.baseAttackSpeed;
 
 			MoveSpeed = spec.moveSpeed;
 
@@ -159,6 +176,45 @@ namespace Dpm.Stage.Unit
 				{
 					_stateMachine.ChangeState(CharacterAfterBattleState.Create(this));
 				}
+			}
+			else if (e is AddAttackSpeedBuffEvent asbe)
+			{
+				if (asbe.IsPermanent)
+				{
+					_attackSpeedBuffCalculator.AddPermanentBuff(asbe.Value);
+				}
+				else
+				{
+					_attackSpeedBuffCalculator.AddBuff(asbe.Key, asbe.Value);
+				}
+
+				CoreService.Event.PublishImmediate(AttackSpeedChangedEvent.Create(this));
+			}
+			else if (e is AddDamageBuffEvent adbe)
+			{
+				if (adbe.IsPermanent)
+				{
+					_damageBuffCalculator.AddPermanentBuff(adbe.Value);
+				}
+				else
+				{
+					_damageBuffCalculator.AddBuff(adbe.Key, adbe.Value);
+				}
+
+				CoreService.Event.PublishImmediate(AttackDamageChangedEvent.Create(this));
+			}
+			else if (e is AddMaxHpBuffEvent ahbe)
+			{
+				if (ahbe.IsPermanent)
+				{
+					_maxHpBuffCalculator.AddPermanentBuff(ahbe.Value);
+				}
+				else
+				{
+					_maxHpBuffCalculator.AddBuff(ahbe.Key, ahbe.Value);
+				}
+
+				CoreService.Event.PublishImmediate(MaxHpChangedEvent.Create(this));
 			}
 
 			base.OnEvent(e);

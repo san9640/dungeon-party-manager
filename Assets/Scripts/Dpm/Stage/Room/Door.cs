@@ -1,6 +1,7 @@
 ﻿using System;
 using Dpm.CoreAdapter;
 using Dpm.Stage.Event;
+using TMPro;
 using UnityEngine;
 
 namespace Dpm.Stage.Room
@@ -13,7 +14,12 @@ namespace Dpm.Stage.Room
 		[SerializeField]
 		private GameObject opened;
 
+		[SerializeField]
+		private TextMeshPro buffText;
+
 		public int Id = -1;
+
+		public int Index = -1;
 
 		public bool IsOpened
 		{
@@ -25,6 +31,12 @@ namespace Dpm.Stage.Room
 			}
 		}
 
+		public string BuffText
+		{
+			get => buffText.text;
+			set => buffText.text = value;
+		}
+
 		// TODO : 클릭 확인
 		private void OnMouseDown()
 		{
@@ -34,7 +46,9 @@ namespace Dpm.Stage.Room
 		public void Dispose()
 		{
 			Id = -1;
+			Index = -1;
 			IsOpened = false;
+			BuffText = null;
 		}
 	}
 }

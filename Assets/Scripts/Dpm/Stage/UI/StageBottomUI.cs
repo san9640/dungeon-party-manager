@@ -86,11 +86,17 @@ namespace Dpm.Stage.UI
 			ChangeAIContents(AICalculatorType.Move);
 
 			CoreService.Event.Subscribe<HpChangedEvent>(OnHpChanged);
+			CoreService.Event.Subscribe<MaxHpChangedEvent>(OnMaxHpChanged);
+			CoreService.Event.Subscribe<AttackSpeedChangedEvent>(OnAttackSpeedChanged);
+			CoreService.Event.Subscribe<AttackDamageChangedEvent>(OnAttackDamageChanged);
 		}
 
 		public void Dispose()
 		{
 			CoreService.Event.Unsubscribe<HpChangedEvent>(OnHpChanged);
+			CoreService.Event.Unsubscribe<MaxHpChangedEvent>(OnMaxHpChanged);
+			CoreService.Event.Unsubscribe<AttackSpeedChangedEvent>(OnAttackSpeedChanged);
+			CoreService.Event.Unsubscribe<AttackDamageChangedEvent>(OnAttackDamageChanged);
 		}
 
 		public void OnMemberChangeButton(bool isNext)
@@ -196,7 +202,7 @@ namespace Dpm.Stage.UI
 
 		private void OnHpChanged(Core.Interface.Event e)
 		{
-			if (!(e is HpChangedEvent hce) || hce.Character != CurrentMember)
+			if (e is not HpChangedEvent hce || hce.Character != CurrentMember)
 			{
 				return;
 			}
@@ -206,17 +212,36 @@ namespace Dpm.Stage.UI
 
 		public void OnMpChanged(Core.Interface.Event e)
 		{
-
 		}
 
 		public void OnAttackDamageChanged(Core.Interface.Event e)
 		{
+			if (e is not AttackDamageChangedEvent adce || adce.Character != CurrentMember)
+			{
+				return;
+			}
 
+			SetAttackDamageText(adce.Character.AttackDamage);
 		}
 
 		public void OnAttackSpeedChanged(Core.Interface.Event e)
 		{
+			if (e is not AttackSpeedChangedEvent asce || asce.Character != CurrentMember)
+			{
+				return;
+			}
 
+			SetAttackSpeedText(asce.Character.AttackSpeed);
+		}
+
+		public void OnMaxHpChanged(Core.Interface.Event e)
+		{
+			if (e is not MaxHpChangedEvent mce || mce.Character != CurrentMember)
+			{
+				return;
+			}
+
+			SetHpText(mce.Character.Hp, mce.Character.MaxHp);
 		}
 
 		private void UpdateMemberInfo()
@@ -248,7 +273,7 @@ namespace Dpm.Stage.UI
 
 		private void SetAttackSpeedText(float value)
 		{
-			asdText.text = value.ToString(CultureInfo.InvariantCulture);
+			asdText.text = $"{value:N1}";
 		}
 	}
 }

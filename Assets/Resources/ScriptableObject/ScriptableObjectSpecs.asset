@@ -28,3 +28,5 @@ MonoBehaviour:
     path: ScriptableObject/GameSpecs/BattleActionSpecTable
   - name: PartySpecTable
     path: ScriptableObject/GameSpecs/PartySpecTable
+  - name: BuffSpecTable
+    path: ScriptableObject/GameSpecs/BuffSpecTable

@@ -66,17 +66,17 @@ namespace Dpm.Stage.Unit
 			};
 		}
 
-		public void SpawnAllies(SpawnArea spawnArea)
+		public void SpawnAllies(string partySpecName, SpawnArea spawnArea)
 		{
-			if (_allyParty == null && TrySpawnParty("ally", spawnArea, out var party))
+			if (_allyParty == null && TrySpawnParty(partySpecName, spawnArea, out var party))
 			{
 				_allyParty = party;
 			}
 		}
 
-		public void SpawnEnemies(SpawnArea spawnArea)
+		public void SpawnEnemies(string partySpecName, SpawnArea spawnArea)
 		{
-			if (_enemyParty == null && TrySpawnParty("enemy", spawnArea, out var party))
+			if (_enemyParty == null && TrySpawnParty(partySpecName, spawnArea, out var party))
 			{
 				_enemyParty = party;
 			}

@@ -17,8 +17,10 @@ namespace Dpm.Stage.Room
 		[SerializeField]
 		private TextMeshPro buffText;
 
+		[HideInInspector]
 		public int Id = -1;
 
+		[HideInInspector]
 		public int Index = -1;
 
 		public bool IsOpened

@@ -55,11 +55,20 @@ namespace Dpm.Stage
 
 		private readonly List<BuffSpec> _currentDoorBuffs = new();
 
-		private static readonly string[] BuffNames =
+		private int _clearedRoomCount = 0;
+
+		private static readonly string[] DoorBuffNames =
 		{
 			"room_buff_max_hp",
 			"room_buff_attack_speed",
 			"room_buff_damage",
+		};
+
+		private static readonly string[] EnemyBuffNames =
+		{
+			"enemy_buff_max_hp",
+			"enemy_buff_attack_speed",
+			"enemy_buff_damage",
 		};
 
 		public IEnumerator LoadAsync()
@@ -85,8 +94,9 @@ namespace Dpm.Stage
 				UnitManager.RegisterUnit(unit);
 			}
 
-			UnitManager.SpawnAllies(_room.AllySpawnArea);
-			UnitManager.SpawnEnemies(_room.EnemySpawnArea);
+			UnitManager.SpawnAllies("ally", _room.AllySpawnArea);
+
+			CreateEnemies();
 
 			ProjectileManager = new ProjectileManager();
 
@@ -219,8 +229,6 @@ namespace Dpm.Stage
 			{
 				State = StageState.AfterBattle;
 
-				// GenerateDoorBuffs();
-
 				CoreService.Event.Publish(BattleEndEvent.Create(UnitRegion.Ally));
 			}
 		}
@@ -234,20 +242,11 @@ namespace Dpm.Stage
 
 			yield return ScreenTransition.Instance.FadeOutAsync(1, this);
 
+			_clearedRoomCount++;
+
 			foreach (var ally in UnitManager.AllyParty.Members)
 			{
-				Core.Interface.Event buffEvent = buff.type switch
-				{
-					BuffType.AttackSpeed => AddAttackSpeedBuffEvent.Create(null, buff.value),
-					BuffType.Damage => AddDamageBuffEvent.Create(null, buff.value),
-					BuffType.MaxHp => AddMaxHpBuffEvent.Create(null, buff.IntValue),
-					_ => null
-				};
-
-				if (buffEvent != null)
-				{
-					CoreService.Event.SendImmediate(ally, buffEvent);
-				}
+				BuffUtility.ApplyBuff(ally, buff);
 
 				var healEvent = HealEvent.Create(ally, ally.MaxHp);
 
@@ -262,7 +261,7 @@ namespace Dpm.Stage
 
 			GenerateRoom();
 
-			UnitManager.SpawnEnemies(_room.EnemySpawnArea);
+			CreateEnemies();
 
 			CoreService.Event.PublishImmediate(RoomChangeEndEvent.Instance);
 
@@ -276,7 +275,7 @@ namespace Dpm.Stage
 		/// </summary>
 		private void GenerateRoom()
 		{
-			var doorCount = 1 + Random.Range(0, Math.Min(BuffNames.Length, GameRoom.MaxDoorCount));
+			var doorCount = 1 + Random.Range(0, Math.Min(DoorBuffNames.Length, GameRoom.MaxDoorCount));
 
 			_room.Initialize(doorCount);
 
@@ -287,22 +286,21 @@ namespace Dpm.Stage
 		{
 			_currentDoorBuffs.Clear();
 
-			var pooledList = PooledList<int>.Get();
+			var pooledList = PooledList<string>.Get();
 
-			for (var i = 0; i < BuffNames.Length; i++)
+			foreach (var buffName in DoorBuffNames)
 			{
-				pooledList.Add(i);
+				pooledList.Add(buffName);
 			}
 
 			for (var i = 0; i < _room.DoorCount; i++)
 			{
 				var r = Random.Range(0, pooledList.Count);
 
-				var buffIndex = pooledList[r];
+				var buffName = pooledList[r];
 				pooledList.RemoveAt(r);
 
-				var spedName = BuffNames[buffIndex];
-				var buff = SpecUtility.GetSpec<BuffSpec>(spedName);
+				var buff = SpecUtility.GetSpec<BuffSpec>(buffName);
 
 				var text = buff.type switch
 				{
@@ -318,6 +316,64 @@ namespace Dpm.Stage
 			}
 
 			pooledList.Dispose();
+		}
+
+		private void CreateEnemies()
+		{
+			UnitManager.SpawnEnemies("enemy", _room.EnemySpawnArea);
+
+			var buffLottery = PooledList<int>.Get();
+
+			// 작은 버프를 플레이어 파티보다 두 배로 부여받게 했음
+			var buffCount = _clearedRoomCount << 1;
+
+			for (var i = 0; i < EnemyBuffNames.Length; i++)
+			{
+				buffLottery.Add(buffCount);
+			}
+
+			for (var i = 0; i < buffCount; i++)
+			{
+				var r = Random.Range(0, EnemyBuffNames.Length * buffCount - i);
+				var buffIndex = -1;
+
+				// 확률을 조정하기 위해 N개씩 넣어놓고 하나씩 뺌
+				for (var j = 0; j < EnemyBuffNames.Length; j++)
+				{
+					if (buffLottery[j] > r)
+					{
+						buffIndex = j;
+						buffLottery[j]--;
+
+						break;
+					}
+					else
+					{
+						r -= buffLottery[j];
+					}
+				}
+
+				Debug.Assert(buffIndex >= 0);
+
+				var buffSpecName = EnemyBuffNames[buffIndex];
+				var buff = SpecUtility.GetSpec<BuffSpec>(buffSpecName);
+
+#if UNITY_EDITOR
+				Debug.Log($"Enemy Buff[{i}] : {buffSpecName}");
+#endif
+
+				foreach (var enemy in UnitManager.EnemyParty.Members)
+				{
+					BuffUtility.ApplyBuff(enemy, buff);
+				}
+			}
+
+			foreach (var enemy in UnitManager.EnemyParty.Members)
+			{
+				CoreService.Event.SendImmediate(enemy, HealEvent.Create(enemy, enemy.MaxHp));
+			}
+
+			buffLottery.Dispose();
 		}
 	}
 }

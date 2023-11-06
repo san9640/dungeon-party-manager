@@ -38,6 +38,20 @@ namespace Dpm.Stage.Spec
 			}
 		}
 
+		public static IReadOnlyDictionary<string, T> GetSpecData<T>() where T : struct, IGameSpec
+		{
+			if (!_typeToAssetName.TryGetValue(typeof(T), out var tableSpecName))
+			{
+				return null;
+			}
+
+			var specTable = CoreService.Asset.UnsafeGet<ScriptableObject>(tableSpecName) as SpecTableBase<T>;
+
+			Debug.Assert(specTable != null, nameof(specTable) + " != null");
+
+			return specTable.NameToSpec;
+		}
+
 		public static T GetSpec<T>(string specName) where T : struct, IGameSpec
 		{
 			if (_typeToAssetName.TryGetValue(typeof(T), out var tableSpecName))

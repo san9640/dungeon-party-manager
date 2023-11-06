@@ -49,7 +49,13 @@ namespace Dpm.Editor
 				return;
 			}
 
-			// TODO
+			EditorGUILayout.Space();
+
+			EditorGUILayout.LabelField("MaxHp", _character.MaxHp.ToString());
+			EditorGUILayout.LabelField("Hp", _character.Hp.ToString());
+			EditorGUILayout.LabelField("AttackSpeed", $"{_character.AttackSpeed:N3}");
+			EditorGUILayout.LabelField("AttackDamage", _character.AttackDamage.ToString());
+
 			foreach (var type in _aiTypes)
 			{
 				if (_character.DecisionMaker.IsUsingTyped(type))

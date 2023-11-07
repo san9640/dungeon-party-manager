@@ -89,5 +89,14 @@ namespace Dpm.Stage.Unit
 			projectile.Dispose();
 			projectileGo.Deactivate();
 		}
+
+		public void Clear()
+		{
+			foreach (var kv in _usingProjectiles)
+			{
+				kv.Key.Dispose();
+				kv.Value.Deactivate();
+			}
+		}
 	}
 }

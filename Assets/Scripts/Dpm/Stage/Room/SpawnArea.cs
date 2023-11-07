@@ -1,4 +1,6 @@
-﻿using Dpm.Utility;
+﻿using Dpm.Stage.Physics;
+using Dpm.Stage.Unit;
+using Dpm.Utility;
 using Dpm.Utility.Constants;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -79,6 +81,54 @@ namespace Dpm.Stage.Room
 		}
 
 		private Vector2? _pivot;
+
+		public Vector2 GetClosestSpawnPos(Party party, Character character, Vector2 position)
+		{
+			var min = transform.position + new Vector3(minOffset.x, minOffset.y, 0);
+			var max = transform.position + new Vector3(maxOffset.x, maxOffset.y, 0);
+			var center = (min + max) / 2;
+			var size = max - min;
+
+			var maxXCount = Mathf.FloorToInt((size.x - SpawnPosSize) / SpawnPosSize);
+			var maxYHalfCount = Mathf.FloorToInt((size.y - SpawnPosSize) * 0.5f / SpawnPosSize);
+
+			float? minSqrDist = null;
+			var closest = Vector2.zero;
+
+			for (var x = 0; x <= maxXCount; x++)
+			{
+				for (var y = -maxYHalfCount; y <= maxYHalfCount; y++)
+				{
+					var spawnPos = this[x, y];
+
+					var sqrDist = (position - spawnPos).sqrMagnitude;
+
+					if (!minSqrDist.HasValue || minSqrDist.Value > sqrDist)
+					{
+						var collapse = false;
+
+						foreach (var member in party.Members)
+						{
+							if (member != character && member.Bounds.Contains(spawnPos))
+							{
+								collapse = true;
+								break;
+							}
+						}
+
+						if (collapse)
+						{
+							continue;
+						}
+
+						minSqrDist = sqrDist;
+						closest = spawnPos;
+					}
+				}
+			}
+
+			return closest;
+		}
 
 #if UNITY_EDITOR
 		private void OnDrawGizmos()

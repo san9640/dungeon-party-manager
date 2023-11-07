@@ -30,4 +30,13 @@ namespace Dpm.Stage.Physics
 			extents = size * 0.5f;
 		}
 	}
+
+	public static class Bounds2DExtensions
+	{
+		public static bool Contains(this Bounds2D bounds, Vector2 position)
+		{
+			return position.x <= bounds.Max.x && position.x >= bounds.Min.x &&
+			       position.y <= bounds.Max.y && position.y >= bounds.Min.y;
+		}
+	}
 }

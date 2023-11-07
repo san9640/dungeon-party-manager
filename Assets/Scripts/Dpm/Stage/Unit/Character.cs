@@ -31,9 +31,9 @@ namespace Dpm.Stage.Unit
 			set => Animator.LookDirection = value;
 		}
 
-		public Vector2 OriginPos { get; private set; }
+		public Vector2 OriginPos { get; set; }
 
-		public Direction OriginDir { get; private set; }
+		public Direction OriginDir { get; set; }
 
 		public IDecisionMaker DecisionMaker { get; } = new DecisionMaker();
 

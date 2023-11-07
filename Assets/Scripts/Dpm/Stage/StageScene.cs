@@ -57,6 +57,8 @@ namespace Dpm.Stage
 
 		private int _clearedRoomCount = 0;
 
+		private PartyClickController _partyClickController = new();
+
 		private static readonly string[] DoorBuffNames =
 		{
 			"room_buff_max_hp",
@@ -127,6 +129,9 @@ namespace Dpm.Stage
 
 			CoreService.Event.PublishImmediate(StageExitEvent.Instance);
 
+			_partyClickController.Dispose();
+			_partyClickController = null;
+
 			_stageUIManager.Dispose();
 			_stageUIManager = null;
 
@@ -191,6 +196,8 @@ namespace Dpm.Stage
 				if (State == StageState.Loading)
 				{
 					State = StageState.WaitBattle;
+
+					_partyClickController.Init(UnitManager.AllyParty, _room.AllySpawnArea);
 				}
 			}
 		}
@@ -203,6 +210,8 @@ namespace Dpm.Stage
 			}
 
 			State = StageState.InBattle;
+
+			_partyClickController.Dispose();
 
 			CoreService.Event.Publish(BattleStartEvent.Instance);
 
@@ -242,6 +251,8 @@ namespace Dpm.Stage
 
 			yield return ScreenTransition.Instance.FadeOutAsync(1, this);
 
+			ProjectileManager.Clear();
+
 			_clearedRoomCount++;
 
 			foreach (var ally in UnitManager.AllyParty.Members)
@@ -268,6 +279,8 @@ namespace Dpm.Stage
 			yield return ScreenTransition.Instance.FadeInAsync(1, this);
 
 			State = StageState.WaitBattle;
+
+			_partyClickController.Init(UnitManager.AllyParty, _room.AllySpawnArea);
 		}
 
 		/// <summary>

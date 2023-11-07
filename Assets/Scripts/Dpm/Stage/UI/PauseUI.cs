@@ -1,5 +1,6 @@
 ﻿using System;
 using Dpm.CoreAdapter;
+using Dpm.Stage.Event;
 using Dpm.Stage.UI.Event;
 using UnityEngine;
 
@@ -9,8 +10,7 @@ namespace Dpm.Stage.UI
 	{
 		public void OnStageExitButtonPressed()
 		{
-			// FIXME : 여기서 이렇게 불러주는 게 맞나?
-			Game.Instance.MoveToMainMenu();
+			CoreService.Event.Publish(ExitStageEvent.Instance);
 		}
 
 		public void OnResumeButtonPressed()

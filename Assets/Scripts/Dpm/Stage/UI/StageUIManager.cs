@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using Dpm.Common.Event;
 using Dpm.CoreAdapter;
 using Dpm.Stage.Event;
@@ -20,6 +21,8 @@ namespace Dpm.Stage.UI
 		Interactable,
 		// Pause된 상태에서는 OptionUI만 사용할 수 있음
 		Paused,
+		// 게임 오버 시
+		GameOver,
 	}
 
 	public class StageUIManager : MonoBehaviour, IDisposable
@@ -43,6 +46,9 @@ namespace Dpm.Stage.UI
 
 		[SerializeField]
 		private Button bottomUIHideButton;
+
+		[SerializeField]
+		private GameOverUI gameOverUI;
 
 		[SerializeField]
 		private EventSystem eventSystem;
@@ -84,6 +90,7 @@ namespace Dpm.Stage.UI
 			CoreService.Event.Subscribe<ScreenFadeInEndEvent>(OnScreenFadeInEnd);
 			CoreService.Event.Subscribe<ScreenFadeOutStartEvent>(OnScreenFadeOutStart);
 			CoreService.Event.Subscribe<ResumeButtonPressedEvent>(OnResumeButtonPressedEvent);
+			CoreService.Event.Subscribe<GameOverEvent>(OnGameOverEvent);
 		}
 
 		public void Dispose()
@@ -91,6 +98,7 @@ namespace Dpm.Stage.UI
 			CoreService.Event.Unsubscribe<ScreenFadeInEndEvent>(OnScreenFadeInEnd);
 			CoreService.Event.Unsubscribe<ScreenFadeOutStartEvent>(OnScreenFadeOutStart);
 			CoreService.Event.Unsubscribe<ResumeButtonPressedEvent>(OnResumeButtonPressedEvent);
+			CoreService.Event.Unsubscribe<GameOverEvent>(OnGameOverEvent);
 
 			bottomUI.Dispose();
 		}
@@ -163,6 +171,18 @@ namespace Dpm.Stage.UI
 			battleStartButton.SetActive(_canStartBattle);
 		}
 
+		private void OnGameOverEvent(Core.Interface.Event e)
+		{
+			if (e is not GameOverEvent goe)
+			{
+				return;
+			}
+
+			ChangeState(StageUIState.GameOver);
+
+			CoreService.Coroutine.StartCoroutine(ShowGameOverUI(goe.Score));
+		}
+
 		private void ChangeState(StageUIState nextState)
 		{
 			if (CurrentState == nextState)
@@ -209,6 +229,15 @@ namespace Dpm.Stage.UI
 					ChangeBottomUIState(BottomUIState.Disabled);
 
 					break;
+
+				case StageUIState.GameOver:
+					eventSystem.enabled = true;
+					pauseUI.gameObject.SetActive(false);
+					pauseButton.gameObject.SetActive(false);
+
+					ChangeBottomUIState(BottomUIState.Disabled);
+
+					break;
 			}
 		}
 
@@ -248,6 +277,13 @@ namespace Dpm.Stage.UI
 
 					break;
 			}
+		}
+
+		private IEnumerator ShowGameOverUI(int score)
+		{
+			yield return new WaitForSeconds(1.0f);
+
+			gameOverUI.Show(score);
 		}
 	}
 }

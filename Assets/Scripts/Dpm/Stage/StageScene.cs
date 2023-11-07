@@ -27,7 +27,8 @@ namespace Dpm.Stage
 		Loading,
 		WaitBattle,
 		InBattle,
-		AfterBattle,
+		Win,
+		Lose,
 	}
 
 	/// <summary>
@@ -116,6 +117,7 @@ namespace Dpm.Stage
 			CoreService.Event.Subscribe<ScreenFadeInEndEvent>(OnScreenFadeInEnd);
 			CoreService.Event.Subscribe<PartyEliminatedEvent>(OnPartyEliminated);
 			CoreService.Event.Subscribe<BattleStartButtonPressedEvent>(OnBattleStartButtonPressed);
+			CoreService.Event.Subscribe<RetryButtonPressedEvent>(OnRetryButtonPressed);
 		}
 
 		public void Exit()
@@ -126,6 +128,7 @@ namespace Dpm.Stage
 			CoreService.Event.Unsubscribe<ScreenFadeInEndEvent>(OnScreenFadeInEnd);
 			CoreService.Event.Unsubscribe<PartyEliminatedEvent>(OnPartyEliminated);
 			CoreService.Event.Unsubscribe<BattleStartButtonPressedEvent>(OnBattleStartButtonPressed);
+			CoreService.Event.Unsubscribe<RetryButtonPressedEvent>(OnRetryButtonPressed);
 
 			CoreService.Event.PublishImmediate(StageExitEvent.Instance);
 
@@ -155,6 +158,11 @@ namespace Dpm.Stage
 		private void OnExitStage(Core.Interface.Event e)
 		{
 			Game.Instance.MoveToMainMenu();
+		}
+
+		private void OnRetryButtonPressed(Core.Interface.Event e)
+		{
+			Game.Instance.MoveToStage();
 		}
 
 		private void OnRoomCleared(Core.Interface.Event e)
@@ -227,16 +235,16 @@ namespace Dpm.Stage
 
 			if (pee.Party.Region == UnitRegion.Ally)
 			{
-				State = StageState.AfterBattle;
+				State = StageState.Lose;
 
 				CoreService.Event.Publish(BattleEndEvent.Create(UnitRegion.Enemy));
+				CoreService.Event.Publish(GameOverEvent.Create(_clearedRoomCount));
 
-				// TODO : 임시 처리임. 게임 결과창 띄워주기
-				Game.Instance.MoveToMainMenu();
+				// TODO : 최고 점수 갱신
 			}
 			else if (pee.Party.Region == UnitRegion.Enemy)
 			{
-				State = StageState.AfterBattle;
+				State = StageState.Win;
 
 				CoreService.Event.Publish(BattleEndEvent.Create(UnitRegion.Ally));
 			}

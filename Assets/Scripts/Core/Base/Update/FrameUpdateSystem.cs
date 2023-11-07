@@ -38,7 +38,7 @@ namespace Core.Base.Update
 				{
 					// Priority 값이 같은 경우에는 미리 들어가 있는 것들보다 더 늦게 불러줌
 					// Updatables가 비어있는 경우도 있기 때문에, for문 안에서 Insert한다면 제대로 처리되지 않을 것임
-					if (priority > _container[insertPos].Priority)
+					if (priority < _container[insertPos].Priority)
 						break;
 				}
 

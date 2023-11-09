@@ -180,7 +180,7 @@ namespace Dpm.Stage.UI
 
 			ChangeState(StageUIState.GameOver);
 
-			CoreService.Coroutine.StartCoroutine(ShowGameOverUI(goe.Score));
+			CoreService.Coroutine.StartCoroutine(ShowGameOverUI(goe.Score, goe.IsHighScore));
 		}
 
 		private void ChangeState(StageUIState nextState)
@@ -279,11 +279,11 @@ namespace Dpm.Stage.UI
 			}
 		}
 
-		private IEnumerator ShowGameOverUI(int score)
+		private IEnumerator ShowGameOverUI(int score, bool isHighScore)
 		{
 			yield return new WaitForSeconds(1.0f);
 
-			gameOverUI.Show(score);
+			gameOverUI.Show(score, isHighScore);
 		}
 	}
 }

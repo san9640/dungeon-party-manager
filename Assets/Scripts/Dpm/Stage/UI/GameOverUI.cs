@@ -2,6 +2,7 @@
 using Dpm.CoreAdapter;
 using Dpm.Stage.Event;
 using Dpm.Stage.UI.Event;
+using Dpm.User;
 using TMPro;
 using UnityEngine;
 
@@ -12,11 +13,20 @@ namespace Dpm.Stage.UI
 		[SerializeField]
 		private TextMeshProUGUI scoreText;
 
-		public void Show(int score)
-		{
-			// TODO : PANEL FADE IN
-			scoreText.text = score.ToString();
+		[SerializeField]
+		private TextMeshProUGUI highScoreText;
 
+		[SerializeField]
+		private GameObject newHighScore;
+
+		public void Show(int score, bool isHighScore)
+		{
+			newHighScore.SetActive(isHighScore);
+
+			scoreText.text = score.ToString();
+			highScoreText.text = UserData.HighScore.ToString();
+
+			// TODO : PANEL FADE IN
 			gameObject.SetActive(true);
 		}
 

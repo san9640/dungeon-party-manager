@@ -239,7 +239,7 @@ namespace Dpm.Stage.Physics
 			var found = false;
 			result = Vector2.zero;
 
-			var maxSearchDepth = (character.Position - targetPos).magnitude + 3f;
+			var maxSearchDepth = (character.Position - targetPos).magnitude + 4f;
 
 			_bfsQueue.Enqueue((Vector2Int.zero, Vector2Int.zero, 0));
 

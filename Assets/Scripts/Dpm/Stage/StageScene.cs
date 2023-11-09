@@ -13,6 +13,7 @@ using Dpm.Stage.Spec;
 using Dpm.Stage.UI;
 using Dpm.Stage.UI.Event;
 using Dpm.Stage.Unit;
+using Dpm.User;
 using Dpm.Utility.Pool;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -237,10 +238,16 @@ namespace Dpm.Stage
 			{
 				State = StageState.Lose;
 
-				CoreService.Event.Publish(BattleEndEvent.Create(UnitRegion.Enemy));
-				CoreService.Event.Publish(GameOverEvent.Create(_clearedRoomCount));
+				var prevHighScore = UserData.HighScore;
+				var isHighScore = prevHighScore < _clearedRoomCount;
 
-				// TODO : 최고 점수 갱신
+				if (isHighScore)
+				{
+					UserData.HighScore = _clearedRoomCount;
+				}
+
+				CoreService.Event.Publish(BattleEndEvent.Create(UnitRegion.Enemy));
+				CoreService.Event.Publish(GameOverEvent.Create(_clearedRoomCount, isHighScore));
 			}
 			else if (pee.Party.Region == UnitRegion.Enemy)
 			{
@@ -272,7 +279,7 @@ namespace Dpm.Stage
 				CoreService.Event.SendImmediate(ally, healEvent);
 			}
 
-			CoreService.Event.PublishImmediate(RoomChangeStartEvent.Instance);
+			CoreService.Event.PublishImmediate(RoomChangeStartEvent.Create(_clearedRoomCount + 1));
 
 			UnitManager.DespawnEnemies();
 

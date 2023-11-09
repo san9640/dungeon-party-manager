@@ -5,6 +5,7 @@ using Dpm.CoreAdapter;
 using Dpm.Stage.Event;
 using Dpm.Stage.Render;
 using Dpm.Stage.UI.Event;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
@@ -53,6 +54,9 @@ namespace Dpm.Stage.UI
 		[SerializeField]
 		private EventSystem eventSystem;
 
+		[SerializeField]
+		private TextMeshProUGUI roomCountText;
+
 		private bool _canStartBattle = false;
 
 		public StageUIState CurrentState { get; private set; } = StageUIState.None;
@@ -91,6 +95,7 @@ namespace Dpm.Stage.UI
 			CoreService.Event.Subscribe<ScreenFadeOutStartEvent>(OnScreenFadeOutStart);
 			CoreService.Event.Subscribe<ResumeButtonPressedEvent>(OnResumeButtonPressedEvent);
 			CoreService.Event.Subscribe<GameOverEvent>(OnGameOverEvent);
+			CoreService.Event.Subscribe<RoomChangeStartEvent>(OnRoomChangeStartEvent);
 		}
 
 		public void Dispose()
@@ -99,6 +104,7 @@ namespace Dpm.Stage.UI
 			CoreService.Event.Unsubscribe<ScreenFadeOutStartEvent>(OnScreenFadeOutStart);
 			CoreService.Event.Unsubscribe<ResumeButtonPressedEvent>(OnResumeButtonPressedEvent);
 			CoreService.Event.Unsubscribe<GameOverEvent>(OnGameOverEvent);
+			CoreService.Event.Unsubscribe<RoomChangeStartEvent>(OnRoomChangeStartEvent);
 
 			bottomUI.Dispose();
 		}
@@ -169,6 +175,16 @@ namespace Dpm.Stage.UI
 			ChangeState(StageUIState.Interactable);
 
 			battleStartButton.SetActive(_canStartBattle);
+		}
+
+		private void OnRoomChangeStartEvent(Core.Interface.Event e)
+		{
+			if (e is not RoomChangeStartEvent rce)
+			{
+				return;
+			}
+
+			roomCountText.text = rce.RoomNumber.ToString();
 		}
 
 		private void OnGameOverEvent(Core.Interface.Event e)

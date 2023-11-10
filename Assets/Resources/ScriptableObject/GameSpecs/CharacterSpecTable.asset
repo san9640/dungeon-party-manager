@@ -13,6 +13,17 @@ MonoBehaviour:
   m_Name: CharacterSpecTable
   m_EditorClassIdentifier: 
   specs:
+  - name: knight
+    poolSpecName: character_knight
+    baseHp: 200
+    baseMp: 100
+    baseDamageFactor: 1
+    baseAttackSpeed: 1
+    moveSpeed: 3
+    battleActionSpecName: fist_battle_action
+    moveSpecName: melee_move
+    attackSpecName: knight_attack
+    specialSpecName: 
   - name: wizard
     poolSpecName: character_wizard
     baseHp: 100
@@ -90,14 +101,47 @@ MonoBehaviour:
     moveSpecName: melee_move
     attackSpecName: medium_melee_attack
     specialSpecName: 
-  - name: knight
-    poolSpecName: character_knight
-    baseHp: 200
-    baseMp: 100
+  - name: dev_imp
+    poolSpecName: character_dev_imp
+    baseHp: 50
+    baseMp: 0
+    baseDamageFactor: 0.7
+    baseAttackSpeed: 1
+    moveSpeed: 5
+    battleActionSpecName: fist_battle_action
+    moveSpecName: melee_move
+    attackSpecName: weak_melee_attack
+    specialSpecName: 
+  - name: dev_wogol
+    poolSpecName: character_dev_wogol
+    baseHp: 50
+    baseMp: 0
+    baseDamageFactor: 1
+    baseAttackSpeed: 1
+    moveSpeed: 4
+    battleActionSpecName: fist_battle_action
+    moveSpecName: melee_move
+    attackSpecName: strong_melee_attack
+    specialSpecName: 
+  - name: dev_chort
+    poolSpecName: character_dev_chort
+    baseHp: 80
+    baseMp: 0
+    baseDamageFactor: 1
+    baseAttackSpeed: 0.7
+    moveSpeed: 4
+    battleActionSpecName: fist_battle_action
+    moveSpecName: melee_move
+    attackSpecName: medium_melee_attack
+    specialSpecName: 
+  - name: dev_demon
+    poolSpecName: character_dev_demon
+    baseHp: 120
+    baseMp: 0
     baseDamageFactor: 1
     baseAttackSpeed: 1
     moveSpeed: 3
-    battleActionSpecName: fist_battle_action
-    moveSpecName: melee_move
-    attackSpecName: knight_attack
+    battleActionSpecName: dev_daemon_battle_action
+    moveSpecName: fragile_move
+    attackSpecName: strong_ranged_attack
     specialSpecName: 

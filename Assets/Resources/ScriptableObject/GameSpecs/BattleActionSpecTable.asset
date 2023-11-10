@@ -57,3 +57,14 @@ MonoBehaviour:
     meleeAttackAngle: 0
     rangedProjectileName: bolt
     rangedProjectileSpeed: 10
+  - name: dev_daemon_battle_action
+    attackRange: 15
+    attackDelay: 1.5
+    damage: 10
+    type: 1
+    meleeFx: 
+    meleeHitFx: 
+    meleeDuration: 0
+    meleeAttackAngle: 0
+    rangedProjectileName: fire_green
+    rangedProjectileSpeed: 10

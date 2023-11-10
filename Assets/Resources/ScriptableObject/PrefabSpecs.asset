@@ -38,6 +38,14 @@ MonoBehaviour:
     path: Prefabs/Character/orc_ogre/orc_ogre
   - name: character_orc_shaman
     path: Prefabs/Character/orc_shaman/orc_shaman
+  - name: character_dev_imp
+    path: Prefabs/Character/dev_imp/dev_imp
+  - name: character_dev_wogol
+    path: Prefabs/Character/dev_wogol/dev_wogol
+  - name: character_dev_chort
+    path: Prefabs/Character/dev_chort/dev_chort
+  - name: character_dev_demon
+    path: Prefabs/Character/dev_demon/dev_demon
   - name: stat_bar
     path: Prefabs/stat_bar
   - name: fx_slash_1

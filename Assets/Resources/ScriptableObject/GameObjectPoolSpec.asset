@@ -69,3 +69,19 @@ MonoBehaviour:
     prefabSpecName: fx_slash_1
     maxCount: -1
     lifeTime: 0.8
+  - name: character_dev_imp
+    prefabSpecName: character_dev_imp
+    maxCount: 4
+    lifeTime: -1
+  - name: character_dev_wogol
+    prefabSpecName: character_dev_wogol
+    maxCount: 4
+    lifeTime: -1
+  - name: character_dev_chort
+    prefabSpecName: character_dev_chort
+    maxCount: 4
+    lifeTime: -1
+  - name: character_dev_demon
+    prefabSpecName: character_dev_demon
+    maxCount: 4
+    lifeTime: -1

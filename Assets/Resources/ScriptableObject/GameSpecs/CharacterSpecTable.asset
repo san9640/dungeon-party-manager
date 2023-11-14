@@ -17,8 +17,8 @@ MonoBehaviour:
     poolSpecName: character_knight
     baseHp: 200
     baseMp: 100
-    baseDamageFactor: 0.5
-    baseAttackSpeed: 0.3
+    baseDamageFactor: 0.7
+    baseAttackSpeed: 0.5
     moveSpeed: 3
     battleActionSpecName: fist_battle_action
     moveSpecName: melee_move
@@ -28,9 +28,9 @@ MonoBehaviour:
     poolSpecName: character_wizard
     baseHp: 100
     baseMp: 200
-    baseDamageFactor: 0.5
-    baseAttackSpeed: 0.3
-    moveSpeed: 3
+    baseDamageFactor: 0.7
+    baseAttackSpeed: 0.5
+    moveSpeed: 4
     battleActionSpecName: wizard_battle_action
     moveSpecName: fragile_move
     attackSpecName: wizard_attack
@@ -40,8 +40,8 @@ MonoBehaviour:
     baseHp: 100
     baseMp: 200
     baseDamageFactor: 0.5
-    baseAttackSpeed: 0.3
-    moveSpeed: 3
+    baseAttackSpeed: 0.5
+    moveSpeed: 4
     battleActionSpecName: bishop_battle_action
     moveSpecName: fragile_move
     attackSpecName: bishop_attack
@@ -50,8 +50,8 @@ MonoBehaviour:
     poolSpecName: character_lizardman
     baseHp: 150
     baseMp: 150
-    baseDamageFactor: 0.5
-    baseAttackSpeed: 0.3
+    baseDamageFactor: 0.7
+    baseAttackSpeed: 0.7
     moveSpeed: 5
     battleActionSpecName: fist_battle_action
     moveSpecName: melee_move
@@ -62,7 +62,7 @@ MonoBehaviour:
     baseHp: 70
     baseMp: 0
     baseDamageFactor: 0.5
-    baseAttackSpeed: 0.3
+    baseAttackSpeed: 0.5
     moveSpeed: 5
     battleActionSpecName: fist_battle_action
     moveSpecName: melee_move
@@ -73,7 +73,7 @@ MonoBehaviour:
     baseHp: 120
     baseMp: 0
     baseDamageFactor: 0.5
-    baseAttackSpeed: 0.3
+    baseAttackSpeed: 0.5
     moveSpeed: 3
     battleActionSpecName: fist_battle_action
     moveSpecName: melee_move
@@ -81,10 +81,10 @@ MonoBehaviour:
     specialSpecName: 
   - name: orc_shaman
     poolSpecName: character_orc_shaman
-    baseHp: 80
+    baseHp: 50
     baseMp: 0
-    baseDamageFactor: 2
-    baseAttackSpeed: 0.3
+    baseDamageFactor: 1.7
+    baseAttackSpeed: 0.5
     moveSpeed: 4
     battleActionSpecName: orc_shaman_battle_action
     moveSpecName: fragile_move
@@ -95,7 +95,7 @@ MonoBehaviour:
     baseHp: 100
     baseMp: 0
     baseDamageFactor: 0.5
-    baseAttackSpeed: 0.3
+    baseAttackSpeed: 0.5
     moveSpeed: 4
     battleActionSpecName: fist_battle_action
     moveSpecName: melee_move

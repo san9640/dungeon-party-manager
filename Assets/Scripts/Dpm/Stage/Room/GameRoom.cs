@@ -186,6 +186,7 @@ namespace Dpm.Stage.Room
 				doorHolder.Door.Index = _usingDoorHolders.Count;
 
 				_usingDoorHolders.Add(doorHolder);
+				doorHolder.Door.BuffTextShow(false);
 			}
 
 			_state = State.None;
@@ -241,6 +242,11 @@ namespace Dpm.Stage.Room
 
 			if (bee.WonPartyRegion == UnitRegion.Ally)
 			{
+				foreach (var index in _doorIndicesByCount[DoorCount])
+				{
+					var doorHolder = _doorHolders[index];
+					doorHolder.Door.BuffTextShow(true);
+				}
 				_state = State.WaitDoorOpen;
 			}
 		}

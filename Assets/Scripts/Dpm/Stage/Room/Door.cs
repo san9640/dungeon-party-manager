@@ -45,6 +45,11 @@ namespace Dpm.Stage.Room
 			CoreService.Event.Publish(DoorClickEvent.Create(Id));
 		}
 
+		public void BuffTextShow(bool isShow)
+		{
+			buffText.gameObject.SetActive(isShow);
+		}
+
 		public void Dispose()
 		{
 			Id = -1;

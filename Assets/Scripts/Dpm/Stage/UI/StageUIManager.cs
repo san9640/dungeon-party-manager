@@ -5,6 +5,7 @@ using Dpm.CoreAdapter;
 using Dpm.Stage.Event;
 using Dpm.Stage.Render;
 using Dpm.Stage.UI.Event;
+using Dpm.Stage.Unit;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -59,6 +60,9 @@ namespace Dpm.Stage.UI
 
 		private bool _canStartBattle = false;
 
+		[SerializeField]
+		private GameObject battleWinUI;
+
 		public StageUIState CurrentState { get; private set; } = StageUIState.None;
 
 		private enum BottomUIState
@@ -90,12 +94,13 @@ namespace Dpm.Stage.UI
 			bottomUI.Init();
 
 			ChangeState(StageUIState.NoneInteractable);
-
+			
 			CoreService.Event.Subscribe<ScreenFadeInEndEvent>(OnScreenFadeInEnd);
 			CoreService.Event.Subscribe<ScreenFadeOutStartEvent>(OnScreenFadeOutStart);
 			CoreService.Event.Subscribe<ResumeButtonPressedEvent>(OnResumeButtonPressedEvent);
 			CoreService.Event.Subscribe<GameOverEvent>(OnGameOverEvent);
 			CoreService.Event.Subscribe<RoomChangeStartEvent>(OnRoomChangeStartEvent);
+			CoreService.Event.Subscribe<BattleEndEvent>(OnBattleEndEvent);
 		}
 
 		public void Dispose()
@@ -105,6 +110,7 @@ namespace Dpm.Stage.UI
 			CoreService.Event.Unsubscribe<ResumeButtonPressedEvent>(OnResumeButtonPressedEvent);
 			CoreService.Event.Unsubscribe<GameOverEvent>(OnGameOverEvent);
 			CoreService.Event.Unsubscribe<RoomChangeStartEvent>(OnRoomChangeStartEvent);
+			CoreService.Event.Unsubscribe<BattleEndEvent>(OnBattleEndEvent);
 
 			bottomUI.Dispose();
 		}
@@ -161,8 +167,9 @@ namespace Dpm.Stage.UI
 			{
 				return;
 			}
-
+			
 			ChangeState(StageUIState.NoneInteractable);
+			battleWinUI.SetActive(false);
 		}
 
 		private void OnResumeButtonPressedEvent(Core.Interface.Event e)
@@ -199,6 +206,19 @@ namespace Dpm.Stage.UI
 			CoreService.Coroutine.StartCoroutine(ShowGameOverUI(goe.Score, goe.IsHighScore));
 		}
 
+		private void OnBattleEndEvent(Core.Interface.Event e)
+		{
+			if (e is not BattleEndEvent bee)
+			{
+				return;
+			}
+
+			if (bee.WonPartyRegion == UnitRegion.Ally)
+			{
+				battleWinUI.SetActive(true);
+			}
+		}
+
 		private void ChangeState(StageUIState nextState)
 		{
 			if (CurrentState == nextState)
@@ -223,7 +243,7 @@ namespace Dpm.Stage.UI
 					eventSystem.enabled = false;
 					pauseUI.gameObject.SetActive(false);
 					pauseButton.gameObject.SetActive(true);
-
+					
 					ChangeBottomUIState(BottomUIState.Hidden);
 
 					break;

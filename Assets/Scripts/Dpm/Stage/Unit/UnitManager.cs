@@ -76,7 +76,7 @@ namespace Dpm.Stage.Unit
 
 		public void SpawnEnemies(string partySpecName, SpawnArea spawnArea)
 		{
-			if (_enemyParty == null && TrySpawnParty(partySpecName, spawnArea, out var party))
+			if (_enemyParty == null && TrySpawnRandomParty(partySpecName, spawnArea, out var party))
 			{
 				_enemyParty = party;
 			}
@@ -115,6 +115,39 @@ namespace Dpm.Stage.Unit
 					    out var member))
 				{
 					members.Add(member);
+				}
+			}
+
+			party = new Party(partySpec.region, members);
+
+			return true;
+		}
+		
+		private bool TrySpawnRandomParty(string partySpecName, SpawnArea spawnArea, out Party party)
+		{
+			var partySpec = SpecUtility.GetSpec<PartySpec>(partySpecName);
+			var members = new List<Character>();
+			
+			int[,] arraySpawnPos = new int[4,2]
+			{
+				{ 0, 0 },
+				{ 2, 2 },
+				{ 4, 0 },
+				{ 2, -2 }
+			};
+
+			int count = 0;
+			
+			while (count < 4)
+			{
+				int unitCount = UnityEngine.Random.Range(0, partySpec.spawnInfos.Length);
+
+				if (TrySpawnCharacter(partySpec.spawnInfos[unitCount].characterSpecName,
+					    spawnArea[arraySpawnPos[count,0],arraySpawnPos[count,1]], spawnArea.Direction,
+					    out var member))
+				{
+					members.Add(member);
+					count++;
 				}
 			}
 

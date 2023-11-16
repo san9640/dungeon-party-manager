@@ -35,3 +35,11 @@ MonoBehaviour:
       spawnIndex: {x: 4, y: 0}
     - characterSpecName: orc_goblin
       spawnIndex: {x: 2, y: -2}
+    - characterSpecName: dev_imp
+      spawnIndex: {x: 2, y: -2}
+    - characterSpecName: dev_wogol
+      spawnIndex: {x: 2, y: -2}
+    - characterSpecName: dev_chort
+      spawnIndex: {x: 2, y: -2}
+    - characterSpecName: dev_demon
+      spawnIndex: {x: 2, y: -2}

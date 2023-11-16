@@ -1,6 +1,8 @@
 ﻿using Dpm.CoreAdapter;
 using Dpm.Stage.Event;
+using Dpm.Utility.Constants;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Dpm.Stage.Unit
 {
@@ -24,6 +26,12 @@ namespace Dpm.Stage.Unit
 
 			HpValue = _character.HpRatio;
 
+			var hpColor = hpBar.GetComponent<SpriteRenderer>().color;
+
+			hpColor = _character.Direction == Direction.Right ? Color.blue : Color.red;
+			
+			hpBar.GetComponent<SpriteRenderer>().color = hpColor;
+			
 			CoreService.Event.Subscribe<HpChangedEvent>(OnHpChangedEvent);
 		}
 

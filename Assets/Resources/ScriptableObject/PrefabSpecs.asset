@@ -50,3 +50,5 @@ MonoBehaviour:
     path: Prefabs/stat_bar
   - name: fx_slash_1
     path: Prefabs/Effect/fx_slash_1
+  - name: projectile_fire_green
+    path: Prefabs/Projectile/projectile_fire_green

@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bounds:
-    extents: {x: 0, y: 0}
+    extents: {x: 0.5, y: 0.5}
     center: {x: 0, y: 0}
 --- !u!114 &6456407723384570188
 MonoBehaviour:

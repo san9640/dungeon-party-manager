@@ -85,3 +85,7 @@ MonoBehaviour:
     prefabSpecName: character_dev_demon
     maxCount: 4
     lifeTime: -1
+  - name: projectile_fire_green
+    prefabSpecName: projectile_fire_green
+    maxCount: -1
+    lifeTime: -1

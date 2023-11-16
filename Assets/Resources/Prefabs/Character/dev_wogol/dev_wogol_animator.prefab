@@ -99,11 +99,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   renderer: {fileID: 766304076363628626}
   animationInfo:
-  - name: 
-    sprites: []
-  - name: 
-    sprites: []
-  - name: 
-    sprites: []
+  - name: idle
+    sprites:
+    - {fileID: 21300000, guid: 0d484e5106205c14a81ad74b67a3c169, type: 3}
+    - {fileID: 21300000, guid: f3fc0dfdc044c864ea82b80871a221e0, type: 3}
+    - {fileID: 21300000, guid: 78b6e774a11428949a426bf557ff066e, type: 3}
+    - {fileID: 21300000, guid: 8285def11c95ebe4f8917f04da60c550, type: 3}
+  - name: run
+    sprites:
+    - {fileID: 21300000, guid: 3e5fdcf3ad2dfad40a077df1f339ed3f, type: 3}
+    - {fileID: 21300000, guid: a65c79adb9dbd784788bbc20d601830e, type: 3}
+    - {fileID: 21300000, guid: d3b1ff58cf84daa4b84467f150abbdeb, type: 3}
+    - {fileID: 21300000, guid: 66d2ab409c617d54987c52f7584c8afc, type: 3}
+  - name: dead
+    sprites:
+    - {fileID: 21300000, guid: 0d484e5106205c14a81ad74b67a3c169, type: 3}
   isLoop: 1
   transitionSpriteDelay: 0.12

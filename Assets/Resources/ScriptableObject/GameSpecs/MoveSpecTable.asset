@@ -35,3 +35,11 @@ MonoBehaviour:
     - type: 2
       weightFactorInfo:
         defaultValue: 0.3
+  - name: knight_move
+    calculatorInfos:
+    - type: 0
+      weightFactorInfo:
+        defaultValue: 0.7
+    - type: 3
+      weightFactorInfo:
+        defaultValue: 1

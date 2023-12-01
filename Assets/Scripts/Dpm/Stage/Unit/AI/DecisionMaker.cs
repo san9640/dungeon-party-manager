@@ -52,6 +52,7 @@ namespace Dpm.Stage.Unit.AI
                     MoveType.ApproachToEnemy => new ApproachToEnemyMoveCalculator(),
                     MoveType.Retreat => new RetreatMoveCalculator(),
                     MoveType.AwayFromWall => new AwayFromWallMoveCalculator(),
+                    MoveType.DistanceFromAllies => new DistanceFromAlliesMoveCalculator(),
                     _ => null
                 };
 
@@ -86,6 +87,7 @@ namespace Dpm.Stage.Unit.AI
                     AttackTargetSearchingType.HighHp => new HighHpTargetAttackCalculator(),
                     AttackTargetSearchingType.Ranged => new RangedTargetAttackCalculator(),
                     AttackTargetSearchingType.Melee => new MeleeTargetAttackCalculator(),
+                    AttackTargetSearchingType.ProtectAllies => new ProtectAlliesAttackCalculator(),
                     // AttackTargetSearchingType.Strongest => new StrongestTargetAttackCalculator(),
                     // AttackTargetSearchingType.Weakest => new WeakestTargetAttackCalculator(),
                     _ => null
@@ -266,6 +268,7 @@ namespace Dpm.Stage.Unit.AI
             if (CurrentAttackTarget != null)
             {
                 CoreService.Event.Send(_character, RequestAttackTargetEvent.Create(CurrentAttackTarget));
+                _character.CurrentAttackTarget = CurrentAttackTarget;
             }
 
             _attackTargetsBuffer.Clear();

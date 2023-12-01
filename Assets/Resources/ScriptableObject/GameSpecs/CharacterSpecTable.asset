@@ -21,7 +21,7 @@ MonoBehaviour:
     baseAttackSpeed: 0.5
     moveSpeed: 3
     battleActionSpecName: fist_battle_action
-    moveSpecName: melee_move
+    moveSpecName: knight_move
     attackSpecName: knight_attack
     specialSpecName: 
   - name: wizard

@@ -24,6 +24,8 @@ namespace Dpm.Editor
 			typeof(RangedTargetAttackCalculator),
 			typeof(AwayFromWallMoveCalculator),
 			typeof(RetreatMoveCalculator),
+			typeof(DistanceFromAlliesMoveCalculator),
+			typeof(ProtectAlliesAttackCalculator),
 		};
 
 		protected override void OnEnable()

@@ -70,6 +70,8 @@ namespace Dpm.Stage.Unit
 		public float AttackSpeed => _originAttackSpeed * _attackSpeedBuffCalculator.Value;
 
 		public float MoveSpeed { get; private set; }
+		
+		public IUnit CurrentAttackTarget { get; set; }
 
 		private void Awake()
 		{

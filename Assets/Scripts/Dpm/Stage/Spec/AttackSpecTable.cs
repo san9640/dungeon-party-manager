@@ -15,6 +15,7 @@ namespace Dpm.Stage.Spec
 		HighHp,
 		Melee,
 		Ranged,
+		ProtectAllies,
 	}
 
 	[Serializable]

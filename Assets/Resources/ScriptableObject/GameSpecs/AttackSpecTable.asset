@@ -47,6 +47,9 @@ MonoBehaviour:
     - type: 6
       weightFactorInfo:
         defaultValue: 0.5
+    - type: 7
+      weightFactorInfo:
+        defaultValue: 0.5
   - name: bishop_attack
     calculatorInfos:
     - type: 0

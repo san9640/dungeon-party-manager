@@ -2,8 +2,10 @@
 using System.Collections;
 using Dpm.Common.Event;
 using Dpm.CoreAdapter;
+using Dpm.Stage.Buff;
 using Dpm.Stage.Event;
 using Dpm.Stage.Render;
+using Dpm.Stage.Spec;
 using Dpm.Stage.UI.Event;
 using Dpm.Stage.Unit;
 using TMPro;
@@ -67,6 +69,14 @@ namespace Dpm.Stage.UI
 		
 		[SerializeField]
 		private GameWinUI GameWinUI;
+
+		[SerializeField]
+		private GameObject buffShowUI;
+
+		[SerializeField] 
+		private TextMeshProUGUI buffText;
+
+		
 
 		public StageUIState CurrentState { get; private set; } = StageUIState.None;
 
@@ -161,9 +171,16 @@ namespace Dpm.Stage.UI
 			{
 				return;
 			}
-
+			
 			ChangeState(StageUIState.Interactable);
 
+			var stageScene = StageScene.Instance;
+			if (stageScene.PrevRoomBuffSpec.value != 0)
+			{
+				var prevRoomBuffSpec = stageScene.PrevRoomBuffSpec;
+				buffShowUI.gameObject.SetActive(true);
+				StartCoroutine(ShowBuffUI(prevRoomBuffSpec));
+			}
 			_canStartBattle = true;
 			battleStartButton.SetActive(true);
 		}
@@ -348,6 +365,31 @@ namespace Dpm.Stage.UI
 			yield return new WaitForSeconds(1.0f);
 
 			GameWinUI.Show(totalUnits);
+		}
+
+		private IEnumerator ShowBuffUI(BuffSpec buffSpec)
+		{
+			var buff = SpecUtility.GetSpec<BuffSpec>(buffSpec.name);
+
+			var text = buff.type switch
+			{
+				BuffType.MaxHp => $"HP +{buff.IntValue}",
+				BuffType.Damage => $"ATK x{(buff.value + 1):N2}",
+				BuffType.AttackSpeed => $"ASD x{(buff.value + 1):N2}",
+				_ => string.Empty
+			};
+			
+			buffText.text = text;
+			
+			Image imageToFade = buffShowUI.GetComponent<Image>();
+			for (float f = 1f; f >= 0; f -= 0.1f)
+			{
+				Color c = imageToFade.color;
+				c.a = f;
+				imageToFade.color = c;
+				yield return new WaitForSeconds(0.15f);
+			}
+			buffShowUI.SetActive(false);
 		}
 	}
 }

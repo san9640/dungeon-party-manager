@@ -63,6 +63,9 @@ namespace Dpm.Stage
 		
 		private const int MaxRoomCount = 30;
 
+		private BuffSpec _prevRoomBuffSpec = new();
+		public BuffSpec PrevRoomBuffSpec => _prevRoomBuffSpec;
+
 		private static readonly string[] DoorBuffNames =
 		{
 			"room_buff_max_hp",
@@ -177,6 +180,8 @@ namespace Dpm.Stage
 
 			var buff = _currentDoorBuffs[rce.DoorIndex];
 
+			_prevRoomBuffSpec = buff;
+			
 			CoreService.Coroutine.StartCoroutine(MoveRoomAsync(buff));
 		}
 

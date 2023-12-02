@@ -47,7 +47,7 @@ public class ProtectAlliesAttackCalculator : IAIAttackCalculator
                 
                 score = 0;
                 
-                if (enemy.CurrentAttackTarget == unit)
+                if ((Character)enemy.CurrentAttackTarget == unit)
                 {
                     score += (1 - unit.HpRatio);
 

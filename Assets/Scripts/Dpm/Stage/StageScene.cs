@@ -60,6 +60,8 @@ namespace Dpm.Stage
 		private int _clearedRoomCount = 0;
 
 		private PartyClickController _partyClickController = new();
+		
+		private const int MaxRoomCount = 30;
 
 		private static readonly string[] DoorBuffNames =
 		{
@@ -252,8 +254,14 @@ namespace Dpm.Stage
 			else if (pee.Party.Region == UnitRegion.Enemy)
 			{
 				State = StageState.Win;
-
+				
 				CoreService.Event.Publish(BattleEndEvent.Create(UnitRegion.Ally));
+				
+				if (_clearedRoomCount + 1 == MaxRoomCount)
+				{
+					int totalClearUnits = UnitManager.Instance.TotalClearUnits;
+					CoreService.Event.Publish(GameWinEvent.Create(totalClearUnits));
+				}
 			}
 		}
 
@@ -353,7 +361,7 @@ namespace Dpm.Stage
 			var buffLottery = PooledList<int>.Get();
 
 			// 작은 버프를 플레이어 파티보다 두 배로 부여받게 했음
-			var buffCount = _clearedRoomCount << 1;
+			var buffCount = _clearedRoomCount;
 
 			for (var i = 0; i < EnemyBuffNames.Length; i++)
 			{
@@ -387,7 +395,7 @@ namespace Dpm.Stage
 				var buff = SpecUtility.GetSpec<BuffSpec>(buffSpecName);
 
 #if UNITY_EDITOR
-				Debug.Log($"Enemy Buff[{i}] : {buffSpecName}");
+				//Debug.Log($"Enemy Buff[{i}] : {buffSpecName}");
 #endif
 
 				foreach (var enemy in UnitManager.EnemyParty.Members)

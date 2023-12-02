@@ -25,6 +25,8 @@ namespace Dpm.Stage.UI
 		Paused,
 		// 게임 오버 시
 		GameOver,
+		// 게임 승리 시
+		GameWin
 	}
 
 	public class StageUIManager : MonoBehaviour, IDisposable
@@ -62,6 +64,9 @@ namespace Dpm.Stage.UI
 
 		[SerializeField]
 		private GameObject battleWinUI;
+		
+		[SerializeField]
+		private GameWinUI GameWinUI;
 
 		public StageUIState CurrentState { get; private set; } = StageUIState.None;
 
@@ -101,6 +106,7 @@ namespace Dpm.Stage.UI
 			CoreService.Event.Subscribe<GameOverEvent>(OnGameOverEvent);
 			CoreService.Event.Subscribe<RoomChangeStartEvent>(OnRoomChangeStartEvent);
 			CoreService.Event.Subscribe<BattleEndEvent>(OnBattleEndEvent);
+			CoreService.Event.Subscribe<GameWinEvent>(OnGameWinEvent);
 		}
 
 		public void Dispose()
@@ -111,6 +117,7 @@ namespace Dpm.Stage.UI
 			CoreService.Event.Unsubscribe<GameOverEvent>(OnGameOverEvent);
 			CoreService.Event.Unsubscribe<RoomChangeStartEvent>(OnRoomChangeStartEvent);
 			CoreService.Event.Unsubscribe<BattleEndEvent>(OnBattleEndEvent);
+			CoreService.Event.Subscribe<GameWinEvent>(OnGameWinEvent);
 
 			bottomUI.Dispose();
 		}
@@ -192,6 +199,8 @@ namespace Dpm.Stage.UI
 			}
 
 			roomCountText.text = rce.RoomNumber.ToString();
+			
+			Debug.Log(rce.RoomNumber);
 		}
 
 		private void OnGameOverEvent(Core.Interface.Event e)
@@ -217,6 +226,18 @@ namespace Dpm.Stage.UI
 			{
 				battleWinUI.SetActive(true);
 			}
+		}
+		
+		private void OnGameWinEvent(Core.Interface.Event e)
+		{
+			if (e is not GameWinEvent gwe)
+			{
+				return;
+			}
+
+			ChangeState(StageUIState.GameOver);
+
+			CoreService.Coroutine.StartCoroutine(ShowGameWinUI(gwe.TotalUnits));
 		}
 
 		private void ChangeState(StageUIState nextState)
@@ -320,6 +341,13 @@ namespace Dpm.Stage.UI
 			yield return new WaitForSeconds(1.0f);
 
 			gameOverUI.Show(score, isHighScore);
+		}
+		
+		private IEnumerator ShowGameWinUI(int totalUnits)
+		{
+			yield return new WaitForSeconds(1.0f);
+
+			GameWinUI.Show(totalUnits);
 		}
 	}
 }

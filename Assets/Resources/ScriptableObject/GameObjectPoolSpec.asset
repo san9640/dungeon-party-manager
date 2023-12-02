@@ -47,19 +47,19 @@ MonoBehaviour:
     lifeTime: -1
   - name: character_lizardman
     prefabSpecName: character_lizardman
-    maxCount: 4
+    maxCount: 8
     lifeTime: -1
   - name: character_orc_goblin
     prefabSpecName: character_orc_goblin
-    maxCount: 4
+    maxCount: 8
     lifeTime: -1
   - name: character_orc_ogre
     prefabSpecName: character_orc_ogre
-    maxCount: 4
+    maxCount: 8
     lifeTime: -1
   - name: character_orc_shaman
     prefabSpecName: character_orc_shaman
-    maxCount: 4
+    maxCount: 8
     lifeTime: -1
   - name: field_ui_stat_bar
     prefabSpecName: stat_bar
@@ -71,19 +71,19 @@ MonoBehaviour:
     lifeTime: 0.8
   - name: character_dev_imp
     prefabSpecName: character_dev_imp
-    maxCount: 4
+    maxCount: 8
     lifeTime: -1
   - name: character_dev_wogol
     prefabSpecName: character_dev_wogol
-    maxCount: 4
+    maxCount: 8
     lifeTime: -1
   - name: character_dev_chort
     prefabSpecName: character_dev_chort
-    maxCount: 4
+    maxCount: 8
     lifeTime: -1
   - name: character_dev_demon
     prefabSpecName: character_dev_demon
-    maxCount: 4
+    maxCount: 8
     lifeTime: -1
   - name: projectile_fire_green
     prefabSpecName: projectile_fire_green

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Dpm.CoreAdapter;
 using Dpm.Stage.Event;
 using Dpm.Stage.Room;
@@ -8,6 +9,7 @@ using Dpm.Utility.Constants;
 using Dpm.Utility.Pool;
 using Unity.VisualScripting;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Dpm.Stage.Unit
 {
@@ -28,7 +30,19 @@ namespace Dpm.Stage.Unit
 		private int _nextUnitId = 1;
 
 		private readonly Dictionary<Character, PooledGameObject> _statBars = new();
+		
+		private float _lastRoundEnemyTotalStats = 0;
 
+		private int _unitCount = 4;
+		
+		List<(int, int)> spawnPositions = new List<(int, int)>
+		{
+			(0, 0), (2, 2), (4, 0), (2, -2),
+		};
+
+		private int _totalClearUnits = 0;
+		public int TotalClearUnits => _totalClearUnits;
+		
 		public void Dispose()
 		{
 			DespawnParty(ref _allyParty);
@@ -126,33 +140,85 @@ namespace Dpm.Stage.Unit
 		private bool TrySpawnRandomParty(string partySpecName, SpawnArea spawnArea, out Party party)
 		{
 			var partySpec = SpecUtility.GetSpec<PartySpec>(partySpecName);
+			List<CharacterSpec> selectedCharacters = new List<CharacterSpec>();
 			var members = new List<Character>();
+			var allCharacters = partySpec.spawnInfos.Select(info => SpecUtility.GetSpec<CharacterSpec>(info.characterSpecName)).ToList();
+			float totalStats = 0;
+			int maxAttempts = 1000;
+			int attempt = 0;
+			var sortedCharacters = allCharacters.OrderBy(character => character.baseHp + character.baseDamageFactor + character.baseAttackSpeed*10).ToList();
 			
-			int[,] arraySpawnPos = new int[4,2]
+			do
 			{
-				{ 0, 0 },
-				{ 2, 2 },
-				{ 4, 0 },
-				{ 2, -2 }
-			};
+				if (_unitCount == 9)
+				{
+					selectedCharacters = sortedCharacters;
+					break;
+				}
+				selectedCharacters.Clear();
+				// maxAttempts를 초과하면 유닛 하나 추가
+				if (attempt == maxAttempts -1)
+				{
+					_unitCount++;
+					for (int i = 4; i <= 8; i += 2)
+					{
+						for (int j = -2; j <= 2; j += 2)
+						{
+							var newPos = (i, j);
+							// 기존의 좌표와 중복되지 않는 경우에만 추가
+							if (!spawnPositions.Contains(newPos))  
+							{
+								spawnPositions.Add(newPos);
+								break;
+							}
+						}
 
-			int count = 0;
-			
-			while (count < 4)
+						if (spawnPositions.Count == _unitCount)
+							break;
+					}
+					attempt = 0;
+				}
+						
+				for (int i = 0; i < _unitCount; i++)
+				{
+					double randomValue = (double)Random.Range(1, 9)/ sortedCharacters.Count; 
+
+					for (int j = 0; j < sortedCharacters.Count; j++)
+					{
+						// 확률적 가중치. 스탯이 낮은 캐릭터일수록 높은 확률로 선택
+						double probability = (double)(j + 1) / sortedCharacters.Count;
+
+
+						if (randomValue <= probability)
+						{
+							selectedCharacters.Add(sortedCharacters[j]);
+							break;
+						}
+					}
+				}
+
+				totalStats = selectedCharacters.Sum(character => character.baseHp + character.baseDamageFactor + character.baseAttackSpeed*10);
+
+				attempt++;
+			}
+			while (totalStats <= _lastRoundEnemyTotalStats && attempt < maxAttempts);
+
+			// 선택된 캐릭터와 좌표를 이용하여 유닛 생성
+			for (int i = 0; i < selectedCharacters.Count; i++)
 			{
-				int unitCount = UnityEngine.Random.Range(0, partySpec.spawnInfos.Length);
-
-				if (TrySpawnCharacter(partySpec.spawnInfos[unitCount].characterSpecName,
-					    spawnArea[arraySpawnPos[count,0],arraySpawnPos[count,1]], spawnArea.Direction,
+				if (TrySpawnCharacter(selectedCharacters[i].Name,
+					    spawnArea[spawnPositions[i].Item1, spawnPositions[i].Item2], spawnArea.Direction,
 					    out var member))
 				{
 					members.Add(member);
-					count++;
+					Debug.Log(member.name);
 				}
 			}
-
+			_lastRoundEnemyTotalStats = totalStats;
 			party = new Party(partySpec.region, members);
-
+			// 처치 유닛수 누적
+			_totalClearUnits += members.Count;
+			
 			return true;
 		}
 

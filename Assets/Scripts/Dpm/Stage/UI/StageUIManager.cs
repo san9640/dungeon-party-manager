@@ -127,7 +127,7 @@ namespace Dpm.Stage.UI
 			CoreService.Event.Unsubscribe<GameOverEvent>(OnGameOverEvent);
 			CoreService.Event.Unsubscribe<RoomChangeStartEvent>(OnRoomChangeStartEvent);
 			CoreService.Event.Unsubscribe<BattleEndEvent>(OnBattleEndEvent);
-			CoreService.Event.Subscribe<GameWinEvent>(OnGameWinEvent);
+			CoreService.Event.Unsubscribe<GameWinEvent>(OnGameWinEvent);
 
 			bottomUI.Dispose();
 		}

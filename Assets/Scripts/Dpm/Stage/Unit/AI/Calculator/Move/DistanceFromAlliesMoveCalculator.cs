@@ -6,6 +6,7 @@ using Dpm.Stage.Physics;
 using Dpm.Stage.Spec;
 using Dpm.Stage.Unit;
 using Dpm.Stage.Unit.AI;
+using Dpm.Stage.Unit.AI.Calculator;
 using Dpm.Stage.Unit.AI.Calculator.Move;
 using Dpm.Utility.Constants;
 using Dpm.Utility.Extensions;
@@ -46,11 +47,11 @@ public class DistanceFromAlliesMoveCalculator : IAIMoveCalculator
             {
                 var direction = (_character.Position - unit.Position).normalized;
                 _targetPos = _character.Position + direction * MinDistance;
-                return 1;
+                return 1 / (1 + Mathf.Exp(-MinDistance / distance));
             }
         }
 
-        return 0;
+        return AICalculatorConstants.MinInnerScore;
     }
 
     public Vector2? TargetPos => _targetPos;

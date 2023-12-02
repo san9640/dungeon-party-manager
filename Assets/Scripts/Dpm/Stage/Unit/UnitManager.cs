@@ -211,7 +211,6 @@ namespace Dpm.Stage.Unit
 					    out var member))
 				{
 					members.Add(member);
-					Debug.Log(member.name);
 				}
 			}
 			_lastRoundEnemyTotalStats = totalStats;
